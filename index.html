@@ -49,6 +49,7 @@
   };
  
   const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
   const auth = getAuth(app);
  
   const status = document.getElementById("status");
@@ -68,21 +69,40 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-document.getElementById("book-appointment").onclick = () => {
+document.getElementById("book-appointment").onclick = async () => {
   const date = document.getElementById("date").value;
   const time = document.getElementById("time").value;
+  const user = auth.currentUser;
 
   if (!date || !time) {
     appointmentStatus.innerText = "Please select both date and time.";
     return;
   }
 
-  // For now, just show confirmation. In a real app, you'd save this to a database.
-  appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
+  if (!user) {
+    appointmentStatus.innerText = "You must be logged in to book an appointment.";
+    return;
+  }
 
-  // Clear inputs
-  document.getElementById("date").value = "";
-  document.getElementById("time").value = "";
+  try {
+    // Save appointment to Firestore in 'appointments' collection
+    await addDoc(collection(db, "appointments"), {
+      userId: user.uid,
+      email: user.email,
+      date: date,
+      time: time,
+      createdAt: serverTimestamp()
+    });
+
+    appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
+
+    // Clear inputs
+    document.getElementById("date").value = "";
+    document.getElementById("time").value = "";
+
+  } catch (error) {
+    appointmentStatus.innerText = "Error booking appointment: " + error.message;
+  }
 };
  
   document.getElementById("signup").onclick = async () => {
