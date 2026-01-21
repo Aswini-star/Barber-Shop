@@ -1079,14 +1079,23 @@
             showNotification('Opening payment app...', 'info');
         }
 
-        function confirmPayment() {
-            // In real app, verify payment on server
-            showLoader();
-            
-            setTimeout(() => {
-                hideLoader();
-                closePaymentModal();
-                
+        async function confirmPayment() {
+  showLoader();
+ 
+  await saveBooking({
+    name: bookingData.name,
+    phone: bookingData.phone,
+    service: bookingData.service.name,
+    date: bookingData.date,
+    time: bookingData.timeSlot,
+    amount: bookingData.totalAmount,
+    createdAt: new Date()
+  });
+ 
+  hideLoader();
+  closePaymentModal();
+  showNotification("Booking saved successfully!", "success");
+             
                 // Send WhatsApp confirmation
                 sendBookingConfirmation();
                 
