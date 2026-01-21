@@ -75,7 +75,7 @@
       transition: background-color 0.3s ease;
     }
 
-    button:hover {
+    button:hover:not(:disabled) {
       background-color: #2980b9;
     }
 
@@ -126,6 +126,22 @@
       background-color: #f9f9f9;
     }
 
+    /* Services list style */
+    #services-list li {
+      padding: 10px;
+      border: 1px solid #ddd;
+      margin-bottom: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #services-list li:hover,
+    #services-list li:focus {
+      background-color: #d6e9fc;
+      outline: none;
+    }
+
     /* Responsive */
     @media (max-width: 600px) {
       .container {
@@ -160,8 +176,15 @@
 
     <p id="status"></p>
 
+    <div id="services-section">
+      <h3>Our Services & Prices</h3>
+      <ul id="services-list" style="list-style:none; padding-left: 0;"></ul>
+    </div>
+
     <div id="appointment-section" style="display:none;">
       <h3>Book an Appointment</h3>
+
+      <p><strong>Selected Service:</strong> <span id="selected-service"></span></p>
 
       <label for="customerName">Name:</label>
       <input type="text" id="customerName" placeholder="Your full name" />
@@ -170,9 +193,7 @@
       <input type="tel" id="phone" placeholder="Your phone number" />
 
       <label for="barber">Select Barber:</label>
-      <select id="barber" aria-label="Select Barber">
-        <!-- Barbers will be populated here -->
-      </select>
+      <select id="barber" aria-label="Select Barber"></select>
 
       <label for="date">Select Date:</label>
       <input type="date" id="date" />
@@ -181,6 +202,7 @@
       <input type="time" id="time" />
 
       <button id="book-appointment">Book Appointment</button>
+      <button id="cancel-booking" style="background-color: #e74c3c; margin-left: 10px;">Cancel Booking</button>
 
       <p id="appointment-status" role="alert" aria-live="polite"></p>
     </div>
@@ -194,14 +216,14 @@
             <th>Customer Name</th>
             <th>Phone</th>
             <th>Barber</th>
+            <th>Service</th>
+            <th>Price ($)</th>
             <th>Date</th>
             <th>Time</th>
             <th>Booked At</th>
           </tr>
         </thead>
-        <tbody id="bookings-body">
-          <!-- Bookings will be inserted here -->
-        </tbody>
+        <tbody id="bookings-body"></tbody>
       </table>
     </div>
   </div>
@@ -214,7 +236,21 @@
       "Emily Davis"
     ];
 
+    const services = [
+      { name: "Haircut", price: 25 },
+      { name: "Beard Trim", price: 15 },
+      { name: "Hair Coloring", price: 40 },
+      { name: "Shave", price: 20 }
+    ];
+
     const barberSelect = document.getElementById("barber");
+    const servicesList = document.getElementById("services-list");
+    const selectedServiceSpan = document.getElementById("selected-service");
+    const signupBtn = document.getElementById("signup");
+    const loginBtn = document.getElementById("login");
+    const servicesSection = document.getElementById("services-section");
+    const appointmentSection = document.getElementById("appointment-section");
+    const appointmentStatus = document.getElementById("appointment-status");
 
     // Populate barber dropdown
     barbers.forEach(barber => {
@@ -223,6 +259,46 @@
       option.textContent = barber;
       barberSelect.appendChild(option);
     });
+
+    // Populate services list with clickable items
+    services.forEach(service => {
+      const li = document.createElement("li");
+      li.tabIndex = 0; // make focusable for accessibility
+      li.textContent = `${service.name} - $${service.price}`;
+      li.addEventListener("click", () => {
+        startBooking(service);
+      });
+      li.addEventListener("keypress", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          startBooking(service);
+        }
+      });
+      servicesList.appendChild(li);
+    });
+
+    function startBooking(service) {
+      selectedServiceSpan.textContent = `${service.name} ($${service.price})`;
+      appointmentSection.style.display = "block";
+      servicesSection.style.display = "none";
+      signupBtn.disabled = true;
+      loginBtn.disabled = true;
+      appointmentStatus.innerText = "";
+    }
+
+    document.getElementById("cancel-booking").onclick = () => {
+      appointmentSection.style.display = "none";
+      servicesSection.style.display = "block";
+      signupBtn.disabled = false;
+      loginBtn.disabled = false;
+      // Clear booking form and status
+      document.getElementById("customerName").value = "";
+      document.getElementById("phone").value = "";
+      barberSelect.value = "";
+      document.getElementById("date").value = "";
+      document.getElementById("time").value = "";
+      appointmentStatus.innerText = "";
+      selectedServiceSpan.textContent = "";
+    };
 
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import {
@@ -243,7 +319,6 @@
       where,
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
       authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -253,44 +328,47 @@
       appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // Get DOM elements
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
     const status = document.getElementById("status");
-    const appointmentSection = document.getElementById("appointment-section");
-    const appointmentStatus = document.getElementById("appointment-status");
     const adminSection = document.getElementById("admin-section");
     const bookingsBody = document.getElementById("bookings-body");
     const adminEmails = ["skrajadba@gmail.com"]; // Replace with your admin email(s)
 
-    // Listen for auth state changes and toggle UI accordingly
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         status.innerText = `Logged in as: ${user.email}`;
 
         if (adminEmails.includes(user.email)) {
           appointmentSection.style.display = "none";
+          servicesSection.style.display = "none";
           adminSection.style.display = "block";
+          signupBtn.disabled = true;
+          loginBtn.disabled = true;
           await loadAllBookings();
         } else {
-          appointmentSection.style.display = "block";
+          appointmentSection.style.display = appointmentSection.style.display === "block" ? "block" : "none";
+          servicesSection.style.display = appointmentSection.style.display === "block" ? "none" : "block";
           adminSection.style.display = "none";
+          signupBtn.disabled = false;
+          loginBtn.disabled = false;
           appointmentStatus.innerText = "";
         }
       } else {
         status.innerText = "Not logged in";
         appointmentSection.style.display = "none";
+        servicesSection.style.display = "block";
         adminSection.style.display = "none";
+        signupBtn.disabled = false;
+        loginBtn.disabled = false;
         appointmentStatus.innerText = "";
       }
     });
 
-    // Sign Up
     document.getElementById("signup").onclick = async () => {
       try {
         await createUserWithEmailAndPassword(
@@ -304,7 +382,6 @@
       }
     };
 
-    // Login
     document.getElementById("login").onclick = async () => {
       try {
         await signInWithEmailAndPassword(
@@ -318,7 +395,6 @@
       }
     };
 
-    // Logout
     document.getElementById("logout").onclick = async () => {
       try {
         await signOut(auth);
@@ -328,7 +404,6 @@
       }
     };
 
-    // Book appointment
     document.getElementById("book-appointment").onclick = async () => {
       const customerName = document.getElementById("customerName").value.trim();
       const phone = document.getElementById("phone").value.trim();
@@ -362,7 +437,16 @@
         return;
       }
 
-      // Check if the selected barber is available at the chosen date and time
+      const serviceText = selectedServiceSpan.textContent;
+      if (!serviceText) {
+        appointmentStatus.innerText = "Please select a service first.";
+        return;
+      }
+
+      const match = serviceText.match(/^(.+) \(\$(\d+)\)$/);
+      const serviceName = match ? match[1] : "";
+      const servicePrice = match ? Number(match[2]) : 0;
+
       try {
         const q = query(
           collection(db, "appointments"),
@@ -378,7 +462,6 @@
           return;
         }
 
-        // Save appointment to Firestore in 'appointments' collection
         await addDoc(collection(db, "appointments"), {
           userId: user.uid,
           email: user.email,
@@ -387,25 +470,22 @@
           barber,
           date,
           time,
+          serviceName,
+          servicePrice,
           createdAt: serverTimestamp(),
         });
 
-        appointmentStatus.innerText = `Appointment booked with ${barber} for ${date} at ${time}. Thank you, ${customerName}!`;
+        appointmentStatus.innerText = `Appointment for ${serviceName} booked with ${barber} on ${date} at ${time}. Thank you, ${customerName}!`;
 
-        // Clear inputs
-        document.getElementById("customerName").value = "";
-        document.getElementById("phone").value = "";
-        barberSelect.value = "";
-        document.getElementById("date").value = "";
-        document.getElementById("time").value = "";
+        document.getElementById("cancel-booking").click();
+
       } catch (error) {
         appointmentStatus.innerText = "Error booking appointment: " + error.message;
       }
     };
 
-    // Load all bookings for admin view
     async function loadAllBookings() {
-      bookingsBody.innerHTML = ""; // Clear existing rows
+      bookingsBody.innerHTML = "";
 
       const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
       const querySnapshot = await getDocs(q);
@@ -420,6 +500,8 @@
           <td>${data.customerName || "N/A"}</td>
           <td>${data.phone || "N/A"}</td>
           <td>${data.barber || "N/A"}</td>
+          <td>${data.serviceName || "N/A"}</td>
+          <td>${data.servicePrice !== undefined ? data.servicePrice : "N/A"}</td>
           <td>${data.date}</td>
           <td>${data.time}</td>
           <td>${bookedAt}</td>
