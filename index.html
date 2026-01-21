@@ -278,6 +278,9 @@ async function loadAllBookings() {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${data.email}</td>
+      <td>${data.customerName || "N/A"}</td>
+      <td>${data.phone || "N/A"}</td>
+      <td>${data.barber || "N/A"}</td>
       <td>${data.date}</td>
       <td>${data.time}</td>
       <td>${bookedAt}</td>
