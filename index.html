@@ -54,6 +54,36 @@
   const status = document.getElementById("status");
  
   // Auth state listener
+  const appointmentSection = document.getElementById("appointment-section");
+const appointmentStatus = document.getElementById("appointment-status");
+
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    status.innerText = "Logged in as: " + user.email;
+    appointmentSection.style.display = "block";  // Show appointment form when logged in
+  } else {
+    status.innerText = "Not logged in";
+    appointmentSection.style.display = "none";  // Hide appointment form when logged out
+    appointmentStatus.innerText = "";
+  }
+});
+
+document.getElementById("book-appointment").onclick = () => {
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value;
+
+  if (!date || !time) {
+    appointmentStatus.innerText = "Please select both date and time.";
+    return;
+  }
+
+  // For now, just show confirmation. In a real app, you'd save this to a database.
+  appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
+
+  // Clear inputs
+  document.getElementById("date").value = "";
+  document.getElementById("time").value = "";
+};
   onAuthStateChanged(auth, (user) => {
     if (user) {
       status.innerText = "Logged in as: " + user.email;
