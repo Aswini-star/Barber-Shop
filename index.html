@@ -543,6 +543,23 @@
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
 </script>
+    <script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+import { getAuth, signInWithPhoneNumber, RecaptchaVerifier }
+from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+ 
+const firebaseConfig = {
+    apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+    authDomain: "barber-shop-4c26f.firebaseapp.com",
+    projectId: "barber-shop-4c26f",
+    storageBucket: "barber-shop-4c26f.firebasestorage.app",
+    messagingSenderId: "213114385226",
+    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
+};
+ 
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+</script>
 <body>
     <!-- Header -->
     <header class="app-header">
