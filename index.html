@@ -549,6 +549,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
 import { getAuth, signInWithPhoneNumber, RecaptchaVerifier }
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
  
 const firebaseConfig = {
     apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
@@ -561,6 +562,7 @@ const firebaseConfig = {
  
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+  const db = getFirestore(app);
         if(!window.recaptchaVerifier){ window.recaptchaVerifier = new RecaptchaVerifier(
     'recaptcha-container',
     { size: 'normal' },
@@ -803,7 +805,7 @@ const auth = getAuth(app);
 
                 <div style="background: var(--background-light); padding: 1rem; border-radius: 8px;">
                     <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">UPI ID:</p>
-                    <p style="font-weight: bold; color: var(--accent-color);">karuppuraja.1870@waicici</p>
+                    <p style="font-weight: bold; color: var(--accent-color);">barbershop@upi</p>
                 </div>
 
                 <button class="btn btn--success" onclick="confirmPayment()" style="margin-top: 1rem;">
