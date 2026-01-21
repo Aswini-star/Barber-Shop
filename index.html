@@ -527,8 +527,8 @@
 <script type="module">
   // Import the functions you need from the SDKs you need
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  // Import Firestore specific services
-  import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+  // TODO: Add SDKs for Firebase products that you want to use
+  // https://firebase.google.com/docs/web/setup#available-libraries
 
   // Your web app's Firebase configuration
   const firebaseConfig = {
@@ -542,15 +542,6 @@
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-
-  // Initialize Cloud Firestore and get a reference to the service
-  const db = getFirestore(app);
-
-  // Expose db, addDoc, and collection to the global scope for use in the other script block
-  window.db = db;
-  window.addDoc = addDoc;
-  window.collection = collection;
-
 </script>    
 <body>
     <!-- Header -->
@@ -890,4 +881,423 @@
 
         // Load Barbers
         function loadBarbers() {
-            const barber
+            const barberList = document.getElementById('barberList');
+            const barberSelect = document.getElementById('selectedBarber');
+            
+            barberList.innerHTML = BARBERS.map(barber => `
+                <div class="barber-card">
+                    <div class="barber-card__photo"></div>
+                    <div class="barber-card__info">
+                        <h3 class="barber-card__name">${barber.name}</h3>
+                        <p class="barber-card__experience">${barber.experience} years experience</p>
+                        <p class="barber-card__rating">⭐ ${barber.rating}</p>
+                    </div>
+                </div>
+            `).join('');
+
+            barberSelect.innerHTML = '<option value="">Any available barber</option>' + 
+                BARBERS.map(b => `<option value="${b.id}">${b.name} (${b.rating}⭐)</option>`).join('');
+        }
+
+        // Load Reviews
+        function loadReviews() {
+            const reviewsList = document.getElementById('reviewsList');
+            reviewsList.innerHTML = REVIEWS.map(review => `
+                <article class="review-card">
+                    <div class="review-card__header">
+                        <h4 class="review-card__name">${review.customerName}</h4>
+                        <div class="review-card__rating">${'⭐'.repeat(review.rating)}</div>
+                    </div>
+                    <p class="review-card__text">${review.comment}</p>
+                    <p class="review-card__date">${formatDate(review.date)}</p>
+                </article>
+            `).join('');
+        }
+
+        // Service Selection
+        function selectService(serviceId) {
+            selectedServiceId = serviceId;
+            openBookingModal();
+            document.getElementById('selectedService').value = serviceId;
+            updatePrice();
+        }
+
+        // Update Price
+        function updatePrice() {
+            const serviceId = parseInt(document.getElementById('selectedService').value);
+            const service = SERVICES.find(s => s.id === serviceId);
+            
+            if (service) {
+                let basePrice = service.price;
+                let discount = 0;
+                
+                if (appliedCoupon) {
+                    if (appliedCoupon.type === 'percentage') {
+                        discount = Math.min(basePrice * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
+                    } else {
+                        discount = appliedCoupon.value;
+                    }
+                }
+                
+                const total = basePrice - discount;
+                
+                document.getElementById('servicePrice').textContent = `₹${basePrice}`;
+                document.getElementById('discountAmount').textContent = `-₹${discount}`;
+                document.getElementById('totalPrice').textContent = `₹${total}`;
+                
+                if (discount > 0) {
+                    document.getElementById('discountRow').style.display = 'flex';
+                } else {
+                    document.getElementById('discountRow').style.display = 'none';
+                }
+            }
+        }
+
+        // Load Time Slots
+        function loadTimeSlots() {
+            const date = document.getElementById('bookingDate').value;
+            if (!date) return;
+
+            const timeSlots = document.getElementById('timeSlots');
+            const slots = [
+                '09:00', '10:00', '11:00', '12:00', '14:00', 
+                '15:00', '16:00', '17:00', '18:00', '19:00'
+            ];
+
+            // Mock: Mark some slots as booked
+            const bookedSlots = ['11:00', '15:00'];
+
+            timeSlots.innerHTML = slots.map(slot => {
+                const isBooked = bookedSlots.includes(slot);
+                const classes = `time-slot ${isBooked ? 'time-slot--booked' : ''}`;
+                const disabled = isBooked ? 'disabled' : '';
+                
+                return `
+                    <button type="button" class="${classes}" ${disabled} 
+                            onclick="selectTimeSlot('${slot}', this)">
+                        ${formatTime(slot)}
+                    </button>
+                `;
+            }).join('');
+        }
+
+        // Select Time Slot
+        function selectTimeSlot(time, element) {
+            if (element.disabled) return;
+            
+            document.querySelectorAll('.time-slot').forEach(slot => {
+                slot.classList.remove('time-slot--selected');
+            });
+            
+            element.classList.add('time-slot--selected');
+            selectedTimeSlot = time;
+        }
+
+        // Apply Coupon
+        function applyCoupon() {
+            const code = document.getElementById('couponCode').value.toUpperCase();
+            const coupon = COUPONS.find(c => c.code === code);
+            
+            if (!coupon) {
+                showNotification('Invalid coupon code', 'error');
+                return;
+            }
+
+            const serviceId = parseInt(document.getElementById('selectedService').value);
+            const service = SERVICES.find(s => s.id === serviceId);
+            
+            if (!service) {
+                showNotification('Please select a service first', 'error');
+                return;
+            }
+
+            if (service.price < coupon.minAmount) {
+                showNotification(`Minimum amount ₹${coupon.minAmount} required`, 'error');
+                return;
+            }
+
+            appliedCoupon = coupon;
+            updatePrice();
+            showNotification('Coupon applied successfully!', 'success');
+        }
+
+        // Booking Form Submit
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if (!selectedTimeSlot) {
+                showNotification('Please select a time slot', 'error');
+                return;
+            }
+
+            const formData = {
+                name: document.getElementById('customerName').value,
+                phone: document.getElementById('customerPhone').value,
+                serviceId: parseInt(document.getElementById('selectedService').value),
+                barberId: document.getElementById('selectedBarber').value || null,
+                date: document.getElementById('bookingDate').value,
+                timeSlot: selectedTimeSlot,
+                coupon: appliedCoupon?.code || null
+            };
+
+            const service = SERVICES.find(s => s.id === formData.serviceId);
+            let totalAmount = service.price;
+
+            if (appliedCoupon) {
+                if (appliedCoupon.type === 'percentage') {
+                    totalAmount -= Math.min(totalAmount * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
+                } else {
+                    totalAmount -= appliedCoupon.value;
+                }
+            }
+
+            bookingData = { ...formData, totalAmount, service };
+
+            closeBookingModal();
+            openPaymentModal(totalAmount);
+        });
+
+        // Payment Functions
+        function openPaymentModal(amount) {
+            document.getElementById('paymentAmount').textContent = amount;
+            document.getElementById('paymentModal').classList.add('active');
+        }
+
+        function closePaymentModal() {
+            document.getElementById('paymentModal').classList.remove('active');
+        }
+
+        function initiateUPI(app) {
+            const amount = parseInt(document.getElementById('paymentAmount').textContent);
+            const transactionId = 'BKG' + Date.now();
+            
+            let upiUrl = `upi://pay?pa=barbershop@upi&pn=BarberShop&am=${amount}&cu=INR&tn=Booking-${transactionId}`;
+            
+            // Try to open UPI app
+            window.location.href = upiUrl;
+            
+            showNotification('Opening payment app...', 'info');
+        }
+
+        async function confirmPayment() {
+  showLoader();
+ 
+  await saveBooking({
+    name: bookingData.name,
+    phone: bookingData.phone,
+    service: bookingData.service.name,
+    date: bookingData.date,
+    time: bookingData.timeSlot,
+    amount: bookingData.totalAmount,
+    createdAt: new Date()
+  });
+ 
+  hideLoader();
+  closePaymentModal();
+  showNotification("Booking saved successfully!", "success");
+             
+                // Send WhatsApp confirmation
+                sendBookingConfirmation();
+                
+                showNotification('Booking confirmed! Check WhatsApp for details.', 'success');
+                
+                // Reset form
+                document.getElementById('bookingForm').reset();
+                appliedCoupon = null;
+                selectedTimeSlot = null;
+            }, 2000);
+        }
+
+        // Send Booking Confirmation via WhatsApp
+        function sendBookingConfirmation() {
+            const message = `
+✂️ *Booking Confirmed!*
+
+Service: ${bookingData.service.name}
+Date: ${formatDate(bookingData.date)}
+Time: ${formatTime(bookingData.timeSlot)}
+${bookingData.barberId ? 'Barber: ' + BARBERS.find(b => b.id == bookingData.barberId).name : ''}
+Amount Paid: ₹${bookingData.totalAmount}
+
+Thank you for choosing BarberShop! 💈
+See you soon!
+
+📍 123 Main Street, City Name
+📞 +91-9876543210
+            `.trim();
+            
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/919876543210?text=${encodedMessage}`, '_blank');
+        }
+
+        // Login Functions
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+
+        function sendOTP() {
+            const phone = document.getElementById('loginPhone').value;
+            
+            if (!/^[6-9]\d{9}$/.test(phone)) {
+                showNotification('Please enter a valid 10-digit mobile number', 'error');
+                return;
+            }
+
+            showLoader();
+            
+            // Mock: Send OTP (In real app, call API)
+            setTimeout(() => {
+                hideLoader();
+                document.getElementById('phoneStep').classList.add('hidden');
+                document.getElementById('otpStep').classList.remove('hidden');
+                showNotification('OTP sent to your mobile', 'success');
+                console.log('Mock OTP: 123456'); // For testing
+            }, 1500);
+        }
+
+        function verifyOTP() {
+            const phone = document.getElementById('loginPhone').value;
+            const otp = document.getElementById('loginOTP').value;
+            
+            if (otp.length !== 6) {
+                showNotification('Please enter 6-digit OTP', 'error');
+                return;
+            }
+
+            showLoader();
+            
+            // Mock: Verify OTP (In real app, call API)
+            setTimeout(() => {
+                hideLoader();
+                
+                // Mock user data
+                const userData = {
+                    id: Date.now(),
+                    name: 'Customer',
+                    phone: phone
+                };
+                
+                localStorage.setItem('user', JSON.stringify(userData));
+                localStorage.setItem('token', 'mock_token_' + Date.now());
+                
+                currentUser = userData;
+                checkLoginStatus();
+                closeLoginModal();
+                
+                // Reset login form
+                document.getElementById('loginPhone').value = '';
+                document.getElementById('loginOTP').value = '';
+                document.getElementById('phoneStep').classList.remove('hidden');
+                document.getElementById('otpStep').classList.add('hidden');
+                
+                showNotification('Login successful!', 'success');
+            }, 1500);
+        }
+
+        function backToPhone() {
+            document.getElementById('phoneStep').classList.remove('hidden');
+            document.getElementById('otpStep').classList.add('hidden');
+            document.getElementById('loginOTP').value = '';
+        }
+
+        function showProfile() {
+            if (currentUser) {
+                alert(`Profile:\nName: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n(Profile page coming soon!)`);
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            currentUser = null;
+            document.getElementById('loginBtn').classList.remove('hidden');
+            document.getElementById('profileBtn').classList.add('hidden');
+            showNotification('Logged out successfully', 'info');
+        }
+
+        // Modal Functions
+        function openBookingModal() {
+            document.getElementById('bookingModal').classList.add('active');
+        }
+
+        function closeBookingModal() {
+            document.getElementById('bookingModal').classList.remove('active');
+        }
+
+        // Navigation
+        function showSection(section) {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            const sections = {
+                home: ['servicesSection', 'barbersSection', 'reviewsSection', 'locationSection'],
+                services: ['servicesSection'],
+                reviews: ['reviewsSection'],
+                location: ['locationSection']
+            };
+
+            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+            
+            if (sections[section]) {
+                sections[section].forEach(id => {
+                    document.getElementById(id).classList.remove('hidden');
+                });
+            }
+
+            if (section === 'home') {
+                document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
+            }
+        }
+
+        // Helper Functions
+        function setMinDate() {
+            const tomorrow = new Date();
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            const minDate = tomorrow.toISOString().split('T')[0];
+            document.getElementById('bookingDate').setAttribute('min', minDate);
+        }
+
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-IN', { 
+                day: 'numeric', 
+                month: 'short', 
+                year: 'numeric' 
+            });
+        }
+
+        function formatTime(time) {
+            const [hours, minutes] = time.split(':');
+            const hour = parseInt(hours);
+            const ampm = hour >= 12 ? 'PM' : 'AM';
+            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+            return `${displayHour}:${minutes} ${ampm}`;
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification notification--${type}`;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showLoader() {
+            document.getElementById('loader').classList.add('active');
+        }
+
+        function hideLoader() {
+            document.getElementById('loader').classList.remove('active');
+        }
+    </script>
+</body>
+</html>
