@@ -29,7 +29,22 @@
 
   <p id="appointment-status"></p>
 </div>
-
+<div id="admin-section" style="display:none;">
+  <h3>All Bookings (Admin)</h3>
+  <table border="1" id="bookings-table">
+    <thead>
+      <tr>
+        <th>User Email</th>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Booked At</th>
+      </tr>
+    </thead>
+    <tbody id="bookings-body">
+      <!-- Bookings will be inserted here -->
+    </tbody>
+  </table>
+</div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
@@ -44,6 +59,9 @@
     collection,
     addDoc,
     serverTimestamp,
+    query,
+  orderBy,
+  getDocs,
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
   // Your Firebase config
@@ -67,6 +85,7 @@
   const status = document.getElementById("status");
   const appointmentSection = document.getElementById("appointment-section");
   const appointmentStatus = document.getElementById("appointment-status");
+  const adminEmails = ["skrajadba@gmail.com"]; // Replace with your admin email(s)
 
   // Listen for auth state changes
   onAuthStateChanged(auth, (user) => {
@@ -79,7 +98,27 @@
       appointmentStatus.innerText = "";
     }
   });
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    status.innerText = `Logged in as: ${user.email}`;
 
+    if (adminEmails.includes(user.email)) {
+      // Admin user
+      appointmentSection.style.display = "none";
+      adminSection.style.display = "block";
+      await loadAllBookings();
+    } else {
+      // Regular user
+      appointmentSection.style.display = "block";
+      adminSection.style.display = "none";
+    }
+  } else {
+    status.innerText = "Not logged in";
+    appointmentSection.style.display = "none";
+    adminSection.style.display = "none";
+    appointmentStatus.innerText = "";
+  }
+});
   // Sign Up
   document.getElementById("signup").onclick = async () => {
     try {
@@ -152,6 +191,29 @@
       appointmentStatus.innerText = "Error booking appointment: " + error.message;
     }
   };
+  const adminSection = document.getElementById("admin-section");
+const bookingsBody = document.getElementById("bookings-body");
+
+async function loadAllBookings() {
+  bookingsBody.innerHTML = ""; // Clear existing rows
+
+  const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+  const querySnapshot = await getDocs(q);
+
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+    const bookedAt = data.createdAt ? data.createdAt.toDate().toLocaleString() : "N/A";
+
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${data.email}</td>
+      <td>${data.date}</td>
+      <td>${data.time}</td>
+      <td>${bookedAt}</td>
+    `;
+    bookingsBody.appendChild(tr);
+  });
+}
 </script>
 
 </body>
