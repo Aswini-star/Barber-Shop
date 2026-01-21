@@ -1,1340 +1,1268 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1a1a1a">
-    <title>Barber Shop - Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary-color: #1a1a1a;
-            --accent-color: #d4af37;
-            --success-color: #28a745;
-            --danger-color: #dc3545;
-            --text-color: #333333;
-            --text-light: #666666;
-            --background-color: #ffffff;
-            --background-light: #f8f9fa;
-            --border-color: #dddddd;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
-        }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-light);
-            color: var(--text-color);
-            line-height: 1.6;
-        }
-
-        .app-header {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 1rem;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: var(--shadow-md);
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .nav-menu {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background-color: var(--primary-color);
-            display: flex;
-            justify-content: space-around;
-            padding: 0.5rem;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
-        }
-
-        .nav-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            text-decoration: none;
-            padding: 0.5rem;
-            font-size: 0.75rem;
-            min-width: 60px;
-        }
-
-        .nav-item i {
-            font-size: 1.5rem;
-            margin-bottom: 0.25rem;
-        }
-
-        .nav-item.active {
-            color: var(--accent-color);
-        }
-
-        .app-main {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem;
-            padding-bottom: 80px;
-        }
-
-        .hero-section {
-            background: linear-gradient(135deg, var(--primary-color) 0%, #333 100%);
-            color: white;
-            padding: 2rem;
-            border-radius: 12px;
-            text-align: center;
-            margin-bottom: 2rem;
-        }
-
-        .hero-section h1 {
-            font-size: 2rem;
-            margin-bottom: 0.5rem;
-        }
-
-        .hero-section p {
-            margin-bottom: 1rem;
-            opacity: 0.9;
-        }
-
-        .contact-actions {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-
-        .contact-btn {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 0.5rem;
-            padding: 1rem;
-            border-radius: 8px;
-            text-decoration: none;
-            color: white;
-            font-weight: 600;
-            min-height: 48px;
-        }
-
-        .contact-btn--call {
-            background-color: #007bff;
-        }
-
-        .contact-btn--whatsapp {
-            background-color: #25d366;
-        }
-
-        .section {
-            background-color: white;
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: var(--shadow-sm);
-        }
-
-        .section h2 {
-            margin-bottom: 1rem;
-            color: var(--primary-color);
-            font-size: 1.5rem;
-        }
-
-        .service-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-
-        @media (min-width: 640px) {
-            .service-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-
-        .service-card {
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            overflow: hidden;
-            transition: transform 0.2s;
-        }
-
-        .service-card:active {
-            transform: scale(0.98);
-        }
-
-        .service-card__image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .service-card__content {
-            padding: 1rem;
-        }
-
-        .service-card__title {
-            font-size: 1.1rem;
-            margin-bottom: 0.5rem;
-            color: var(--primary-color);
-        }
-
-        .service-card__description {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-        }
-
-        .service-card__details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
-
-        .service-card__price {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--accent-color);
-        }
-
-        .service-card__duration {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .btn {
-            background-color: var(--accent-color);
-            border: none;
-            border-radius: 8px;
-            color: white;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: 600;
-            min-height: 48px;
-            padding: 0.75rem 1.5rem;
-            width: 100%;
-            transition: all 0.3s;
-        }
-
-        .btn:active {
-            transform: scale(0.98);
-        }
-
-        .btn--primary {
-            background-color: var(--accent-color);
-        }
-
-        .btn--success {
-            background-color: var(--success-color);
-        }
-
-        .barber-card {
-            display: flex;
-            gap: 1rem;
-            padding: 1rem;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            margin-bottom: 1rem;
-        }
-
-        .barber-card__photo {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        }
-
-        .barber-card__info {
-            flex: 1;
-        }
-
-        .barber-card__name {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-
-        .barber-card__experience {
-            font-size: 0.9rem;
-            color: var(--text-light);
-            margin-bottom: 0.25rem;
-        }
-
-        .barber-card__rating {
-            color: var(--accent-color);
-        }
-
-        .time-slots {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.75rem;
-            margin-top: 1rem;
-        }
-
-        .time-slot {
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            background: white;
-            cursor: pointer;
-            font-weight: 600;
-            min-height: 48px;
-            transition: all 0.2s;
-        }
-
-        .time-slot:hover {
-            border-color: var(--accent-color);
-        }
-
-        .time-slot--selected {
-            background-color: var(--accent-color);
-            color: white;
-            border-color: var(--accent-color);
-        }
-
-        .time-slot--booked {
-            opacity: 0.4;
-            cursor: not-allowed;
-            text-decoration: line-through;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            margin-bottom: 0.5rem;
-            font-weight: 600;
-            color: var(--primary-color);
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 2px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1rem;
-            min-height: 48px;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: rgba(0, 0, 0, 0.5);
-            z-index: 1000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal.active {
-            display: flex;
-        }
-
-        .modal-content {
-            background: white;
-            border-radius: 12px;
-            padding: 2rem;
-            max-width: 500px;
-            width: 90%;
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            color: var(--primary-color);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-light);
-        }
-
-        .notification {
-            position: fixed;
-            top: -100px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: var(--primary-color);
-            color: white;
-            padding: 1rem 2rem;
-            border-radius: 8px;
-            box-shadow: var(--shadow-md);
-            z-index: 2000;
-            transition: top 0.3s;
-        }
-
-        .notification.show {
-            top: 20px;
-        }
-
-        .notification--success {
-            background: var(--success-color);
-        }
-
-        .notification--error {
-            background: var(--danger-color);
-        }
-
-        .review-card {
-            padding: 1rem;
-            border-left: 4px solid var(--accent-color);
-            background: var(--background-light);
-            margin-bottom: 1rem;
-            border-radius: 4px;
-        }
-
-        .review-card__header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .review-card__name {
-            font-weight: 600;
-        }
-
-        .review-card__rating {
-            color: var(--accent-color);
-        }
-
-        .review-card__text {
-            margin-bottom: 0.5rem;
-            color: var(--text-color);
-        }
-
-        .review-card__date {
-            font-size: 0.85rem;
-            color: var(--text-light);
-        }
-
-        .map-container {
-            width: 100%;
-            height: 300px;
-            border-radius: 8px;
-            overflow: hidden;
-            margin-bottom: 1rem;
-        }
-
-        .coupon-input {
-            display: flex;
-            gap: 0.5rem;
-            margin-top: 1rem;
-        }
-
-        .coupon-input input {
-            flex: 1;
-        }
-
-        .coupon-input button {
-            width: auto;
-            padding: 0 1.5rem;
-        }
-
-        .price-summary {
-            background: var(--background-light);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-        }
-
-        .price-row {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .price-row--total {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--accent-color);
-            padding-top: 0.5rem;
-            border-top: 2px solid var(--border-color);
-        }
-
-        .loader {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            z-index: 3000;
-        }
-
-        .loader.active {
-            display: block;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid var(--border-color);
-            border-top-color: var(--accent-color);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a1a1a" />
+  <title>Barber Shop Home</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <style>
+    /* Reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    /* Root CSS Variables */
+    :root {
+      --primary-color: #1a1a1a;
+      --accent-color: #d4af37;
+      --success-color: #28a745;
+      --danger-color: #dc3545;
+      --text-color: #333333;
+      --text-light: #666666;
+      --background-color: #ffffff;
+      --background-light: #f8f9fa;
+      --border-color: #dddddd;
+      --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: var(--background-light);
+      color: var(--text-color);
+      line-height: 1.6;
+    }
+
+    .app-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: var(--shadow-md);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .nav-menu {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--primary-color);
+      display: flex;
+      justify-content: space-around;
+      padding: 0.5rem;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+
+    .nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem;
+      font-size: 0.75rem;
+      min-width: 60px;
+      cursor: pointer;
+    }
+
+    .nav-item i {
+      font-size: 1.5rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .nav-item.active {
+      color: var(--accent-color);
+    }
+
+    .app-main {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 1rem;
+      padding-bottom: 80px;
+    }
+
+    .hero-section {
+      background: linear-gradient(135deg, var(--primary-color) 0%, #333 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .hero-section h1 {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-section p {
+      margin-bottom: 1rem;
+      opacity: 0.9;
+    }
+
+    .contact-actions {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .contact-btn {
+      flex: 1;
+      max-width: 180px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 1rem;
+      border-radius: 8px;
+      text-decoration: none;
+      color: white;
+      font-weight: 600;
+      min-height: 48px;
+      transition: background-color 0.3s;
+    }
+
+    .contact-btn:hover {
+      opacity: 0.85;
+    }
+
+    .contact-btn--call {
+      background-color: #007bff;
+    }
+
+    .contact-btn--whatsapp {
+      background-color: #25d366;
+    }
+
+    .section {
+      background-color: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .section h2 {
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      font-size: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .service-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    @media (min-width: 640px) {
+      .service-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    .service-card {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      overflow: hidden;
+      transition: transform 0.2s;
+      background: #fff;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    .service-card:active {
+      transform: scale(0.98);
+    }
+
+    .service-card__image {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .service-card__content {
+      padding: 1rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .service-card__title {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+      color: var(--primary-color);
+    }
+
+    .service-card__description {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.5rem;
+      flex-grow: 1;
+    }
+
+    .service-card__details {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .service-card__price {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--accent-color);
+    }
+
+    .service-card__duration {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .btn {
+      background-color: var(--accent-color);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 1rem;
+      font-weight: 600;
+      min-height: 48px;
+      padding: 0.75rem 1.5rem;
+      width: 100%;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn--primary {
+      background-color: var(--accent-color);
+    }
+
+    .btn--success {
+      background-color: var(--success-color);
+    }
+
+    .barber-card {
+      display: flex;
+      gap: 1rem;
+      padding: 1rem;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      background: #fff;
+      align-items: center;
+    }
+
+    .barber-card__photo {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      object-fit: cover;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    .barber-card__info {
+      flex: 1;
+    }
+
+    .barber-card__name {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--primary-color);
+    }
+
+    .barber-card__experience {
+      font-size: 0.9rem;
+      color: var(--text-light);
+      margin-bottom: 0.25rem;
+    }
+
+    .barber-card__rating {
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    .time-slots {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+
+    .time-slot {
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      background: white;
+      cursor: pointer;
+      font-weight: 600;
+      min-height: 48px;
+      transition: all 0.2s;
+      text-align: center;
+    }
+
+    .time-slot:hover:not(.time-slot--booked) {
+      border-color: var(--accent-color);
+    }
+
+    .time-slot--selected {
+      background-color: var(--accent-color);
+      color: white;
+      border-color: var(--accent-color);
+    }
+
+    .time-slot--booked {
+      opacity: 0.4;
+      cursor: not-allowed;
+      text-decoration: line-through;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid var(--border-color);
+      border-radius: 8px;
+      font-size: 1rem;
+      min-height: 48px;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--accent-color);
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal.active {
+      display: flex;
+    }
+
+    .modal-content {
+      background: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-md);
+      position: relative;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .modal-title {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      cursor: pointer;
+      color: var(--text-light);
+      line-height: 1;
+      padding: 0;
+    }
+
+    .notification {
+      position: fixed;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: var(--primary-color);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      box-shadow: var(--shadow-md);
+      z-index: 2000;
+      transition: top 0.3s;
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .notification.show {
+      top: 20px;
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .notification--success {
+      background: var(--success-color);
+    }
+
+    .notification--error {
+      background: var(--danger-color);
+    }
+
+    .review-card {
+      padding: 1rem;
+      border-left: 4px solid var(--accent-color);
+      background: var(--background-light);
+      margin-bottom: 1rem;
+      border-radius: 4px;
+    }
+
+    .review-card__header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      align-items: center;
+    }
+
+    .review-card__name {
+      font-weight: 600;
+      color: var(--primary-color);
+    }
+
+    .review-card__rating {
+      color: var(--accent-color);
+      font-weight: 700;
+    }
+
+    .review-card__text {
+      margin-bottom: 0.5rem;
+      color: var(--text-color);
+      font-style: italic;
+    }
+
+    .review-card__date {
+      font-size: 0.85rem;
+      color: var(--text-light);
+    }
+
+    .map-container {
+      width: 100%;
+      height: 300px;
+      border-radius: 8px;
+      overflow: hidden;
+      margin-bottom: 1rem;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .coupon-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .coupon-input input.form-input {
+      flex: 1;
+    }
+
+    .coupon-input button.btn {
+      width: auto;
+      padding: 0 1.5rem;
+    }
+
+    .price-summary {
+      background: var(--background-light);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-top: 1rem;
+    }
+
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .price-row-total {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: var(--accent-color);
+      padding-top: 0.5rem;
+      border-top: 2px solid var(--border-color);
+      margin-top: 0.5rem;
+    }
+
+    .loader {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 3000;
+    }
+
+    .loader.active {
+      display: block;
+    }
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid var(--border-color);
+      border-top-color: var(--accent-color);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
 </head>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-    authDomain: "barber-shop-4c26f.firebaseapp.com",
-    projectId: "barber-shop-4c26f",
-    storageBucket: "barber-shop-4c26f.firebasestorage.app",
-    messagingSenderId: "213114385226",
-    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, signInWithPhoneNumber, RecaptchaVerifier }
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
- 
-const firebaseConfig = {
-    apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-    authDomain: "barber-shop-4c26f.firebaseapp.com",
-    projectId: "barber-shop-4c26f",
-    storageBucket: "barber-shop-4c26f.firebasestorage.app",
-    messagingSenderId: "213114385226",
-    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
-};
- 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-        window.recaptchaVerifier = new RecaptchaVerifier(
-    'recaptcha-container',
-    { size: 'normal' },
-    auth
-  );
- 
-  window.sendOTP = function () {
-    const phoneNumber = document.getElementById("phone").value;
-    signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        alert("OTP sent");
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
- 
-  window.verifyOTP = function () {
-    const otp = document.getElementById("otp").value;
-    window.confirmationResult.confirm(otp)
-      .then((result) => {
-        alert("Login successful");
-        console.log(result.user);
-      })
-      .catch(() => {
-        alert("Invalid OTP");
-      });
-  };
-</script>
 <body>
-    <!-- Header -->
-    <header class="app-header">
-        <div class="header-content">
-            <div class="logo">
-                <i class="fas fa-cut"></i> BarberShop
-            </div>
-            <div>
-                <button class="btn btn--primary" onclick="openLoginModal()" id="loginBtn">
-                    <i class="fas fa-user"></i> Login
-                </button>
-                <button class="btn btn--success hidden" onclick="showProfile()" id="profileBtn">
-                    <i class="fas fa-user-circle"></i> <span id="userName"></span>
-                </button>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main class="app-main" id="mainContent">
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <h1>Welcome to BarberShop</h1>
-            <p>Professional grooming services for the modern gentleman</p>
-            <div class="contact-actions">
-                <a href="tel:+919876543210" class="contact-btn contact-btn--call">
-                    <i class="fas fa-phone"></i>
-                    <span>Call Now</span>
-                </a>
-                <a href="https://wa.me/919344741870" class="contact-btn contact-btn--whatsapp" target="_blank">
-                    <i class="fab fa-whatsapp"></i>
-                    <span>WhatsApp</span>
-                </a>
-            </div>
-        </section>
-
-        <!-- Services Section -->
-        <section class="section" id="servicesSection">
-            <h2><i class="fas fa-scissors"></i> Our Services</h2>
-            <div class="service-grid" id="serviceList"></div>
-        </section>
-
-        <!-- Barbers Section -->
-        <section class="section hidden" id="barbersSection">
-            <h2><i class="fas fa-users"></i> Our Expert Barbers</h2>
-            <div id="barberList"></div>
-        </section>
-
-        <!-- Reviews Section -->
-        <section class="section" id="reviewsSection">
-            <h2><i class="fas fa-star"></i> Customer Reviews</h2>
-            <div id="reviewsList"></div>
-        </section>
-
-        <!-- Location Section -->
-        <section class="section" id="locationSection">
-            <h2><i class="fas fa-map-marker-alt"></i> Visit Our Shop</h2>
-            <div class="map-container">
-                <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.1234567890!2d77.1234567!3d28.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDA3JzI0LjQiTiA3N8KwMDcnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890"
-                    width="100%" 
-                    height="100%" 
-                    style="border:0;" 
-                    allowfullscreen="" 
-                    loading="lazy"
-                    title="Barber shop location">
-                </iframe>
-            </div>
-            <p><strong>Address:</strong> 123 Main Street, City Name, PIN 123456</p>
-            <p><strong>Working Hours:</strong> Mon-Sat: 9:00 AM - 8:00 PM | Sunday: Closed</p>
-        </section>
-    </main>
-
-    <!-- Booking Modal -->
-    <div class="modal" id="bookingModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Book Appointment</h2>
-                <button class="modal-close" onclick="closeBookingModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <form id="bookingForm">
-                <div class="form-group">
-                    <label class="form-label">Name</label>
-                    <input type="text" class="form-input" id="customerName" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" id="customerPhone" pattern="[6-9][0-9]{9}" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Service</label>
-                    <select class="form-input" id="selectedService" required>
-                        <option value="">Select a service</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Select Barber</label>
-                    <select class="form-input" id="selectedBarber" onchange="loadTimeSlots()">
-                        <option value="">Any available barber</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Select Date</label>
-                    <input type="date" class="form-input" id="bookingDate" onchange="loadTimeSlots()" required>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Select Time</label>
-                    <div class="time-slots" id="timeSlots"></div>
-                </div>
-
-                <div class="form-group">
-                    <label class="form-label">Apply Coupon (Optional)</label>
-                    <div class="coupon-input">
-                        <input type="text" class="form-input" id="couponCode" placeholder="Enter coupon code">
-                        <button type="button" class="btn" onclick="applyCoupon()">Apply</button>
-                    </div>
-                </div>
-
-                <div class="price-summary">
-                    <div class="price-row">
-                        <span>Service Price:</span>
-                        <span id="servicePrice">₹0</span>
-                    </div>
-                    <div class="price-row" id="discountRow" style="display: none;">
-                        <span>Discount:</span>
-                        <span id="discountAmount" style="color: var(--success-color);">-₹0</span>
-                    </div>
-                    <div class="price-row price-row--total">
-                        <span>Total:</span>
-                        <span id="totalPrice">₹0</span>
-                    </div>
-                </div>
-
-                <button type="submit" class="btn btn--success" style="margin-top: 1rem;">
-                    <i class="fas fa-check"></i> Confirm Booking
-                </button>
-            </form>
-        </div>
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-content">
+      <div class="logo">
+        <i class="fas fa-cut"></i> BarberShop
+      </div>
+      <div>
+        <button class="btn btn--primary" onclick="openLoginModal()" id="loginBtn">
+          <i class="fas fa-user"></i> Login
+        </button>
+        <button class="btn btn--success hidden" onclick="showProfile()" id="profileBtn">
+          <i class="fas fa-user-circle"></i> <span id="userName"></span>
+        </button>
+        <button class="btn btn--danger hidden" onclick="logout()" id="logoutBtn" style="margin-left:1rem;">
+          <i class="fas fa-sign-out-alt"></i> Logout
+        </button>
+      </div>
     </div>
+  </header>
 
-    <!-- Login Modal -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Login</h2>
-                <button class="modal-close" onclick="closeLoginModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
+  <!-- Main Content -->
+  <main class="app-main" id="mainContent">
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <h1>Welcome to BarberShop</h1>
+      <p>Professional grooming services for the modern gentleman</p>
+      <div class="contact-actions">
+        <a href="tel:+919876543210" class="contact-btn contact-btn--call">
+          <i class="fas fa-phone"></i> <span>Call Now</span>
+        </a>
+        <a href="https://wa.me/919344741870" class="contact-btn contact-btn--whatsapp" target="_blank" rel="noopener">
+          <i class="fab fa-whatsapp"></i> <span>WhatsApp</span>
+        </a>
+      </div>
+    </section>
 
-            <div id="phoneStep">
-                <div class="form-group">
-                    <label class="form-label">Mobile Number</label>
-                    <input type="tel" class="form-input" id="loginPhone" pattern="[6-9][0-9]{9}" placeholder="Enter 10-digit mobile number">
-                </div>
-                <button class="btn btn--primary" onclick="sendOTP()">
-                    <i class="fas fa-paper-plane"></i> Send OTP
-                </button>
-            </div>
+    <!-- Services Section -->
+    <section class="section" id="servicesSection">
+      <h2><i class="fas fa-scissors"></i> Our Services</h2>
+      <div class="service-grid" id="serviceList"></div>
+    </section>
 
-            <div id="otpStep" class="hidden">
-                <div class="form-group">
-                    <label class="form-label">Enter OTP</label>
-                    <input type="text" class="form-input" id="loginOTP" maxlength="6" placeholder="Enter 6-digit OTP">
-                </div>
-                <button class="btn btn--success" onclick="verifyOTP()">
-                    <i class="fas fa-check"></i> Verify & Login
-                </button>
-                <button class="btn" onclick="backToPhone()" style="margin-top: 0.5rem; background: var(--text-light);">
-                    <i class="fas fa-arrow-left"></i> Back
-                </button>
-            </div>
+    <!-- Barbers Section -->
+    <section class="section hidden" id="barbersSection">
+      <h2><i class="fas fa-users"></i> Our Expert Barbers</h2>
+      <div id="barberList"></div>
+    </section>
+
+    <!-- Reviews Section -->
+    <section class="section" id="reviewsSection">
+      <h2><i class="fas fa-star"></i> Customer Reviews</h2>
+      <div id="reviewsList"></div>
+    </section>
+
+    <!-- Location Section -->
+    <section class="section" id="locationSection">
+      <h2><i class="fas fa-map-marker-alt"></i> Visit Our Shop</h2>
+      <div class="map-container">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.1234567890!2d77.1234567!3d28.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDA3JzI0LjQiTiA3N8KwMDcnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890" width="100%" height="100%" style="border:0;" allowfullscreen="" loading="lazy" title="Barber shop location"></iframe>
+      </div>
+      <p><strong>Address:</strong> 123 Main Street, City Name, PIN 123456</p>
+      <p><strong>Working Hours:</strong> Mon-Sat: 9:00 AM - 8:00 PM | Sunday: Closed</p>
+    </section>
+  </main>
+
+  <!-- Booking Modal -->
+  <div class="modal" id="bookingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Book Appointment</h2>
+        <button class="modal-close" onclick="closeBookingModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <form id="bookingForm">
+        <div class="form-group">
+          <label class="form-label" for="customerName">Name</label>
+          <input type="text" class="form-input" id="customerName" required />
         </div>
-    </div>
-
-    <!-- Payment Modal -->
-    <div class="modal" id="paymentModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Payment</h2>
-                <button class="modal-close" onclick="closePaymentModal()">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-
-            <div style="text-align: center;">
-                <h3 style="margin-bottom: 1rem;">Pay ₹<span id="paymentAmount">0</span></h3>
-                <p style="margin-bottom: 1rem; color: var(--text-light);">Choose payment method:</p>
-
-                <button class="btn" onclick="initiateUPI('gpay')" style="margin-bottom: 0.5rem; background: #4285f4;">
-                    <i class="fab fa-google"></i> Google Pay
-                </button>
-                <button class="btn" onclick="initiateUPI('phonepe')" style="margin-bottom: 0.5rem; background: #5f259f;">
-                    <i class="fas fa-mobile-alt"></i> PhonePe
-                </button>
-                <button class="btn" onclick="initiateUPI('paytm')" style="margin-bottom: 0.5rem; background: #00baf2;">
-                    <i class="fas fa-wallet"></i> Paytm
-                </button>
-
-                <p style="margin: 1rem 0; color: var(--text-light);">OR</p>
-
-                <div style="background: var(--background-light); padding: 1rem; border-radius: 8px;">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">UPI ID:</p>
-                    <p style="font-weight: bold; color: var(--accent-color);">barbershop@upi</p>
-                </div>
-
-                <button class="btn btn--success" onclick="confirmPayment()" style="margin-top: 1rem;">
-                    <i class="fas fa-check-circle"></i> I've Paid
-                </button>
-            </div>
+        <div class="form-group">
+          <label class="form-label" for="customerPhone">Phone</label>
+          <input type="tel" class="form-input" id="customerPhone" pattern="[6-9][0-9]{9}" required />
         </div>
+        <div class="form-group">
+          <label class="form-label" for="selectedService">Service</label>
+          <select class="form-input" id="selectedService" required></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="selectedBarber">Select Barber</label>
+          <select class="form-input" id="selectedBarber" onchange="loadTimeSlots()">
+            <option value="">Any available barber</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="bookingDate">Select Date</label>
+          <input type="date" class="form-input" id="bookingDate" onchange="loadTimeSlots()" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Select Time</label>
+          <div class="time-slots" id="timeSlots"></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="couponCode">Apply Coupon (Optional)</label>
+          <div class="coupon-input">
+            <input type="text" class="form-input" id="couponCode" placeholder="Enter coupon code" />
+            <button type="button" class="btn" onclick="applyCoupon()">Apply</button>
+          </div>
+        </div>
+        <div class="price-summary">
+          <div class="price-row">
+            <span>Service Price:</span><span id="servicePrice">₹0</span>
+          </div>
+          <div class="price-row" id="discountRow" style="display: none;">
+            <span>Discount:</span><span id="discountAmount" style="color: var(--success-color);">₹0</span>
+          </div>
+          <div class="price-row price-row-total">
+            <span>Total:</span><span id="totalPrice">₹0</span>
+          </div>
+        </div>
+        <button type="submit" class="btn btn--success" style="margin-top: 1rem;">
+          <i class="fas fa-check"></i> Confirm Booking
+        </button>
+      </form>
     </div>
+  </div>
 
-    <!-- Bottom Navigation -->
-    <nav class="nav-menu">
-        <a href="#" class="nav-item active" onclick="showSection('home')">
-            <i class="fas fa-home"></i>
-            <span>Home</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showSection('services')">
-            <i class="fas fa-scissors"></i>
-            <span>Services</span>
-        </a>
-        <a href="#" class="nav-item" onclick="openBookingModal()">
-            <i class="fas fa-calendar-check"></i>
-            <span>Book</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showSection('reviews')">
-            <i class="fas fa-star"></i>
-            <span>Reviews</span>
-        </a>
-        <a href="#" class="nav-item" onclick="showSection('location')">
-            <i class="fas fa-map-marker-alt"></i>
-            <span>Location</span>
-        </a>
-    </nav>
-
-    <!-- Loader -->
-    <div class="loader" id="loader">
-        <div class="spinner"></div>
+  <!-- Login Modal -->
+  <div class="modal" id="loginModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Login</h2>
+        <button class="modal-close" onclick="closeLoginModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div id="phoneStep">
+        <div class="form-group">
+          <label class="form-label" for="loginPhone">Mobile Number</label>
+          <input type="tel" class="form-input" id="loginPhone" pattern="[6-9][0-9]{9}" placeholder="Enter 10 digit mobile number" />
+        </div>
+        <div id="recaptcha-container"></div>
+        <button class="btn btn--primary" onclick="sendOTP()">
+          <i class="fas fa-paper-plane"></i> Send OTP
+        </button>
+      </div>
+      <div id="otpStep" class="hidden">
+        <div class="form-group">
+          <label class="form-label" for="loginOTP">Enter OTP</label>
+          <input type="text" class="form-input" id="loginOTP" maxlength="6" placeholder="Enter 6-digit OTP" />
+        </div>
+        <button class="btn btn--success" onclick="verifyOTP()">
+          <i class="fas fa-check"></i> Verify & Login
+        </button>
+        <button class="btn" onclick="backToPhone()" style="margin-top: 0.5rem; background: var(--text-light);">
+          <i class="fas fa-arrow-left"></i> Back
+        </button>
+      </div>
     </div>
+  </div>
 
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
+  <!-- Payment Modal -->
+  <div class="modal" id="paymentModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Payment</h2>
+        <button class="modal-close" onclick="closePaymentModal()"><i class="fas fa-times"></i></button>
+      </div>
+      <div style="text-align: center;">
+        <h3 style="margin-bottom: 1rem;">Pay ₹<span id="paymentAmount">0</span></h3>
+        <p style="margin-bottom: 1rem; color: var(--text-light);">Choose payment method:</p>
+        <button class="btn" onclick="initiateUPI('gpay')" style="margin-bottom: 0.5rem; background: #4285f4;">
+          <i class="fab fa-google"></i> Google Pay
+        </button>
+        <button class="btn" onclick="initiateUPI('phonepe')" style="margin-bottom: 0.5rem; background: #5f259f;">
+          <i class="fas fa-mobile-alt"></i> PhonePe
+        </button>
+        <button class="btn" onclick="initiateUPI('paytm')" style="margin-bottom: 0.5rem; background: #00baf2;">
+          <i class="fas fa-wallet"></i> Paytm
+        </button>
+        <p style="margin: 1rem 0; color: var(--text-light);">OR</p>
+        <div style="background: var(--background-light); padding: 1rem; border-radius: 8px;">
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">UPI ID:</p>
+          <p style="font-weight: bold; color: var(--accent-color);">barbershop@upi</p>
+        </div>
+        <button class="btn btn--success" onclick="confirmPayment()" style="margin-top: 1rem;">
+          <i class="fas fa-check-circle"></i> I've Paid
+        </button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-        // Mock Data (Replace with actual API calls)
-        const SERVICES = [
-            { id: 1, name: 'Classic Haircut', description: 'Professional styling by expert barbers', price: 250, duration: 30 },
-            { id: 2, name: 'Beard Trim & Shave', description: 'Precision grooming for your beard', price: 150, duration: 20 },
-            { id: 3, name: 'Hair Color', description: 'Premium hair coloring service', price: 800, duration: 60 },
-            { id: 4, name: 'Facial Treatment', description: 'Rejuvenating facial for men', price: 500, duration: 45 },
-            { id: 5, name: 'Head Massage', description: 'Relaxing head and shoulder massage', price: 200, duration: 15 },
-            { id: 6, name: 'Complete Grooming', description: 'Haircut + Beard + Facial combo', price: 800, duration: 90 }
-        ];
+  <!-- Bottom Navigation -->
+  <nav class="nav-menu">
+    <a href="#" class="nav-item active" onclick="showSection('home', event)">
+      <i class="fas fa-home"></i> <span>Home</span>
+    </a>
+    <a href="#" class="nav-item" onclick="showSection('services', event)">
+      <i class="fas fa-scissors"></i> <span>Services</span>
+    </a>
+    <a href="#" class="nav-item" onclick="openBookingModal()">
+      <i class="fas fa-calendar-check"></i> <span>Book</span>
+    </a>
+    <a href="#" class="nav-item" onclick="showSection('reviews', event)">
+      <i class="fas fa-star"></i> <span>Reviews</span>
+    </a>
+    <a href="#" class="nav-item" onclick="showSection('location', event)">
+      <i class="fas fa-map-marker-alt"></i> <span>Location</span>
+    </a>
+  </nav>
 
-        const BARBERS = [
-            { id: 1, name: 'Rajesh Kumar', experience: 10, rating: 4.8, photo: '' },
-            { id: 2, name: 'Amit Singh', experience: 7, rating: 4.7, photo: '' },
-            { id: 3, name: 'Vijay Sharma', experience: 5, rating: 4.6, photo: '' }
-        ];
+  <!-- Loader -->
+  <div class="loader" id="loader">
+    <div class="spinner"></div>
+  </div>
 
-        const REVIEWS = [
-            { id: 1, customerName: 'Rahul M.', rating: 5, comment: 'Excellent service! Very professional and clean.', date: '2026-01-15' },
-            { id: 2, customerName: 'Priya S.', rating: 5, comment: 'Best barbershop in town. Highly recommended!', date: '2026-01-12' },
-            { id: 3, customerName: 'Ankit P.', rating: 4, comment: 'Good service, reasonable prices.', date: '2026-01-10' },
-            { id: 4, customerName: 'Suresh K.', rating: 5, comment: 'Amazing haircut! Will definitely come back.', date: '2026-01-08' }
-        ];
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
 
-        const COUPONS = [
-            { code: 'FIRST50', type: 'percentage', value: 50, maxDiscount: 200, minAmount: 300 },
-            { code: 'SAVE100', type: 'flat', value: 100, minAmount: 500 }
-        ];
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, signInWithPhoneNumber, RecaptchaVerifier } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-        // State
-        let currentUser = null;
-        let selectedServiceId = null;
-        let selectedBarberId = null;
-        let selectedTimeSlot = null;
-        let appliedCoupon = null;
-        let bookingData = {};
+    // Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
+    };
 
-        // Initialize App
-        document.addEventListener('DOMContentLoaded', function() {
-            loadServices();
-            loadBarbers();
-            loadReviews();
-            setMinDate();
-            checkLoginStatus();
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    window.recaptchaVerifier = new RecaptchaVerifier(
+      'recaptcha-container',
+      { size: 'normal' },
+      auth
+    );
+
+    window.sendOTP = function () {
+      const phoneNumber = document.getElementById("loginPhone").value;
+      if (!/^[6-9]\d{9}$/.test(phoneNumber)) {
+        showNotification('Please enter a valid 10-digit mobile number', 'error');
+        return;
+      }
+      signInWithPhoneNumber(auth, '+91' + phoneNumber, window.recaptchaVerifier)
+        .then((confirmationResult) => {
+          window.confirmationResult = confirmationResult;
+          showNotification("OTP sent", "success");
+          document.getElementById('phoneStep').classList.add('hidden');
+          document.getElementById('otpStep').classList.remove('hidden');
+        })
+        .catch((error) => {
+          showNotification(error.message, "error");
         });
+    };
 
-        // Check if user is logged in
-        function checkLoginStatus() {
-            const user = localStorage.getItem('user');
-            if (user) {
-                currentUser = JSON.parse(user);
-                document.getElementById('loginBtn').classList.add('hidden');
-                document.getElementById('profileBtn').classList.remove('hidden');
-                document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
-            }
-        }
-
-        // Load Services
-        function loadServices() {
-            const serviceList = document.getElementById('serviceList');
-            const serviceSelect = document.getElementById('selectedService');
-            
-            serviceList.innerHTML = SERVICES.map(service => `
-                <article class="service-card">
-                    <div class="service-card__image"></div>
-                    <div class="service-card__content">
-                        <h3 class="service-card__title">${service.name}</h3>
-                        <p class="service-card__description">${service.description}</p>
-                        <div class="service-card__details">
-                            <span class="service-card__price">₹${service.price}</span>
-                            <span class="service-card__duration">${service.duration} mins</span>
-                        </div>
-                        <button class="btn btn--primary" onclick="selectService(${service.id})">
-                            Book Now
-                        </button>
-                    </div>
-                </article>
-            `).join('');
-
-            serviceSelect.innerHTML = '<option value="">Select a service</option>' + 
-                SERVICES.map(s => `<option value="${s.id}">${s.name} - ₹${s.price}</option>`).join('');
-        }
-
-        // Load Barbers
-        function loadBarbers() {
-            const barberList = document.getElementById('barberList');
-            const barberSelect = document.getElementById('selectedBarber');
-            
-            barberList.innerHTML = BARBERS.map(barber => `
-                <div class="barber-card">
-                    <div class="barber-card__photo"></div>
-                    <div class="barber-card__info">
-                        <h3 class="barber-card__name">${barber.name}</h3>
-                        <p class="barber-card__experience">${barber.experience} years experience</p>
-                        <p class="barber-card__rating">⭐ ${barber.rating}</p>
-                    </div>
-                </div>
-            `).join('');
-
-            barberSelect.innerHTML = '<option value="">Any available barber</option>' + 
-                BARBERS.map(b => `<option value="${b.id}">${b.name} (${b.rating}⭐)</option>`).join('');
-        }
-
-        // Load Reviews
-        function loadReviews() {
-            const reviewsList = document.getElementById('reviewsList');
-            reviewsList.innerHTML = REVIEWS.map(review => `
-                <article class="review-card">
-                    <div class="review-card__header">
-                        <h4 class="review-card__name">${review.customerName}</h4>
-                        <div class="review-card__rating">${'⭐'.repeat(review.rating)}</div>
-                    </div>
-                    <p class="review-card__text">${review.comment}</p>
-                    <p class="review-card__date">${formatDate(review.date)}</p>
-                </article>
-            `).join('');
-        }
-
-        // Service Selection
-        function selectService(serviceId) {
-            selectedServiceId = serviceId;
-            openBookingModal();
-            document.getElementById('selectedService').value = serviceId;
-            updatePrice();
-        }
-
-        // Update Price
-        function updatePrice() {
-            const serviceId = parseInt(document.getElementById('selectedService').value);
-            const service = SERVICES.find(s => s.id === serviceId);
-            
-            if (service) {
-                let basePrice = service.price;
-                let discount = 0;
-                
-                if (appliedCoupon) {
-                    if (appliedCoupon.type === 'percentage') {
-                        discount = Math.min(basePrice * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
-                    } else {
-                        discount = appliedCoupon.value;
-                    }
-                }
-                
-                const total = basePrice - discount;
-                
-                document.getElementById('servicePrice').textContent = `₹${basePrice}`;
-                document.getElementById('discountAmount').textContent = `-₹${discount}`;
-                document.getElementById('totalPrice').textContent = `₹${total}`;
-                
-                if (discount > 0) {
-                    document.getElementById('discountRow').style.display = 'flex';
-                } else {
-                    document.getElementById('discountRow').style.display = 'none';
-                }
-            }
-        }
-
-        // Load Time Slots
-        function loadTimeSlots() {
-            const date = document.getElementById('bookingDate').value;
-            if (!date) return;
-
-            const timeSlots = document.getElementById('timeSlots');
-            const slots = [
-                '09:00', '10:00', '11:00', '12:00', '14:00', 
-                '15:00', '16:00', '17:00', '18:00', '19:00'
-            ];
-
-            // Mock: Mark some slots as booked
-            const bookedSlots = ['11:00', '15:00'];
-
-            timeSlots.innerHTML = slots.map(slot => {
-                const isBooked = bookedSlots.includes(slot);
-                const classes = `time-slot ${isBooked ? 'time-slot--booked' : ''}`;
-                const disabled = isBooked ? 'disabled' : '';
-                
-                return `
-                    <button type="button" class="${classes}" ${disabled} 
-                            onclick="selectTimeSlot('${slot}', this)">
-                        ${formatTime(slot)}
-                    </button>
-                `;
-            }).join('');
-        }
-
-        // Select Time Slot
-        function selectTimeSlot(time, element) {
-            if (element.disabled) return;
-            
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.classList.remove('time-slot--selected');
-            });
-            
-            element.classList.add('time-slot--selected');
-            selectedTimeSlot = time;
-        }
-
-        // Apply Coupon
-        function applyCoupon() {
-            const code = document.getElementById('couponCode').value.toUpperCase();
-            const coupon = COUPONS.find(c => c.code === code);
-            
-            if (!coupon) {
-                showNotification('Invalid coupon code', 'error');
-                return;
-            }
-
-            const serviceId = parseInt(document.getElementById('selectedService').value);
-            const service = SERVICES.find(s => s.id === serviceId);
-            
-            if (!service) {
-                showNotification('Please select a service first', 'error');
-                return;
-            }
-
-            if (service.price < coupon.minAmount) {
-                showNotification(`Minimum amount ₹${coupon.minAmount} required`, 'error');
-                return;
-            }
-
-            appliedCoupon = coupon;
-            updatePrice();
-            showNotification('Coupon applied successfully!', 'success');
-        }
-
-        // Booking Form Submit
-        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            if (!selectedTimeSlot) {
-                showNotification('Please select a time slot', 'error');
-                return;
-            }
-
-            const formData = {
-                name: document.getElementById('customerName').value,
-                phone: document.getElementById('customerPhone').value,
-                serviceId: parseInt(document.getElementById('selectedService').value),
-                barberId: document.getElementById('selectedBarber').value || null,
-                date: document.getElementById('bookingDate').value,
-                timeSlot: selectedTimeSlot,
-                coupon: appliedCoupon?.code || null
-            };
-
-            const service = SERVICES.find(s => s.id === formData.serviceId);
-            let totalAmount = service.price;
-
-            if (appliedCoupon) {
-                if (appliedCoupon.type === 'percentage') {
-                    totalAmount -= Math.min(totalAmount * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
-                } else {
-                    totalAmount -= appliedCoupon.value;
-                }
-            }
-
-            bookingData = { ...formData, totalAmount, service };
-
-            closeBookingModal();
-            openPaymentModal(totalAmount);
+    window.verifyOTP = function () {
+      const otp = document.getElementById("loginOTP").value;
+      if (otp.length !== 6) {
+        showNotification('Please enter 6-digit OTP', 'error');
+        return;
+      }
+      window.confirmationResult.confirm(otp)
+        .then((result) => {
+          const user = result.user;
+          localStorage.setItem('user', JSON.stringify({ name: user.phoneNumber, phone: user.phoneNumber }));
+          currentUser = JSON.parse(localStorage.getItem('user'));
+          checkLoginStatus();
+          closeLoginModal();
+          document.getElementById('loginPhone').value = '';
+          document.getElementById('loginOTP').value = '';
+          document.getElementById('phoneStep').classList.remove('hidden');
+          document.getElementById('otpStep').classList.add('hidden');
+          showNotification("Login successful", "success");
+        })
+        .catch(() => {
+          showNotification("Invalid OTP", "error");
         });
+    };
 
-        // Payment Functions
-        function openPaymentModal(amount) {
-            document.getElementById('paymentAmount').textContent = amount;
-            document.getElementById('paymentModal').classList.add('active');
+    // Application logic starts here
+
+    // Mock Data
+    const SERVICES = [
+      { id: 1, name: 'Classic Haircut', description: 'Professional styling by expert barbers', price: 250, duration: 30 },
+      { id: 2, name: 'Beard Trim & Shave', description: 'Precision grooming for your beard', price: 150, duration: 20 },
+      { id: 3, name: 'Hair Color', description: 'Premium hair coloring service', price: 800, duration: 60 },
+      { id: 4, name: 'Facial Treatment', description: 'Rejuvenating facial for men', price: 500, duration: 45 },
+      { id: 5, name: 'Head Massage', description: 'Relaxing head and shoulder massage', price: 200, duration: 15 },
+      { id: 6, name: 'Complete Grooming', description: 'Haircut + Beard + Facial combo', price: 800, duration: 90 }
+    ];
+
+    const BARBERS = [
+      { id: 1, name: 'Rajesh Kumar', experience: 10, rating: 4.8, photo: '' },
+      { id: 2, name: 'Amit Singh', experience: 7, rating: 4.7, photo: '' },
+      { id: 3, name: 'Vijay Sharma', experience: 5, rating: 4.6, photo: '' }
+    ];
+
+    const REVIEWS = [
+      { id: 1, customerName: 'Rahul M.', rating: 5, comment: 'Excellent service! Very professional and clean.', date: '2026-01-15' },
+      { id: 2, customerName: 'Priya S.', rating: 5, comment: 'Best barbershop in town. Highly recommended!', date: '2026-01-12' },
+      { id: 3, customerName: 'Ankit P.', rating: 4, comment: 'Good service, reasonable prices.', date: '2026-01-10' },
+      { id: 4, customerName: 'Suresh K.', rating: 5, comment: 'Amazing haircut! Will definitely come back.', date: '2026-01-08' }
+    ];
+
+    const COUPONS = [
+      { code: 'FIRST50', type: 'percentage', value: 50, maxDiscount: 200, minAmount: 300 },
+      { code: 'SAVE100', type: 'flat', value: 100, minAmount: 500 }
+    ];
+
+    let currentUser = null;
+    let selectedServiceId = null;
+    let selectedBarberId = null;
+    let selectedTimeSlot = null;
+    let appliedCoupon = null;
+    let bookingData = {};
+
+    document.addEventListener('DOMContentLoaded', function () {
+      loadServices();
+      loadBarbers();
+      loadReviews();
+      setMinDate();
+      checkLoginStatus();
+    });
+
+    function checkLoginStatus() {
+      const user = localStorage.getItem('user');
+      if (user) {
+        currentUser = JSON.parse(user);
+        document.getElementById('loginBtn').classList.add('hidden');
+        document.getElementById('profileBtn').classList.remove('hidden');
+        document.getElementById('userName').textContent = currentUser.name.split(' ')[0];
+        document.getElementById('logoutBtn').classList.remove('hidden');
+      } else {
+        document.getElementById('loginBtn').classList.remove('hidden');
+        document.getElementById('profileBtn').classList.add('hidden');
+        document.getElementById('logoutBtn').classList.add('hidden');
+      }
+    }
+
+    function loadServices() {
+      const serviceList = document.getElementById('serviceList');
+      const serviceSelect = document.getElementById('selectedService');
+
+      serviceList.innerHTML = SERVICES.map(service =>
+        `<article class="service-card">
+          <div class="service-card__image"></div>
+          <div class="service-card__content">
+            <h3 class="service-card__title">${service.name}</h3>
+            <p class="service-card__description">${service.description}</p>
+            <div class="service-card__details">
+              <span class="service-card__price">₹${service.price}</span>
+              <span class="service-card__duration">${service.duration} mins</span>
+            </div>
+            <button class="btn btn--primary" onclick="selectService(${service.id})">Book Now</button>
+          </div>
+        </article>`)
+        .join('');
+
+      serviceSelect.innerHTML = '<option value="">Select a service</option>' + SERVICES.map(s =>
+        `<option value="${s.id}">${s.name} - ₹${s.price}</option>`).join('');
+    }
+
+    function loadBarbers() {
+      const barberList = document.getElementById('barberList');
+      const barberSelect = document.getElementById('selectedBarber');
+
+      barberList.innerHTML = BARBERS.map(barber =>
+        `<div class="barber-card">
+          <div class="barber-card__photo"></div>
+          <div class="barber-card__info">
+            <h3 class="barber-card__name">${barber.name}</h3>
+            <p class="barber-card__experience">${barber.experience} years experience</p>
+            <p class="barber-card__rating">⭐ ${barber.rating}</p>
+          </div>
+        </div>`).join('');
+
+      barberSelect.innerHTML = '<option value="">Any available barber</option>' + BARBERS.map(b =>
+        `<option value="${b.id}">${b.name} (${b.rating}⭐)</option>`).join('');
+    }
+
+    function loadReviews() {
+      const reviewsList = document.getElementById('reviewsList');
+      reviewsList.innerHTML = REVIEWS.map(review =>
+        `<article class="review-card">
+          <div class="review-card__header">
+            <h4 class="review-card__name">${review.customerName}</h4>
+            <div class="review-card__rating">${'⭐'.repeat(review.rating)}</div>
+          </div>
+          <p class="review-card__text">${review.comment}</p>
+          <p class="review-card__date">${formatDate(review.date)}</p>
+        </article>`).join('');
+    }
+
+    function selectService(serviceId) {
+      selectedServiceId = serviceId;
+      openBookingModal();
+      document.getElementById('selectedService').value = serviceId;
+      updatePrice();
+      loadTimeSlots();
+    }
+
+    function updatePrice() {
+      const serviceId = parseInt(document.getElementById('selectedService').value);
+      const service = SERVICES.find(s => s.id === serviceId);
+
+      if (service) {
+        let basePrice = service.price;
+        let discount = 0;
+        if (appliedCoupon) {
+          if (appliedCoupon.type === 'percentage') {
+            discount = Math.min(basePrice * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
+          } else {
+            discount = appliedCoupon.value;
+          }
         }
+        const total = basePrice - discount;
 
-        function closePaymentModal() {
-            document.getElementById('paymentModal').classList.remove('active');
+        document.getElementById('servicePrice').textContent = `₹${basePrice}`;
+        document.getElementById('discountAmount').textContent = `₹${discount}`;
+        document.getElementById('totalPrice').textContent = `₹${total}`;
+
+        if (discount > 0) {
+          document.getElementById('discountRow').style.display = 'flex';
+        } else {
+          document.getElementById('discountRow').style.display = 'none';
         }
+      }
+    }
 
-        function initiateUPI(app) {
-            const amount = parseInt(document.getElementById('paymentAmount').textContent);
-            const transactionId = 'BKG' + Date.now();
-            
-            let upiUrl = `upi://pay?pa=barbershop@upi&pn=BarberShop&am=${amount}&cu=INR&tn=Booking-${transactionId}`;
-            
-            // Try to open UPI app
-            window.location.href = upiUrl;
-            
-            showNotification('Opening payment app...', 'info');
+    function loadTimeSlots() {
+      const date = document.getElementById('bookingDate').value;
+      if (!date) return;
+
+      const timeSlots = document.getElementById('timeSlots');
+      const slots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+
+      // Mock booked slots
+      const bookedSlots = ['11:00', '15:00'];
+
+      timeSlots.innerHTML = slots.map(slot => {
+        const isBooked = bookedSlots.includes(slot);
+        const classes = `time-slot${isBooked ? ' time-slot--booked' : ''}`;
+        const disabled = isBooked ? 'disabled' : '';
+
+        return `
+          <button type="button" class="${classes}" ${disabled} onclick="selectTimeSlot('${slot}', this)">
+            ${formatTime(slot)}
+          </button>`;
+      }).join('');
+    }
+
+    function selectTimeSlot(time, element) {
+      if (element.disabled) return;
+
+      document.querySelectorAll('.time-slot').forEach(slot => {
+        slot.classList.remove('time-slot--selected');
+      });
+      element.classList.add('time-slot--selected');
+      selectedTimeSlot = time;
+    }
+
+    function applyCoupon() {
+      const code = document.getElementById('couponCode').value.toUpperCase();
+      const coupon = COUPONS.find(c => c.code === code);
+
+      if (!coupon) {
+        showNotification('Invalid coupon code', 'error');
+        return;
+      }
+
+      const serviceId = parseInt(document.getElementById('selectedService').value);
+      const service = SERVICES.find(s => s.id === serviceId);
+
+      if (!service) {
+        showNotification('Please select a service first', 'error');
+        return;
+      }
+
+      if (service.price < coupon.minAmount) {
+        showNotification(`Minimum amount ₹${coupon.minAmount} required`, 'error');
+        return;
+      }
+
+      appliedCoupon = coupon;
+      updatePrice();
+
+      showNotification('Coupon applied successfully!', 'success');
+    }
+
+    document.getElementById('bookingForm').addEventListener('submit', function (e) {
+      e.preventDefault();
+
+      if (!selectedTimeSlot) {
+        showNotification('Please select a time slot', 'error');
+        return;
+      }
+
+      const formData = {
+        name: document.getElementById('customerName').value,
+        phone: document.getElementById('customerPhone').value,
+        serviceId: parseInt(document.getElementById('selectedService').value),
+        barberId: document.getElementById('selectedBarber').value || null,
+        date: document.getElementById('bookingDate').value,
+        timeSlot: selectedTimeSlot,
+        coupon: appliedCoupon?.code || null
+      };
+
+      const service = SERVICES.find(s => s.id === formData.serviceId);
+      let totalAmount = service.price;
+
+      if (appliedCoupon) {
+        if (appliedCoupon.type === 'percentage') {
+          totalAmount -= Math.min(totalAmount * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
+        } else {
+          totalAmount -= appliedCoupon.value;
         }
+      }
 
-        function confirmPayment() {
-            // In real app, verify payment on server
-            showLoader();
-            
-            setTimeout(() => {
-                hideLoader();
-                closePaymentModal();
-                
-                // Send WhatsApp confirmation
-                sendBookingConfirmation();
-                
-                showNotification('Booking confirmed! Check WhatsApp for details.', 'success');
-                
-                // Reset form
-                document.getElementById('bookingForm').reset();
-                appliedCoupon = null;
-                selectedTimeSlot = null;
-            }, 2000);
-        }
+      bookingData = { ...formData, totalAmount, service };
 
-        // Send Booking Confirmation via WhatsApp
-        function sendBookingConfirmation() {
-            const message = `
-✂️ *Booking Confirmed!*
+      closeBookingModal();
+      openPaymentModal(totalAmount);
+    });
 
-Service: ${bookingData.service.name}
-Date: ${formatDate(bookingData.date)}
-Time: ${formatTime(bookingData.timeSlot)}
-${bookingData.barberId ? 'Barber: ' + BARBERS.find(b => b.id == bookingData.barberId).name : ''}
-Amount Paid: ₹${bookingData.totalAmount}
+    // Payment Functions
+    function openPaymentModal(amount) {
+      document.getElementById('paymentAmount').textContent = amount;
+      document.getElementById('paymentModal').classList.add('active');
+    }
 
-Thank you for choosing BarberShop! 💈
-See you soon!
+    function closePaymentModal() {
+      document.getElementById('paymentModal').classList.remove('active');
+    }
 
-📍 123 Main Street, City Name
-📞 +91-9876543210
-            `.trim();
-            
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/919876543210?text=${encodedMessage}`, '_blank');
-        }
+    function initiateUPI(app) {
+      const amount = parseInt(document.getElementById('paymentAmount').textContent);
+      const transactionId = 'BKG' + Date.now();
 
-        // Login Functions
-        function openLoginModal() {
-            document.getElementById('loginModal').classList.add('active');
-        }
+      const upiUrl = `upi://pay?pa=barbershop@upi&pn=BarberShop&am=${amount}&cu=INR&tn=Booking ${transactionId}`;
 
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.remove('active');
-        }
+      window.location.href = upiUrl;
+      showNotification('Opening payment app...', 'info');
+    }
 
-        function sendOTP() {
-            const phone = document.getElementById('loginPhone').value;
-            
-            if (!/^[6-9]\d{9}$/.test(phone)) {
-                showNotification('Please enter a valid 10-digit mobile number', 'error');
-                return;
-            }
+    function confirmPayment() {
+      // In real app, verify payment on server
+      showLoader();
+      setTimeout(() => {
+        hideLoader();
+        closePaymentModal();
 
-            showLoader();
-            
-            // Mock: Send OTP (In real app, call API)
-            setTimeout(() => {
-                hideLoader();
-                document.getElementById('phoneStep').classList.add('hidden');
-                document.getElementById('otpStep').classList.remove('hidden');
-                showNotification('OTP sent to your mobile', 'success');
-                console.log('Mock OTP: 123456'); // For testing
-            }, 1500);
-        }
+        sendBookingConfirmation();
+        showNotification('Booking confirmed! Check WhatsApp for details.', 'success');
+        document.getElementById('bookingForm').reset();
+        appliedCoupon = null;
+        selectedTimeSlot = null;
+      }, 2000);
+    }
 
-        function verifyOTP() {
-            const phone = document.getElementById('loginPhone').value;
-            const otp = document.getElementById('loginOTP').value;
-            
-            if (otp.length !== 6) {
-                showNotification('Please enter 6-digit OTP', 'error');
-                return;
-            }
+    function sendBookingConfirmation() {
+      const message = `
+        ✂️ *Booking Confirmed!*\n
+        Service: ${bookingData.service.name}\n
+        Date: ${formatDate(bookingData.date)}\n
+        Time: ${formatTime(bookingData.timeSlot)}\n
+        ${bookingData.barberId ? 'Barber: ' + BARBERS.find(b => b.id == bookingData.barberId).name : ''}\n
+        Amount Paid: ₹${bookingData.totalAmount}\n
+        Thank you for choosing BarberShop! 💈 See you soon!\n
+        📍 123 Main Street, City Name\n
+        📞 +91-9876543210
+      `.trim();
 
-            showLoader();
-            
-            // Mock: Verify OTP (In real app, call API)
-            setTimeout(() => {
-                hideLoader();
-                
-                // Mock user data
-                const userData = {
-                    id: Date.now(),
-                    name: 'Customer',
-                    phone: phone
-                };
-                
-                localStorage.setItem('user', JSON.stringify(userData));
-                localStorage.setItem('token', 'mock_token_' + Date.now());
-                
-                currentUser = userData;
-                checkLoginStatus();
-                closeLoginModal();
-                
-                // Reset login form
-                document.getElementById('loginPhone').value = '';
-                document.getElementById('loginOTP').value = '';
-                document.getElementById('phoneStep').classList.remove('hidden');
-                document.getElementById('otpStep').classList.add('hidden');
-                
-                showNotification('Login successful!', 'success');
-            }, 1500);
-        }
+      const encodedMessage = encodeURIComponent(message);
+      window.open(`https://wa.me/919876543210?text=${encodedMessage}`, '_blank');
+    }
 
-        function backToPhone() {
-            document.getElementById('phoneStep').classList.remove('hidden');
-            document.getElementById('otpStep').classList.add('hidden');
-            document.getElementById('loginOTP').value = '';
-        }
+    function openLoginModal() {
+      document.getElementById('loginModal').classList.add('active');
+    }
 
-        function showProfile() {
-            if (currentUser) {
-                alert(`Profile:\nName: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n(Profile page coming soon!)`);
-            }
-        }
+    function closeLoginModal() {
+      document.getElementById('loginModal').classList.remove('active');
+      // Reset login form on modal close
+      document.getElementById('loginPhone').value = '';
+      document.getElementById('loginOTP').value = '';
+      document.getElementById('phoneStep').classList.remove('hidden');
+      document.getElementById('otpStep').classList.add('hidden');
+    }
 
-        function logout() {
-            localStorage.removeItem('user');
-            localStorage.removeItem('token');
-            currentUser = null;
-            document.getElementById('loginBtn').classList.remove('hidden');
-            document.getElementById('profileBtn').classList.add('hidden');
-            showNotification('Logged out successfully', 'info');
-        }
+    function backToPhone() {
+      document.getElementById('phoneStep').classList.remove('hidden');
+      document.getElementById('otpStep').classList.add('hidden');
+      document.getElementById('loginOTP').value = '';
+    }
 
-        // Modal Functions
-        function openBookingModal() {
-            document.getElementById('bookingModal').classList.add('active');
-        }
+    function showProfile() {
+      if (currentUser) {
+        alert(`Profile:\nName: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n(Profile page coming soon!)`);
+      }
+    }
 
-        function closeBookingModal() {
-            document.getElementById('bookingModal').classList.remove('active');
-        }
+    function logout() {
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      currentUser = null;
+      document.getElementById('loginBtn').classList.remove('hidden');
+      document.getElementById('profileBtn').classList.add('hidden');
+      document.getElementById('logoutBtn').classList.add('hidden');
+      showNotification('Logged out successfully', 'info');
+    }
 
-        // Navigation
-        function showSection(section) {
-            document.querySelectorAll('.nav-item').forEach(item => {
-                item.classList.remove('active');
-            });
-            event.currentTarget.classList.add('active');
+    function openBookingModal() {
+      document.getElementById('bookingModal').classList.add('active');
+      updatePrice();
+      loadTimeSlots();
+    }
 
-            const sections = {
-                home: ['servicesSection', 'barbersSection', 'reviewsSection', 'locationSection'],
-                services: ['servicesSection'],
-                reviews: ['reviewsSection'],
-                location: ['locationSection']
-            };
+    function closeBookingModal() {
+      document.getElementById('bookingModal').classList.remove('active');
+    }
 
-            document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            
-            if (sections[section]) {
-                sections[section].forEach(id => {
-                    document.getElementById(id).classList.remove('hidden');
-                });
-            }
+    function showSection(section, event) {
+      document.querySelectorAll('.nav-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      event.currentTarget.classList.add('active');
 
-            if (section === 'home') {
-                document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
-            }
-        }
+      const sections = {
+        home: ['servicesSection', 'barbersSection', 'reviewsSection', 'locationSection'],
+        services: ['servicesSection'],
+        reviews: ['reviewsSection'],
+        location: ['locationSection']
+      };
 
-        // Helper Functions
-        function setMinDate() {
-            const tomorrow = new Date();
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            const minDate = tomorrow.toISOString().split('T')[0];
-            document.getElementById('bookingDate').setAttribute('min', minDate);
-        }
+      document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
 
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-IN', { 
-                day: 'numeric', 
-                month: 'short', 
-                year: 'numeric' 
-            });
-        }
+      if (sections[section]) {
+        sections[section].forEach(id => {
+          document.getElementById(id).classList.remove('hidden');
+        });
+      }
 
-        function formatTime(time) {
-            const [hours, minutes] = time.split(':');
-            const hour = parseInt(hours);
-            const ampm = hour >= 12 ? 'PM' : 'AM';
-            const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
-            return `${displayHour}:${minutes} ${ampm}`;
-        }
+      if (section === 'home') {
+        document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
+      }
+    }
 
-        function showNotification(message, type = 'info') {
-            const notification = document.getElementById('notification');
-            notification.textContent = message;
-            notification.className = `notification notification--${type}`;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
+    function setMinDate() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const minDate = tomorrow.toISOString().split('T')[0];
+      document.getElementById('bookingDate').setAttribute('min', minDate);
+    }
 
-        function showLoader() {
-            document.getElementById('loader').classList.add('active');
-        }
+    function formatDate(dateString) {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+    }
 
-        function hideLoader() {
-            document.getElementById('loader').classList.remove('active');
-        }
-    </script>
+    function formatTime(time) {
+      const [hours, minutes] = time.split(':');
+      const hour = parseInt(hours);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
+      return `${displayHour}:${minutes} ${ampm}`;
+    }
+
+    function showNotification(message, type = 'info') {
+      const notification = document.getElementById('notification');
+      notification.textContent = message;
+      notification.className = `notification notification--${type} show`;
+
+      setTimeout(() => {
+        notification.classList.remove('show');
+      }, 3000);
+    }
+
+    function showLoader() {
+      document.getElementById('loader').classList.add('active');
+    }
+
+    function hideLoader() {
+      document.getElementById('loader').classList.remove('active');
+    }
+  </script>
 </body>
+
 </html>
