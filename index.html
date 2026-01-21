@@ -19,6 +19,18 @@
 
 <div id="appointment-section" style="display:none;">
   <h3>Book an Appointment</h3>
+
+  <label for="customerName">Name:</label>
+  <input type="text" id="customerName" placeholder="Your full name" /><br /><br />
+
+  <label for="phone">Phone Number:</label>
+  <input type="tel" id="phone" placeholder="Your phone number" /><br /><br />
+
+  <label for="barber">Select Barber:</label>
+  <select id="barber">
+    <!-- Barbers will be populated here -->
+  </select><br /><br />
+
   <label for="date">Select Date:</label>
   <input type="date" id="date" /><br /><br />
 
@@ -46,6 +58,22 @@
   </table>
 </div>
 <script type="module">
+  const barbers = [
+  "John Doe",
+  "Jane Smith",
+  "Mike Johnson",
+  "Emily Davis"
+];
+
+const barberSelect = document.getElementById("barber");
+
+// Populate barber dropdown
+barbers.forEach(barber => {
+  const option = document.createElement("option");
+  option.value = barber;
+  option.textContent = barber;
+  barberSelect.appendChild(option);
+});
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
     getAuth,
@@ -62,6 +90,7 @@
     query,
   orderBy,
   getDocs,
+    where,
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
   // Your Firebase config
@@ -159,38 +188,79 @@ onAuthStateChanged(auth, async (user) => {
 
   // Book appointment
   document.getElementById("book-appointment").onclick = async () => {
-    const date = document.getElementById("date").value;
-    const time = document.getElementById("time").value;
-    const user = auth.currentUser;
+  const customerName = document.getElementById("customerName").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+  const barber = barberSelect.value;
+  const date = document.getElementById("date").value;
+  const time = document.getElementById("time").value;
+  const user = auth.currentUser;
 
-    if (!date || !time) {
-      appointmentStatus.innerText = "Please select both date and time.";
+  if (!customerName) {
+    appointmentStatus.innerText = "Please enter your name.";
+    return;
+  }
+
+  if (!phone) {
+    appointmentStatus.innerText = "Please enter your phone number.";
+    return;
+  }
+
+  if (!barber) {
+    appointmentStatus.innerText = "Please select a barber.";
+    return;
+  }
+
+  if (!date || !time) {
+    appointmentStatus.innerText = "Please select both date and time.";
+    return;
+  }
+
+  if (!user) {
+    appointmentStatus.innerText = "You must be logged in to book an appointment.";
+    return;
+  }
+
+  // Check if the selected barber is available at the chosen date and time
+  try {
+    const q = query(
+      collection(db, "appointments"),
+      where("barber", "==", barber),
+      where("date", "==", date),
+      where("time", "==", time)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+      appointmentStatus.innerText = `Sorry, ${barber} is not available at ${date} ${time}. Please choose another time or barber.`;
       return;
     }
 
-    if (!user) {
-      appointmentStatus.innerText = "You must be logged in to book an appointment.";
-      return;
-    }
+    // Save appointment to Firestore in 'appointments' collection
+    await addDoc(collection(db, "appointments"), {
+      userId: user.uid,
+      email: user.email,
+      customerName,
+      phone,
+      barber,
+      date,
+      time,
+      createdAt: serverTimestamp()
+    });
 
-    try {
-      await addDoc(collection(db, "appointments"), {
-        userId: user.uid,
-        email: user.email,
-        date: date,
-        time: time,
-        createdAt: serverTimestamp(),
-      });
+    appointmentStatus.innerText = `Appointment booked with ${barber} for ${date} at ${time}. Thank you, ${customerName}!`;
 
-      appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
+    // Clear inputs
+    document.getElementById("customerName").value = "";
+    document.getElementById("phone").value = "";
+    barberSelect.value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("time").value = "";
 
-      // Clear inputs
-      document.getElementById("date").value = "";
-      document.getElementById("time").value = "";
-    } catch (error) {
-      appointmentStatus.innerText = "Error booking appointment: " + error.message;
-    }
-  };
+  } catch (error) {
+    appointmentStatus.innerText = "Error booking appointment: " + error.message;
+  }
+};
   const adminSection = document.getElementById("admin-section");
 const bookingsBody = document.getElementById("bookings-body");
 
