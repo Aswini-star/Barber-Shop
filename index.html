@@ -16,7 +16,18 @@
 <button id="logout">Logout</button>
  
 <p id="status"></p>
- 
+ <div id="appointment-section" style="display:none;">
+  <h3>Book an Appointment</h3>
+  <label for="date">Select Date:</label>
+  <input type="date" id="date"><br><br>
+  
+  <label for="time">Select Time:</label>
+  <input type="time" id="time"><br><br>
+  
+  <button id="book-appointment">Book Appointment</button>
+  
+  <p id="appointment-status"></p>
+</div>
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
