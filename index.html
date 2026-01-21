@@ -1,166 +1,57 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Barber Shop</title>
-
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- ✅ YOUR ORIGINAL CSS – UNCHANGED -->
-<style>
-/* SAME CSS AS YOU PROVIDED – NOT REMOVED */
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Segoe UI,Tahoma,Verdana;background:#f8f9fa}
-.hidden{display:none}
-.btn{padding:10px;border:none;border-radius:8px;background:#d4af37;color:#fff;font-weight:600}
-.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);justify-content:center;align-items:center}
-.modal.active{display:flex}
-.modal-content{background:#fff;padding:20px;border-radius:12px;width:90%;max-width:400px}
-.form-input{width:100%;padding:10px;margin-bottom:10px}
-</style>
+  <meta charset="UTF-8">
+  <title>Firebase OTP Test</title>
 </head>
-
 <body>
-
-<header style="background:#1a1a1a;color:#fff;padding:15px">
-  <h2>💈 Barber Shop</h2>
-  <button class="btn" onclick="openLoginModal()">Login</button>
-</header>
-
-<!-- ================= LOGIN ROLE MODAL ================= -->
-<div class="modal" id="roleModal">
-  <div class="modal-content">
-    <h3>Select Login</h3><br>
-    <button class="btn" onclick="openCustomerLogin()">Customer</button><br><br>
-    <button class="btn" onclick="openStaffLogin()">Staff</button><br><br>
-    <button class="btn" onclick="openAdminLogin()">Admin</button>
-  </div>
-</div>
-
-<!-- ================= CUSTOMER LOGIN ================= -->
-<div class="modal" id="customerLogin">
-  <div class="modal-content">
-    <h3>Customer Login</h3>
-    <input class="form-input" id="custPhone" placeholder="10 digit mobile">
-    <div id="recaptcha-container"></div>
-    <button class="btn" onclick="sendOTP()">Send OTP</button><br><br>
-    <input class="form-input" id="custOTP" placeholder="Enter OTP">
-    <button class="btn" onclick="verifyOTP()">Verify</button>
-  </div>
-</div>
-
-<!-- ================= STAFF / ADMIN LOGIN ================= -->
-<div class="modal" id="emailLogin">
-  <div class="modal-content">
-    <h3 id="emailTitle"></h3>
-    <input class="form-input" id="email" placeholder="Email">
-    <input class="form-input" id="password" type="password" placeholder="Password">
-    <button class="btn" onclick="emailLogin()">Login</button>
-  </div>
-</div>
-
-<!-- ================= BOOKING FORM ================= -->
-<section style="padding:20px">
-<h3>Book Appointment</h3><br>
-<input class="form-input" id="custName" placeholder="Name">
-<input class="form-input" id="custPhone2" placeholder="Phone">
-<input class="form-input" id="service" placeholder="Service">
-<input class="form-input" id="date" type="date">
-<input class="form-input" id="time" placeholder="Time">
-<button class="btn" onclick="saveBooking()">Confirm Booking</button>
-</section>
-
-<!-- ================= FIREBASE ================= -->
+ 
+<h2>Firebase Phone OTP Test</h2>
+ 
+<input id="phone" placeholder="10 digit mobile"><br><br>
+<button onclick="sendOTP()">Send OTP</button><br><br>
+ 
+<input id="otp" placeholder="Enter OTP"><br><br>
+<button onclick="verifyOTP()">Verify OTP</button>
+ 
+<div id="recaptcha-container"></div>
+ 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, RecaptchaVerifier, signInWithPhoneNumber, signInWithEmailAndPassword }
+import { getAuth, RecaptchaVerifier, signInWithPhoneNumber }
 from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { getFirestore, collection, addDoc }
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
+ 
+/* 🔥 YOUR FIREBASE CONFIG */
 const firebaseConfig = {
   apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
   authDomain: "barber-shop-4c26f.firebaseapp.com",
   projectId: "barber-shop-4c26f",
-  storageBucket: "barber-shop-4c26f.appspot.com",
-  messagingSenderId: "213114385226",
   appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
 };
-
+ 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db = getFirestore(app);
-
-let role = "customer";
-
-window.openLoginModal = () => document.getElementById("roleModal").classList.add("active");
-
-window.openCustomerLogin = () => {
-  role="customer";
-  closeAll();
-  document.getElementById("customerLogin").classList.add("active");
-};
-
-window.openStaffLogin = () => {
-  role="staff";
-  closeAll();
-  document.getElementById("emailTitle").innerText="Staff Login";
-  document.getElementById("emailLogin").classList.add("active");
-};
-
-window.openAdminLogin = () => {
-  role="admin";
-  closeAll();
-  document.getElementById("emailTitle").innerText="Admin Login";
-  document.getElementById("emailLogin").classList.add("active");
-};
-
-function closeAll(){
-  document.querySelectorAll(".modal").forEach(m=>m.classList.remove("active"));
-}
-
+ 
+/* reCAPTCHA (required by Firebase) */
 window.recaptchaVerifier = new RecaptchaVerifier(
   'recaptcha-container',
-  { size: 'invisible' },
+  { size: 'normal' },
   auth
 );
-
+ 
 window.sendOTP = async () => {
-  const phone="+91"+document.getElementById("custPhone").value;
-  window.confirmationResult = await signInWithPhoneNumber(auth,phone,window.recaptchaVerifier);
+  const phone = "+91" + document.getElementById("phone").value;
+  window.confirmationResult =
+    await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
   alert("OTP Sent");
 };
-
+ 
 window.verifyOTP = async () => {
-  await window.confirmationResult.confirm(document.getElementById("custOTP").value);
-  alert("Customer Login Success");
-  closeAll();
-};
-
-window.emailLogin = async () => {
-  await signInWithEmailAndPassword(
-    auth,
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  );
-  alert(role+" login success");
-  closeAll();
-};
-
-window.saveBooking = async () => {
-  await addDoc(collection(db,"bookings"),{
-    name: custName.value,
-    phone: custPhone2.value,
-    service: service.value,
-    date: date.value,
-    time: time.value,
-    role: "customer",
-    createdAt: new Date()
-  });
-  alert("Booking saved to Firebase");
+  const otp = document.getElementById("otp").value;
+  await window.confirmationResult.confirm(otp);
+  alert("OTP Verified Successfully");
 };
 </script>
-
+ 
 </body>
 </html>
