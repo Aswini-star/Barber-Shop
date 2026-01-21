@@ -165,13 +165,15 @@
   <div class="container">
     <h2>Barber Shop Booking</h2>
 
-    <input id="email" type="email" placeholder="Email" autocomplete="username" />
-    <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
+    <div id="auth-section">
+      <input id="email" type="email" placeholder="Email" autocomplete="username" />
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password" />
 
-    <div style="margin-bottom: 1.5em;">
-      <button id="signup">Sign Up</button>
-      <button id="login">Login</button>
-      <button id="logout">Logout</button>
+      <div style="margin-bottom: 1.5em;">
+        <button id="signup">Sign Up</button>
+        <button id="login">Login</button>
+        <button id="logout">Logout</button>
+      </div>
     </div>
 
     <p id="status"></p>
@@ -251,6 +253,7 @@
     const servicesSection = document.getElementById("services-section");
     const appointmentSection = document.getElementById("appointment-section");
     const appointmentStatus = document.getElementById("appointment-status");
+    const authSection = document.getElementById("auth-section");
 
     // Populate barber dropdown
     barbers.forEach(barber => {
@@ -342,6 +345,7 @@
     onAuthStateChanged(auth, async (user) => {
       if (user) {
         status.innerText = `Logged in as: ${user.email}`;
+        authSection.style.display = "none";  // Hide login/signup section when logged in
 
         if (adminEmails.includes(user.email)) {
           appointmentSection.style.display = "none";
@@ -360,6 +364,7 @@
         }
       } else {
         status.innerText = "Not logged in";
+        authSection.style.display = "block";  // Show login/signup section when logged out
         appointmentSection.style.display = "none";
         servicesSection.style.display = "block";
         adminSection.style.display = "none";
