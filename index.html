@@ -16,18 +16,7 @@
 <button id="logout">Logout</button>
  
 <p id="status"></p>
- <div id="appointment-section" style="display:none;">
-  <h3>Book an Appointment</h3>
-  <label for="date">Select Date:</label>
-  <input type="date" id="date"><br><br>
-  
-  <label for="time">Select Time:</label>
-  <input type="time" id="time"><br><br>
-  
-  <button id="book-appointment">Book Appointment</button>
-  
-  <p id="appointment-status"></p>
-</div>
+ 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
@@ -37,13 +26,6 @@
     signOut,
     onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
-  import {
-  getFirestore,
-  collection,
-  addDoc,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
  
   // 🔴 Replace with YOUR Firebase config
   const firebaseConfig = {
@@ -56,68 +38,11 @@
   };
  
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
   const auth = getAuth(app);
+ 
   const status = document.getElementById("status");
  
   // Auth state listener
-  const appointmentSection = document.getElementById("appointment-section");
-const appointmentStatus = document.getElementById("appointment-status");
-
-onAuthStateChanged(auth, (user) => {
-  if (user) {
-    status.innerText = "Logged in as: " + user.email;
-    appointmentSection.style.display = "block";  // Show appointment form when logged in
-  } else {
-    status.innerText = "Not logged in";
-    appointmentSection.style.display = "none";  // Hide appointment form when logged out
-    appointmentStatus.innerText = "";
-  }
-});
-
-document.getElementById("book-appointment").onclick = async () => {
-  const date = document.getElementById("date").value;
-  const time = document.getElementById("time").value;
-  const user = auth.currentUser;
-
-  if (!date || !time) {
-    appointmentStatus.innerText = "Please select both date and time.";
-    return;
-  }
-
-  if (!user) {
-    appointmentStatus.innerText = "You must be logged in to book an appointment.";
-    return;
-  }
-
-  try {
-    // Save appointment to Firestore in 'appointments' collection
-    await addDoc(collection(db, "appointments"), {
-      userId: user.uid,
-      email: user.email,
-      date: date,
-      time: time,
-      createdAt: serverTimestamp()
-    });
-
-    appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
-
-    // Clear inputs
-    document.getElementById("date").value = "";
-    document.getElementById("time").value = "";
-
-  } catch (error) {
-    appointmentStatus.innerText = "Error booking appointment: " + error.message;
-  }
-};
-
-  // For now, just show confirmation. In a real app, you'd save this to a database.
-  appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
-
-  // Clear inputs
-  document.getElementById("date").value = "";
-  document.getElementById("time").value = "";
-};
   onAuthStateChanged(auth, (user) => {
     if (user) {
       status.innerText = "Logged in as: " + user.email;
