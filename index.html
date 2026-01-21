@@ -269,6 +269,7 @@ async function loadAllBookings() {
 
   const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
   const querySnapshot = await getDocs(q);
+  
 
   querySnapshot.forEach((doc) => {
     const data = doc.data();
