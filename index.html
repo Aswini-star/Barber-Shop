@@ -1,3 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Firebase Email Auth Test</title>
+</head>
+<body>
+
+<h2>Firebase Email Authentication</h2>
+
+<input id="email" type="email" placeholder="Email" /><br /><br />
+<input id="password" type="password" placeholder="Password" /><br /><br />
+
+<button id="signup">Sign Up</button>
+<button id="login">Login</button>
+<button id="logout">Logout</button>
+
+<p id="status"></p>
+
+<div id="appointment-section" style="display:none;">
+  <h3>Book an Appointment</h3>
+  <label for="date">Select Date:</label>
+  <input type="date" id="date" /><br /><br />
+
+  <label for="time">Select Time:</label>
+  <input type="time" id="time" /><br /><br />
+
+  <button id="book-appointment">Book Appointment</button>
+
+  <p id="appointment-status"></p>
+</div>
+
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
@@ -5,45 +37,88 @@
     createUserWithEmailAndPassword,
     signInWithEmailAndPassword,
     signOut,
-    onAuthStateChanged
+    onAuthStateChanged,
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
   import {
     getFirestore,
     collection,
     addDoc,
-    serverTimestamp
+    serverTimestamp,
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-  // 🔴 Replace with YOUR Firebase config
+  // Your Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
     authDomain: "barber-shop-4c26f.firebaseapp.com",
     projectId: "barber-shop-4c26f",
     storageBucket: "barber-shop-4c26f.firebasestorage.app",
     messagingSenderId: "213114385226",
-    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
+    appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
   };
 
+  // Initialize Firebase
   const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
   const auth = getAuth(app);
+  const db = getFirestore(app);
 
+  // Get DOM elements
+  const emailInput = document.getElementById("email");
+  const passwordInput = document.getElementById("password");
   const status = document.getElementById("status");
   const appointmentSection = document.getElementById("appointment-section");
   const appointmentStatus = document.getElementById("appointment-status");
 
-  // Auth state listener
+  // Listen for auth state changes
   onAuthStateChanged(auth, (user) => {
     if (user) {
-      status.innerText = "Logged in as: " + user.email;
-      appointmentSection.style.display = "block";  // Show appointment form when logged in
+      status.innerText = `Logged in as: ${user.email}`;
+      appointmentSection.style.display = "block";
     } else {
       status.innerText = "Not logged in";
-      appointmentSection.style.display = "none";  // Hide appointment form when logged out
+      appointmentSection.style.display = "none";
       appointmentStatus.innerText = "";
     }
   });
 
+  // Sign Up
+  document.getElementById("signup").onclick = async () => {
+    try {
+      await createUserWithEmailAndPassword(
+        auth,
+        emailInput.value,
+        passwordInput.value
+      );
+      alert("Signup successful");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Login
+  document.getElementById("login").onclick = async () => {
+    try {
+      await signInWithEmailAndPassword(
+        auth,
+        emailInput.value,
+        passwordInput.value
+      );
+      alert("Login successful");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Logout
+  document.getElementById("logout").onclick = async () => {
+    try {
+      await signOut(auth);
+      alert("Logged out");
+    } catch (e) {
+      alert(e.message);
+    }
+  };
+
+  // Book appointment
   document.getElementById("book-appointment").onclick = async () => {
     const date = document.getElementById("date").value;
     const time = document.getElementById("time").value;
@@ -60,13 +135,12 @@
     }
 
     try {
-      // Save appointment to Firestore in 'appointments' collection
       await addDoc(collection(db, "appointments"), {
         userId: user.uid,
         email: user.email,
         date: date,
         time: time,
-        createdAt: serverTimestamp()
+        createdAt: serverTimestamp(),
       });
 
       appointmentStatus.innerText = `Appointment booked for ${date} at ${time}. Thank you!`;
@@ -74,40 +148,11 @@
       // Clear inputs
       document.getElementById("date").value = "";
       document.getElementById("time").value = "";
-
     } catch (error) {
       appointmentStatus.innerText = "Error booking appointment: " + error.message;
     }
   };
-
-  document.getElementById("signup").onclick = async () => {
-    try {
-      await createUserWithEmailAndPassword(
-        auth,
-        email.value,
-        password.value
-      );
-      alert("Signup successful");
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
-  document.getElementById("login").onclick = async () => {
-    try {
-      await signInWithEmailAndPassword(
-        auth,
-        email.value,
-        password.value
-      );
-      alert("Login successful");
-    } catch (e) {
-      alert(e.message);
-    }
-  };
-
-  document.getElementById("logout").onclick = async () => {
-    await signOut(auth);
-    alert("Logged out");
-  };
 </script>
+
+</body>
+</html>
