@@ -1,18 +1,20 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta charset="UTF-8" />
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
+    <meta name="theme-color" content="#1a1a1a" />
     <title>Barber Shop - Home</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+             padding: 0;
             box-sizing: border-box;
         }
-
         :root {
             --primary-color: #1a1a1a;
             --accent-color: #d4af37;
@@ -23,17 +25,15 @@
             --background-color: #ffffff;
             --background-light: #f8f9fa;
             --border-color: #dddddd;
-            --shadow-sm: 0 2px 4px rgba(0,0,0,0.1);
-            --shadow-md: 0 4px 8px rgba(0,0,0,0.15);
+            --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--background-light);
             color: var(--text-color);
             line-height: 1.6;
         }
-
         .app-header {
             background-color: var(--primary-color);
             color: white;
@@ -43,7 +43,6 @@
             z-index: 100;
             box-shadow: var(--shadow-md);
         }
-
         .header-content {
             display: flex;
             justify-content: space-between;
@@ -51,13 +50,11 @@
             max-width: 1200px;
             margin: 0 auto;
         }
-
         .logo {
             font-size: 1.5rem;
             font-weight: bold;
             color: var(--accent-color);
         }
-
         .nav-menu {
             position: fixed;
             bottom: 0;
@@ -67,9 +64,8 @@
             display: flex;
             justify-content: space-around;
             padding: 0.5rem;
-            box-shadow: 0 -2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
         }
-
         .nav-item {
             display: flex;
             flex-direction: column;
@@ -80,23 +76,19 @@
             font-size: 0.75rem;
             min-width: 60px;
         }
-
         .nav-item i {
             font-size: 1.5rem;
             margin-bottom: 0.25rem;
         }
-
         .nav-item.active {
             color: var(--accent-color);
         }
-
         .app-main {
             max-width: 1200px;
             margin: 0 auto;
             padding: 1rem;
             padding-bottom: 80px;
         }
-
         .hero-section {
             background: linear-gradient(135deg, var(--primary-color) 0%, #333 100%);
             color: white;
@@ -105,23 +97,19 @@
             text-align: center;
             margin-bottom: 2rem;
         }
-
         .hero-section h1 {
             font-size: 2rem;
             margin-bottom: 0.5rem;
         }
-
         .hero-section p {
             margin-bottom: 1rem;
             opacity: 0.9;
         }
-
         .contact-actions {
             display: flex;
             gap: 1rem;
             margin-top: 1rem;
         }
-
         .contact-btn {
             flex: 1;
             display: flex;
@@ -135,15 +123,12 @@
             font-weight: 600;
             min-height: 48px;
         }
-
         .contact-btn--call {
             background-color: #007bff;
         }
-
         .contact-btn--whatsapp {
             background-color: #25d366;
         }
-
         .section {
             background-color: white;
             border-radius: 12px;
@@ -151,77 +136,64 @@
             margin-bottom: 1.5rem;
             box-shadow: var(--shadow-sm);
         }
-
         .section h2 {
             margin-bottom: 1rem;
             color: var(--primary-color);
             font-size: 1.5rem;
         }
-
         .service-grid {
             display: grid;
             grid-template-columns: 1fr;
             gap: 1rem;
         }
-
         @media (min-width: 640px) {
             .service-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
         }
-
         .service-card {
             border: 1px solid var(--border-color);
             border-radius: 8px;
             overflow: hidden;
             transition: transform 0.2s;
         }
-
         .service-card:active {
             transform: scale(0.98);
         }
-
         .service-card__image {
             width: 100%;
             height: 150px;
             object-fit: cover;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
         .service-card__content {
             padding: 1rem;
         }
-
         .service-card__title {
             font-size: 1.1rem;
             margin-bottom: 0.5rem;
             color: var(--primary-color);
         }
-
         .service-card__description {
             font-size: 0.9rem;
             color: var(--text-light);
             margin-bottom: 0.5rem;
         }
-
         .service-card__details {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1rem;
         }
-
         .service-card__price {
             font-size: 1.25rem;
             font-weight: bold;
             color: var(--accent-color);
         }
-
         .service-card__duration {
             font-size: 0.85rem;
             color: var(--text-light);
         }
-
         .btn {
             background-color: var(--accent-color);
             border: none;
@@ -235,19 +207,15 @@
             width: 100%;
             transition: all 0.3s;
         }
-
         .btn:active {
             transform: scale(0.98);
         }
-
         .btn--primary {
             background-color: var(--accent-color);
         }
-
         .btn--success {
             background-color: var(--success-color);
         }
-
         .barber-card {
             display: flex;
             gap: 1rem;
@@ -256,7 +224,6 @@
             border-radius: 8px;
             margin-bottom: 1rem;
         }
-
         .barber-card__photo {
             width: 80px;
             height: 80px;
@@ -264,34 +231,28 @@
             object-fit: cover;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
-
         .barber-card__info {
             flex: 1;
         }
-
         .barber-card__name {
             font-size: 1.1rem;
             font-weight: 600;
             margin-bottom: 0.25rem;
         }
-
         .barber-card__experience {
             font-size: 0.9rem;
             color: var(--text-light);
             margin-bottom: 0.25rem;
         }
-
         .barber-card__rating {
             color: var(--accent-color);
         }
-
         .time-slots {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
             gap: 0.75rem;
             margin-top: 1rem;
         }
-
         .time-slot {
             padding: 0.75rem;
             border: 2px solid var(--border-color);
@@ -302,34 +263,28 @@
             min-height: 48px;
             transition: all 0.2s;
         }
-
         .time-slot:hover {
             border-color: var(--accent-color);
         }
-
         .time-slot--selected {
             background-color: var(--accent-color);
             color: white;
             border-color: var(--accent-color);
         }
-
         .time-slot--booked {
             opacity: 0.4;
             cursor: not-allowed;
             text-decoration: line-through;
         }
-
         .form-group {
             margin-bottom: 1rem;
         }
-
         .form-label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: var(--primary-color);
         }
-
         .form-input {
             width: 100%;
             padding: 0.75rem;
@@ -338,12 +293,10 @@
             font-size: 1rem;
             min-height: 48px;
         }
-
         .form-input:focus {
             outline: none;
             border-color: var(--accent-color);
         }
-
         .modal {
             display: none;
             position: fixed;
@@ -356,11 +309,9 @@
             align-items: center;
             justify-content: center;
         }
-
         .modal.active {
             display: flex;
         }
-
         .modal-content {
             background: white;
             border-radius: 12px;
@@ -370,19 +321,16 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 1.5rem;
         }
-
         .modal-title {
             font-size: 1.5rem;
             color: var(--primary-color);
         }
-
         .modal-close {
             background: none;
             border: none;
@@ -390,7 +338,6 @@
             cursor: pointer;
             color: var(--text-light);
         }
-
         .notification {
             position: fixed;
             top: -100px;
@@ -404,19 +351,15 @@
             z-index: 2000;
             transition: top 0.3s;
         }
-
         .notification.show {
             top: 20px;
         }
-
         .notification--success {
             background: var(--success-color);
         }
-
         .notification--error {
             background: var(--danger-color);
         }
-
         .review-card {
             padding: 1rem;
             border-left: 4px solid var(--accent-color);
@@ -424,31 +367,25 @@
             margin-bottom: 1rem;
             border-radius: 4px;
         }
-
         .review-card__header {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
         }
-
         .review-card__name {
             font-weight: 600;
         }
-
         .review-card__rating {
             color: var(--accent-color);
         }
-
         .review-card__text {
             margin-bottom: 0.5rem;
             color: var(--text-color);
         }
-
         .review-card__date {
             font-size: 0.85rem;
             color: var(--text-light);
         }
-
         .map-container {
             width: 100%;
             height: 300px;
@@ -456,35 +393,29 @@
             overflow: hidden;
             margin-bottom: 1rem;
         }
-
         .coupon-input {
             display: flex;
             gap: 0.5rem;
             margin-top: 1rem;
         }
-
         .coupon-input input {
             flex: 1;
         }
-
         .coupon-input button {
             width: auto;
             padding: 0 1.5rem;
         }
-
         .price-summary {
             background: var(--background-light);
             padding: 1rem;
             border-radius: 8px;
             margin-top: 1rem;
         }
-
         .price-row {
             display: flex;
             justify-content: space-between;
             margin-bottom: 0.5rem;
         }
-
         .price-row--total {
             font-size: 1.25rem;
             font-weight: bold;
@@ -492,7 +423,6 @@
             padding-top: 0.5rem;
             border-top: 2px solid var(--border-color);
         }
-
         .loader {
             display: none;
             position: fixed;
@@ -501,11 +431,9 @@
             transform: translate(-50%, -50%);
             z-index: 3000;
         }
-
         .loader.active {
             display: block;
         }
-
         .spinner {
             width: 50px;
             height: 50px;
@@ -514,81 +442,17 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
-
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
         }
-
         .hidden {
             display: none;
         }
     </style>
 </head>
-<script type="module">
-  // Import the functions you need from the SDKs you need
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-  // TODO: Add SDKs for Firebase products that you want to use
-  // https://firebase.google.com/docs/web/setup#available-libraries
 
-  // Your web app's Firebase configuration
-  const firebaseConfig = {
-    apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-    authDomain: "barber-shop-4c26f.firebaseapp.com",
-    projectId: "barber-shop-4c26f",
-    storageBucket: "barber-shop-4c26f.firebasestorage.app",
-    messagingSenderId: "213114385226",
-    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
-  };
-
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-</script>
-    <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-import { getAuth, signInWithPhoneNumber, RecaptchaVerifier }
-from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
- 
-const firebaseConfig = {
-    apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-    authDomain: "barber-shop-4c26f.firebaseapp.com",
-    projectId: "barber-shop-4c26f",
-    storageBucket: "barber-shop-4c26f.firebasestorage.app",
-    messagingSenderId: "213114385226",
-    appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
-};
- 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-        window.recaptchaVerifier = new RecaptchaVerifier(
-    'recaptcha-container',
-    { size: 'normal' },
-    auth
-  );
- 
-  window.sendOTP = function () {
-    const phoneNumber = document.getElementById("phone").value;
-    signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
-      .then((confirmationResult) => {
-        window.confirmationResult = confirmationResult;
-        alert("OTP sent");
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
-  };
- 
-  window.verifyOTP = function () {
-    const otp = document.getElementById("otp").value;
-    window.confirmationResult.confirm(otp)
-      .then((result) => {
-        alert("Login successful");
-        console.log(result.user);
-      })
-      .catch(() => {
-        alert("Invalid OTP");
-      });
-  };
-</script>
 <body>
     <!-- Header -->
     <header class="app-header">
@@ -614,11 +478,10 @@ const auth = getAuth(app);
             <h1>Welcome to BarberShop</h1>
             <p>Professional grooming services for the modern gentleman</p>
             <div class="contact-actions">
-                <a href="tel:+919876543210" class="contact-btn contact-btn--call">
-                    <i class="fas fa-phone"></i>
+                <a href="tel:+919876543210" class="contactlass="fas fa-phone"></i>
                     <span>Call Now</span>
                 </a>
-                <a href="https://wa.me/919344741870" class="contact-btn contact-btn--whatsapp" target="_blank">
+                https://wa.me/919876543210
                     <i class="fab fa-whatsapp"></i>
                     <span>WhatsApp</span>
                 </a>
@@ -647,20 +510,14 @@ const auth = getAuth(app);
         <section class="section" id="locationSection">
             <h2><i class="fas fa-map-marker-alt"></i> Visit Our Shop</h2>
             <div class="map-container">
-                <iframe 
+                <iframe
                     src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3502.1234567890!2d77.1234567!3d28.1234567!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDA3JzI0LjQiTiA3N8KwMDcnMjQuNCJF!5e0!3m2!1sen!2sin!4v1234567890"
-                    width="100%" 
-                    height="100%" 
-                    style="border:0;" 
-                    allowfullscreen="" 
+                    width="100%"
+                    height="100%"
+                    style="border:0;"
+                    allowfullscreen=""
                     loading="lazy"
-                    title="Barber shop location">
-                </iframe>
-            </div>
-            <p><strong>Address:</strong> 123 Main Street, City Name, PIN 123456</p>
-            <p><strong>Working Hours:</strong> Mon-Sat: 9:00 AM - 8:00 PM | Sunday: Closed</p>
-        </section>
-    </main>
+                   main>
 
     <!-- Booking Modal -->
     <div class="modal" id="bookingModal">
@@ -675,17 +532,23 @@ const auth = getAuth(app);
             <form id="bookingForm">
                 <div class="form-group">
                     <label class="form-label">Name</label>
-                    <input type="text" class="form-input" id="customerName" required>
+                    <input type="text" class="form-input" id="customerName" required />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Phone</label>
-                    <input type="tel" class="form-input" id="customerPhone" pattern="[6-9][0-9]{9}" required>
+                    <input
+                        type="tel"
+                        class="form-input"
+                        id="customerPhone"
+                        pattern="[6-9][0-9]{9}"
+                        required
+                    />
                 </div>
 
                 <div class="form-group">
                     <label class="form-label">Service</label>
-                    <select class="form-input" id="selectedService" required>
+                    <select class="form-input" id="selectedService" required onchange="updatePrice()">
                         <option value="">Select a service</option>
                     </select>
                 </div>
@@ -699,7 +562,7 @@ const auth = getAuth(app);
 
                 <div class="form-group">
                     <label class="form-label">Select Date</label>
-                    <input type="date" class="form-input" id="bookingDate" onchange="loadTimeSlots()" required>
+                    <input type="date" class="form-input" id="bookingDate" onchange="loadTimeSlots()" required />
                 </div>
 
                 <div class="form-group">
@@ -710,7 +573,7 @@ const auth = getAuth(app);
                 <div class="form-group">
                     <label class="form-label">Apply Coupon (Optional)</label>
                     <div class="coupon-input">
-                        <input type="text" class="form-input" id="couponCode" placeholder="Enter coupon code">
+                        <input type="text" class="form-input" id="couponCode" placeholder="Enter coupon code" />
                         <button type="button" class="btn" onclick="applyCoupon()">Apply</button>
                     </div>
                 </div>
@@ -747,10 +610,19 @@ const auth = getAuth(app);
                 </button>
             </div>
 
+            <!-- reCAPTCHA container (invisible) -->
+            <div id="recaptcha-container" class="hidden"></div>
+
             <div id="phoneStep">
                 <div class="form-group">
                     <label class="form-label">Mobile Number</label>
-                    <input type="tel" class="form-input" id="loginPhone" pattern="[6-9][0-9]{9}" placeholder="Enter 10-digit mobile number">
+                    <input
+                        type="tel"
+                        class="form-input"
+                        id="loginPhone"
+                        pattern="[6-9][0-9]{9}"
+                        placeholder="Enter 10-digit mobile number"
+                    />
                 </div>
                 <button class="btn btn--primary" onclick="sendOTP()">
                     <i class="fas fa-paper-plane"></i> Send OTP
@@ -760,10 +632,10 @@ const auth = getAuth(app);
             <div id="otpStep" class="hidden">
                 <div class="form-group">
                     <label class="form-label">Enter OTP</label>
-                    <input type="text" class="form-input" id="loginOTP" maxlength="6" placeholder="Enter 6-digit OTP">
+                    <input type="text" class="form-input" id="loginOTP" maxlength="6" placeholder="Enter 6-digit OTP" />
                 </div>
                 <button class="btn btn--success" onclick="verifyOTP()">
-                    <i class="fas fa-check"></i> Verify & Login
+                    <i class="fas fa-check"></i> Verify &amp; Login
                 </button>
                 <button class="btn" onclick="backToPhone()" style="margin-top: 0.5rem; background: var(--text-light);">
                     <i class="fas fa-arrow-left"></i> Back
@@ -812,23 +684,22 @@ const auth = getAuth(app);
 
     <!-- Bottom Navigation -->
     <nav class="nav-menu">
-        <a href="#" class="nav-item active" onclick="showSection('home')">
+        #
             <i class="fas fa-home"></i>
             <span>Home</span>
         </a>
-        <a href="#" class="nav-item" onclick="showSection('services')">
+        #
             <i class="fas fa-scissors"></i>
             <span>Services</span>
         </a>
-        <a href="#" class="nav-item" onclick="openBookingModal()">
+        #
             <i class="fas fa-calendar-check"></i>
             <span>Book</span>
         </a>
-        <a href="#" class="nav-item" onclick="showSection('reviews')">
-            <i class="fas fa-star"></i>
+        <a            <i class="fas fa-star"></i>
             <span>Reviews</span>
         </a>
-        <a href="#" class="nav-item" onclick="showSection('location')">
+        #
             <i class="fas fa-map-marker-alt"></i>
             <span>Location</span>
         </a>
@@ -842,8 +713,31 @@ const auth = getAuth(app);
     <!-- Notification -->
     <div class="notification" id="notification"></div>
 
-    <script>
-        // Mock Data (Replace with actual API calls)
+    <!-- Firebase + App Scripts -->
+    <script type="module">
+        // Firebase v12 (Modular)
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+        import {
+            getAuth,
+            signInWithPhoneNumber,
+            RecaptchaVerifier,
+            onAuthStateChanged,
+        } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+        // Your Firebase config (public client config is OK here)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+            authDomain: "barber-shop-4c26f.firebaseapp.com",
+            projectId: "barber-shop-4c26f",
+            storageBucket: "barber-shop-4c26f.firebasestorage.app",
+            messagingSenderId: "213114385226",
+            appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Global state
         const SERVICES = [
             { id: 1, name: 'Classic Haircut', description: 'Professional styling by expert barbers', price: 250, duration: 30 },
             { id: 2, name: 'Beard Trim & Shave', description: 'Precision grooming for your beard', price: 150, duration: 20 },
@@ -871,16 +765,17 @@ const auth = getAuth(app);
             { code: 'SAVE100', type: 'flat', value: 100, minAmount: 500 }
         ];
 
-        // State
         let currentUser = null;
         let selectedServiceId = null;
         let selectedBarberId = null;
         let selectedTimeSlot = null;
         let appliedCoupon = null;
         let bookingData = {};
+        let confirmationResult = null;
+        let recaptchaVerifier = null;
 
         // Initialize App
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', () => {
             loadServices();
             loadBarbers();
             loadReviews();
@@ -888,7 +783,13 @@ const auth = getAuth(app);
             checkLoginStatus();
         });
 
-        // Check if user is logged in
+        // Auth state sync (in case of refresh after login)
+        onAuthStateChanged(auth, (user) => {
+            // Optional: If you want to prefer Firebase user to local user.
+            // Currently, using localStorage-based session to store name/phone.
+        });
+
+        // Check if user is logged in (local storage)
         function checkLoginStatus() {
             const user = localStorage.getItem('user');
             if (user) {
@@ -899,11 +800,11 @@ const auth = getAuth(app);
             }
         }
 
-        // Load Services
+        // UI Loaders
         function loadServices() {
             const serviceList = document.getElementById('serviceList');
             const serviceSelect = document.getElementById('selectedService');
-            
+
             serviceList.innerHTML = SERVICES.map(service => `
                 <article class="service-card">
                     <div class="service-card__image"></div>
@@ -921,15 +822,14 @@ const auth = getAuth(app);
                 </article>
             `).join('');
 
-            serviceSelect.innerHTML = '<option value="">Select a service</option>' + 
+            serviceSelect.innerHTML = '<option value="">Select a service</option>' +
                 SERVICES.map(s => `<option value="${s.id}">${s.name} - ₹${s.price}</option>`).join('');
         }
 
-        // Load Barbers
         function loadBarbers() {
             const barberList = document.getElementById('barberList');
             const barberSelect = document.getElementById('selectedBarber');
-            
+
             barberList.innerHTML = BARBERS.map(barber => `
                 <div class="barber-card">
                     <div class="barber-card__photo"></div>
@@ -941,11 +841,10 @@ const auth = getAuth(app);
                 </div>
             `).join('');
 
-            barberSelect.innerHTML = '<option value="">Any available barber</option>' + 
+            barberSelect.innerHTML = '<option value="">Any available barber</option>' +
                 BARBERS.map(b => `<option value="${b.id}">${b.name} (${b.rating}⭐)</option>`).join('');
         }
 
-        // Load Reviews
         function loadReviews() {
             const reviewsList = document.getElementById('reviewsList');
             reviewsList.innerHTML = REVIEWS.map(review => `
@@ -960,23 +859,28 @@ const auth = getAuth(app);
             `).join('');
         }
 
-        // Service Selection
-        function selectService(serviceId) {
+        // Service selection
+        window.selectService = function(serviceId) {
             selectedServiceId = serviceId;
             openBookingModal();
             document.getElementById('selectedService').value = serviceId;
             updatePrice();
-        }
+            // Prefill name/phone if logged in
+            if (currentUser) {
+                document.getElementById('customerName').value = currentUser.name || '';
+                document.getElementById('customerPhone').value = (currentUser.phone || '').replace('+91', '');
+            }
+        };
 
-        // Update Price
-        function updatePrice() {
+        // Pricing
+        window.updatePrice = function() {
             const serviceId = parseInt(document.getElementById('selectedService').value);
             const service = SERVICES.find(s => s.id === serviceId);
-            
+
             if (service) {
                 let basePrice = service.price;
                 let discount = 0;
-                
+
                 if (appliedCoupon) {
                     if (appliedCoupon.type === 'percentage') {
                         discount = Math.min(basePrice * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
@@ -984,66 +888,54 @@ const auth = getAuth(app);
                         discount = appliedCoupon.value;
                     }
                 }
-                
-                const total = basePrice - discount;
-                
+
+                const total = Math.max(0, Math.round(basePrice - discount));
+
                 document.getElementById('servicePrice').textContent = `₹${basePrice}`;
                 document.getElementById('discountAmount').textContent = `-₹${discount}`;
                 document.getElementById('totalPrice').textContent = `₹${total}`;
-                
-                if (discount > 0) {
-                    document.getElementById('discountRow').style.display = 'flex';
-                } else {
-                    document.getElementById('discountRow').style.display = 'none';
-                }
-            }
-        }
 
-        // Load Time Slots
-        function loadTimeSlots() {
+                document.getElementById('discountRow').style.display = discount > 0 ? 'flex' : 'none';
+            } else {
+                document.getElementById('servicePrice').textContent = '₹0';
+                document.getElementById('discountRow').style.display = 'none';
+                document.getElementById('totalPrice').textContent = '₹0';
+            }
+        };
+
+        // Time slots
+        window.loadTimeSlots = function() {
             const date = document.getElementById('bookingDate').value;
             if (!date) return;
 
             const timeSlots = document.getElementById('timeSlots');
-            const slots = [
-                '09:00', '10:00', '11:00', '12:00', '14:00', 
-                '15:00', '16:00', '17:00', '18:00', '19:00'
-            ];
-
-            // Mock: Mark some slots as booked
-            const bookedSlots = ['11:00', '15:00'];
+            const slots = ['09:00', '10:00', '11:00', '12:00', '14:00', '15:00', '16:00', '17:00', '18:00', '19:00'];
+            const bookedSlots = ['11:00', '15:00']; // mock
 
             timeSlots.innerHTML = slots.map(slot => {
                 const isBooked = bookedSlots.includes(slot);
                 const classes = `time-slot ${isBooked ? 'time-slot--booked' : ''}`;
                 const disabled = isBooked ? 'disabled' : '';
-                
                 return `
-                    <button type="button" class="${classes}" ${disabled} 
-                            onclick="selectTimeSlot('${slot}', this)">
+                    <button type="button" class="${classes}" ${disabled} onclick="selectTimeSlot('${slot}', this)">
                         ${formatTime(slot)}
                     </button>
                 `;
             }).join('');
-        }
+        };
 
-        // Select Time Slot
-        function selectTimeSlot(time, element) {
+        window.selectTimeSlot = function(time, element) {
             if (element.disabled) return;
-            
-            document.querySelectorAll('.time-slot').forEach(slot => {
-                slot.classList.remove('time-slot--selected');
-            });
-            
+            document.querySelectorAll('.time-slot').forEach(slot => slot.classList.remove('time-slot--selected'));
             element.classList.add('time-slot--selected');
             selectedTimeSlot = time;
-        }
+        };
 
-        // Apply Coupon
-        function applyCoupon() {
-            const code = document.getElementById('couponCode').value.toUpperCase();
+        // Coupon
+        window.applyCoupon = function() {
+            const code = document.getElementById('couponCode').value.toUpperCase().trim();
             const coupon = COUPONS.find(c => c.code === code);
-            
+
             if (!coupon) {
                 showNotification('Invalid coupon code', 'error');
                 return;
@@ -1051,7 +943,7 @@ const auth = getAuth(app);
 
             const serviceId = parseInt(document.getElementById('selectedService').value);
             const service = SERVICES.find(s => s.id === serviceId);
-            
+
             if (!service) {
                 showNotification('Please select a service first', 'error');
                 return;
@@ -1065,10 +957,10 @@ const auth = getAuth(app);
             appliedCoupon = coupon;
             updatePrice();
             showNotification('Coupon applied successfully!', 'success');
-        }
+        };
 
-        // Booking Form Submit
-        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+        // Booking submit
+        document.getElementById('bookingForm').addEventListener('submit', (e) => {
             e.preventDefault();
 
             if (!selectedTimeSlot) {
@@ -1077,8 +969,8 @@ const auth = getAuth(app);
             }
 
             const formData = {
-                name: document.getElementById('customerName').value,
-                phone: document.getElementById('customerPhone').value,
+                name: document.getElementById('customerName').value.trim(),
+                phone: document.getElementById('customerPhone').value.trim(),
                 serviceId: parseInt(document.getElementById('selectedService').value),
                 barberId: document.getElementById('selectedBarber').value || null,
                 date: document.getElementById('bookingDate').value,
@@ -1087,8 +979,12 @@ const auth = getAuth(app);
             };
 
             const service = SERVICES.find(s => s.id === formData.serviceId);
-            let totalAmount = service.price;
+            if (!service) {
+                showNotification('Select a valid service', 'error');
+                return;
+            }
 
+            let totalAmount = service.price;
             if (appliedCoupon) {
                 if (appliedCoupon.type === 'percentage') {
                     totalAmount -= Math.min(totalAmount * appliedCoupon.value / 100, appliedCoupon.maxDiscount || Infinity);
@@ -1096,6 +992,7 @@ const auth = getAuth(app);
                     totalAmount -= appliedCoupon.value;
                 }
             }
+            totalAmount = Math.max(0, Math.round(totalAmount));
 
             bookingData = { ...formData, totalAmount, service };
 
@@ -1103,57 +1000,54 @@ const auth = getAuth(app);
             openPaymentModal(totalAmount);
         });
 
-        // Payment Functions
-        function openPaymentModal(amount) {
+        // Payment
+        window.openPaymentModal = function(amount) {
             document.getElementById('paymentAmount').textContent = amount;
             document.getElementById('paymentModal').classList.add('active');
-        }
+        };
 
-        function closePaymentModal() {
+        window.closePaymentModal = function() {
             document.getElementById('paymentModal').classList.remove('active');
-        }
+        };
 
-        function initiateUPI(app) {
+        window.initiateUPI = function(app) {
             const amount = parseInt(document.getElementById('paymentAmount').textContent);
             const transactionId = 'BKG' + Date.now();
-            
-            let upiUrl = `upi://pay?pa=barbershop@upi&pn=BarberShop&am=${amount}&cu=INR&tn=Booking-${transactionId}`;
-            
-            // Try to open UPI app
+            // Use plain & for URL params
+            const upiUrl = `upi://pay?pa=barbershop@upi&pn=BarberShop&am=${amount}&cu=INR&tn=Booking-${transactionId}`;
+            // Redirect to UPI
             window.location.href = upiUrl;
-            
             showNotification('Opening payment app...', 'info');
-        }
+        };
 
-        function confirmPayment() {
-            // In real app, verify payment on server
+        window.confirmPayment = function() {
+            // In production, verify payment server-side (webhook/polling).
             showLoader();
-            
             setTimeout(() => {
                 hideLoader();
                 closePaymentModal();
-                
-                // Send WhatsApp confirmation
                 sendBookingConfirmation();
-                
                 showNotification('Booking confirmed! Check WhatsApp for details.', 'success');
-                
                 // Reset form
                 document.getElementById('bookingForm').reset();
                 appliedCoupon = null;
                 selectedTimeSlot = null;
+                updatePrice();
             }, 2000);
-        }
+        };
 
-        // Send Booking Confirmation via WhatsApp
         function sendBookingConfirmation() {
+            const barberName = bookingData.barberId
+                ? BARBERS.find(b => b.id == bookingData.barberId)?.name
+                : null;
+
             const message = `
 ✂️ *Booking Confirmed!*
 
 Service: ${bookingData.service.name}
 Date: ${formatDate(bookingData.date)}
 Time: ${formatTime(bookingData.timeSlot)}
-${bookingData.barberId ? 'Barber: ' + BARBERS.find(b => b.id == bookingData.barberId).name : ''}
+${barberName ? 'Barber: ' + barberName : ''}
 Amount Paid: ₹${bookingData.totalAmount}
 
 Thank you for choosing BarberShop! 💈
@@ -1162,115 +1056,146 @@ See you soon!
 📍 123 Main Street, City Name
 📞 +91-9876543210
             `.trim();
-            
+
             const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/919876543210?text=${encodedMessage}`, '_blank');
+            window.open(`https://wa.me/919876543210?text=${encodedMessage}`, '_blank', 'noopener');
         }
 
-        // Login Functions
-        function openLoginModal() {
+        // Login modal controls
+        window.openLoginModal = function() {
             document.getElementById('loginModal').classList.add('active');
-        }
-
-        function closeLoginModal() {
+        };
+        window.closeLoginModal = function() {
             document.getElementById('loginModal').classList.remove('active');
+        };
+
+        window.backToPhone = function() {
+            document.getElementById('phoneStep').classList.remove('hidden');
+            document.getElementById('otpStep').classList.add('hidden');
+            document.getElementById('loginOTP').value = '';
+        };
+
+        // Firebase Phone Auth
+        async function ensureRecaptcha() {
+            if (!recaptchaVerifier) {
+                recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', { size: 'invisible' });
+                await recaptchaVerifier.render();
+            }
+            return recaptchaVerifier;
         }
 
-        function sendOTP() {
-            const phone = document.getElementById('loginPhone').value;
-            
+        window.sendOTP = async function() {
+            const phone = document.getElementById('loginPhone').value.trim();
             if (!/^[6-9]\d{9}$/.test(phone)) {
                 showNotification('Please enter a valid 10-digit mobile number', 'error');
                 return;
             }
 
             showLoader();
-            
-            // Mock: Send OTP (In real app, call API)
-            setTimeout(() => {
+            try {
+                const appVerifier = await ensureRecaptcha();
+                // E.164 phone format
+                const e164 = `+91${phone}`;
+                confirmationResult = await signInWithPhoneNumber(auth, e164, appVerifier);
                 hideLoader();
                 document.getElementById('phoneStep').classList.add('hidden');
                 document.getElementById('otpStep').classList.remove('hidden');
                 showNotification('OTP sent to your mobile', 'success');
-                console.log('Mock OTP: 123456'); // For testing
-            }, 1500);
-        }
+            } catch (err) {
+                console.error(err);
+                hideLoader();
+                showNotification(err?.message || 'Failed to send OTP', 'error');
+                // Reset recaptcha if needed
+                if (recaptchaVerifier) {
+                    try { await recaptchaVerifier.render(); } catch {}
+                }
+            }
+        };
 
-        function verifyOTP() {
-            const phone = document.getElementById('loginPhone').value;
-            const otp = document.getElementById('loginOTP').value;
-            
-            if (otp.length !== 6) {
+        window.verifyOTP = async function() {
+            const otp = document.getElementById('loginOTP').value.trim();
+            if (!/^\d{6}$/.test(otp)) {
                 showNotification('Please enter 6-digit OTP', 'error');
                 return;
             }
 
+            if (!confirmationResult) {
+                showNotification('Please request OTP again', 'error');
+                return;
+            }
+
             showLoader();
-            
-            // Mock: Verify OTP (In real app, call API)
-            setTimeout(() => {
-                hideLoader();
-                
-                // Mock user data
+            try {
+                const result = await confirmationResult.confirm(otp);
+                const user = result.user;
+
+                // Persist a minimal local profile (customize as needed)
+                const phone = document.getElementById('loginPhone').value.trim();
                 const userData = {
-                    id: Date.now(),
+                    id: user.uid || Date.now(),
                     name: 'Customer',
-                    phone: phone
+                    phone: `+91${phone}`,
                 };
-                
+
                 localStorage.setItem('user', JSON.stringify(userData));
-                localStorage.setItem('token', 'mock_token_' + Date.now());
-                
+                localStorage.setItem('token', (await user.getIdToken()) || ('mock_token_' + Date.now()));
+
                 currentUser = userData;
                 checkLoginStatus();
                 closeLoginModal();
-                
-                // Reset login form
+
+                // Reset login form state
                 document.getElementById('loginPhone').value = '';
                 document.getElementById('loginOTP').value = '';
                 document.getElementById('phoneStep').classList.remove('hidden');
                 document.getElementById('otpStep').classList.add('hidden');
-                
+
                 showNotification('Login successful!', 'success');
-            }, 1500);
-        }
+            } catch (err) {
+                console.error(err);
+                showNotification('Invalid OTP', 'error');
+            } finally {
+                hideLoader();
+            }
+        };
 
-        function backToPhone() {
-            document.getElementById('phoneStep').classList.remove('hidden');
-            document.getElementById('otpStep').classList.add('hidden');
-            document.getElementById('loginOTP').value = '';
-        }
-
-        function showProfile() {
+        window.showProfile = function() {
             if (currentUser) {
                 alert(`Profile:\nName: ${currentUser.name}\nPhone: ${currentUser.phone}\n\n(Profile page coming soon!)`);
             }
-        }
+        };
 
-        function logout() {
+        window.logout = function() {
             localStorage.removeItem('user');
             localStorage.removeItem('token');
             currentUser = null;
             document.getElementById('loginBtn').classList.remove('hidden');
             document.getElementById('profileBtn').classList.add('hidden');
             showNotification('Logged out successfully', 'info');
-        }
+        };
 
-        // Modal Functions
-        function openBookingModal() {
+        // Modals
+        window.openBookingModal = function() {
             document.getElementById('bookingModal').classList.add('active');
-        }
+            // Prefill if logged in
+            if (currentUser) {
+                document.getElementById('customerName').value = currentUser.name || '';
+                document.getElementById('customerPhone').value = (currentUser.phone || '').replace('+91', '');
+            }
+        };
 
-        function closeBookingModal() {
+        window.closeBookingModal = function() {
             document.getElementById('bookingModal').classList.remove('active');
-        }
+        };
 
         // Navigation
-        function showSection(section) {
+        window.showSection = function(evt, section) {
             document.querySelectorAll('.nav-item').forEach(item => {
                 item.classList.remove('active');
             });
-            event.currentTarget.classList.add('active');
+            if (evt && evt.currentTarget) {
+                evt.currentTarget.classList.add('active');
+            }
 
             const sections = {
                 home: ['servicesSection', 'barbersSection', 'reviewsSection', 'locationSection'],
@@ -1280,7 +1205,7 @@ See you soon!
             };
 
             document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-            
+
             if (sections[section]) {
                 sections[section].forEach(id => {
                     document.getElementById(id).classList.remove('hidden');
@@ -1290,9 +1215,9 @@ See you soon!
             if (section === 'home') {
                 document.querySelectorAll('.section').forEach(s => s.classList.remove('hidden'));
             }
-        }
+        };
 
-        // Helper Functions
+        // Helpers
         function setMinDate() {
             const tomorrow = new Date();
             tomorrow.setDate(tomorrow.getDate() + 1);
@@ -1302,39 +1227,37 @@ See you soon!
 
         function formatDate(dateString) {
             const date = new Date(dateString);
-            return date.toLocaleDateString('en-IN', { 
-                day: 'numeric', 
-                month: 'short', 
-                year: 'numeric' 
-            });
+            if (isNaN(date.getTime())) return dateString;
+            return date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
         }
 
         function formatTime(time) {
             const [hours, minutes] = time.split(':');
-            const hour = parseInt(hours);
+            const hour = parseInt(hours, 10);
             const ampm = hour >= 12 ? 'PM' : 'AM';
             const displayHour = hour > 12 ? hour - 12 : (hour === 0 ? 12 : hour);
             return `${displayHour}:${minutes} ${ampm}`;
         }
 
-        function showNotification(message, type = 'info') {
+        window.showNotification = function(message, type = 'info') {
             const notification = document.getElementById('notification');
             notification.textContent = message;
             notification.className = `notification notification--${type}`;
             notification.classList.add('show');
-            
+
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 3000);
-        }
+        };
 
-        function showLoader() {
+        window.showLoader = function() {
             document.getElementById('loader').classList.add('active');
-        }
+        };
 
-        function hideLoader() {
+        window.hideLoader = function() {
             document.getElementById('loader').classList.remove('active');
-        }
+        };
     </script>
 </body>
 </html>
+``
