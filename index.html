@@ -559,6 +559,35 @@ const firebaseConfig = {
  
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+        window.recaptchaVerifier = new RecaptchaVerifier(
+    'recaptcha-container',
+    { size: 'normal' },
+    auth
+  );
+ 
+  window.sendOTP = function () {
+    const phoneNumber = document.getElementById("phone").value;
+    signInWithPhoneNumber(auth, phoneNumber, window.recaptchaVerifier)
+      .then((confirmationResult) => {
+        window.confirmationResult = confirmationResult;
+        alert("OTP sent");
+      })
+      .catch((error) => {
+        alert(error.message);
+      });
+  };
+ 
+  window.verifyOTP = function () {
+    const otp = document.getElementById("otp").value;
+    window.confirmationResult.confirm(otp)
+      .then((result) => {
+        alert("Login successful");
+        console.log(result.user);
+      })
+      .catch(() => {
+        alert("Invalid OTP");
+      });
+  };
 </script>
 <body>
     <!-- Header -->
