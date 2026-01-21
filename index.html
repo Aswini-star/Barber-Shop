@@ -2,31 +2,32 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Firebase OTP Test</title>
+  <title>Firebase Email Auth Test</title>
 </head>
 <body>
  
-<h2>Firebase Phone OTP Login</h2>
+<h2>Firebase Email Authentication</h2>
  
-<input id="phone" placeholder="10 digit mobile number">
-<button id="sendOtp">Send OTP</button>
+<input id="email" type="email" placeholder="Email"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
  
-<br><br>
+<button id="signup">Sign Up</button>
+<button id="login">Login</button>
+<button id="logout">Logout</button>
  
-<input id="otp" placeholder="Enter OTP">
-<button id="verifyOtp">Verify OTP</button>
- 
-<div id="recaptcha-container"></div>
+<p id="status"></p>
  
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
   import {
     getAuth,
-    RecaptchaVerifier,
-    signInWithPhoneNumber
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
   } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
  
-  // 🔴 REPLACE with YOUR Firebase config
+  // 🔴 Replace with YOUR Firebase config
   const firebaseConfig = {
     apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
     authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -35,45 +36,50 @@
     messagingSenderId: "213114385226",
     appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
   };
-
-  };
  
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
  
-  // reCAPTCHA (required)
-  window.recaptchaVerifier = new RecaptchaVerifier(
-    "recaptcha-container",
-    { size: "normal" },
-    auth
-  );
+  const status = document.getElementById("status");
  
-  let confirmationResult;
+  // Auth state listener
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      status.innerText = "Logged in as: " + user.email;
+    } else {
+      status.innerText = "Not logged in";
+    }
+  });
  
-  document.getElementById("sendOtp").onclick = async () => {
-    const phone = "+91" + document.getElementById("phone").value;
+  document.getElementById("signup").onclick = async () => {
     try {
-      confirmationResult = await signInWithPhoneNumber(
+      await createUserWithEmailAndPassword(
         auth,
-        phone,
-        window.recaptchaVerifier
+        email.value,
+        password.value
       );
-      alert("OTP sent");
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
+      alert("Signup successful");
+    } catch (e) {
+      alert(e.message);
     }
   };
  
-  document.getElementById("verifyOtp").onclick = async () => {
-    const otp = document.getElementById("otp").value;
+  document.getElementById("login").onclick = async () => {
     try {
-      const result = await confirmationResult.confirm(otp);
-      alert("Login successful: " + result.user.phoneNumber);
-    } catch (err) {
-      console.error(err);
-      alert("Invalid OTP");
+      await signInWithEmailAndPassword(
+        auth,
+        email.value,
+        password.value
+      );
+      alert("Login successful");
+    } catch (e) {
+      alert(e.message);
     }
+  };
+ 
+  document.getElementById("logout").onclick = async () => {
+    await signOut(auth);
+    alert("Logged out");
   };
 </script>
  
