@@ -25,7 +25,7 @@
       padding: 2em 3em;
       margin: 2em auto;
       width: 100%;
-      max-width: 720px;
+      max-width: 760px;
       border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
@@ -65,9 +65,10 @@
 
     #status {
       margin: 0.8em 0;
-      font-weight: 700;
+      font-weight: 800;
       text-align: center;
       color: #27ae60;
+      word-break: break-word;
     }
 
     .section {
@@ -82,7 +83,7 @@
       padding: 4px 10px;
       border-radius: 999px;
       font-size: 0.85em;
-      font-weight: 800;
+      font-weight: 900;
       background: #ecf0f1;
       color: #2c3e50;
     }
@@ -112,9 +113,9 @@
     th {
       background-color: #3498db;
       color: white;
-      font-weight: 800;
+      font-weight: 900;
       text-transform: uppercase;
-      font-size: 0.8em;
+      font-size: 0.78em;
       letter-spacing: 0.02em;
     }
     tr:nth-child(even) { background-color: #f9f9f9; }
@@ -140,7 +141,7 @@
 
     #appointment-status, #staff-manual-status {
       margin-top: 0.8em;
-      font-weight: 800;
+      font-weight: 900;
       min-height: 1.4em;
       text-align: center;
       color: #e67e22;
@@ -187,9 +188,7 @@
         <button id="signup">Sign Up</button>
         <button id="login">Login</button>
       </div>
-      <div class="muted">
-        Staff can sign up normally; Admin enables them in “Manage Staff”.
-      </div>
+      <div class="muted">Staff can sign up normally; Admin enables them in “Manage Staff”.</div>
     </div>
 
     <!-- LOGOUT -->
@@ -288,7 +287,7 @@
       <!-- STAFF: Manual Booking (Option 2) -->
       <div class="section">
         <h3>Manual Booking (Walk-in)</h3>
-        <div class="muted">Create bookings for direct customers. Choose any staff member. (Requires Check-In)</div>
+        <div class="muted">Create bookings for direct customers. Choose any staff member. (Requires creator Check-In)</div>
 
         <label for="staff-service">Service</label>
         <select id="staff-service"></select>
@@ -331,7 +330,6 @@
       <div id="admin-bookings-panel" style="display:none;" class="section">
         <h3>Bookings</h3>
 
-        <!-- Presets -->
         <div class="row">
           <div>
             <label for="admin-preset">Quick Range</label>
@@ -356,7 +354,6 @@
           </div>
         </div>
 
-        <!-- From-To -->
         <div class="row">
           <div>
             <label for="admin-from-date">From</label>
@@ -373,7 +370,6 @@
           <div><button id="admin-reset-filters" class="btn-warning">Reset</button></div>
         </div>
 
-        <!-- Pagination -->
         <div class="pager">
           <div class="left">
             <button id="admin-prev" class="btn-warning" disabled>◀ Prev</button>
@@ -402,7 +398,7 @@
       </div>
     </div>
 
-    <!-- ADMIN: STAFF MANAGEMENT (shown only when admin clicks) -->
+    <!-- ADMIN: STAFF MANAGEMENT -->
     <div id="admin-staff-section" style="display:none;" class="section">
       <h3>Admin: Manage Staff</h3>
 
@@ -420,9 +416,7 @@
       <button id="add-staff" class="btn-success">Add / Enable Staff</button>
       <button id="refresh-staff-list">Refresh Staff List</button>
 
-      <div class="muted">
-        Staff must sign up normally; Admin enables staff role here.
-      </div>
+      <div class="muted">Staff must sign up normally; Admin enables staff role here.</div>
 
       <div class="table-scroll">
         <table aria-label="Staff Table">
@@ -449,13 +443,9 @@
      * CONFIG
      ***********************/
     const adminEmails = ["skrajadba@gmail.com"];
-
-    // Staff manual booking allowed only when creator is checked-in (you asked "all" -> enabling it)
-    // Set to false if you want to allow manual bookings even when staff is checked out.
     const REQUIRE_CHECKIN_FOR_STAFF_MANUAL = true;
 
-    const PAGE_SIZE = 50;             // show 50 per page
-    const FETCH_MULTIPLIER = 4;       // fetch more than 50 to compensate client-side status filtering
+    const PAGE_SIZE = 50;
 
     const services = [
       { name: "Haircut", price: 25, duration: 30 },
@@ -470,18 +460,15 @@
       const [hh, mm] = t.split(":").map(Number);
       return hh * 60 + mm;
     }
-
-    function isoDate(d) {
-      const pad = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
-    function todayISO() { return isoDate(new Date()); }
-    function yesterdayISO() { const d=new Date(); d.setDate(d.getDate()-1); return isoDate(d); }
+    function pad(n){ return String(n).padStart(2,"0"); }
+    function isoDate(d){ return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`; }
+    function todayISO(){ return isoDate(new Date()); }
+    function yesterdayISO(){ const d=new Date(); d.setDate(d.getDate()-1); return isoDate(d); }
 
     // Monday-start week
     function thisWeekRange() {
       const d = new Date();
-      const day = d.getDay(); // 0 Sun .. 6 Sat
+      const day = d.getDay(); // 0..6
       const diffToMonday = (day === 0 ? 6 : day - 1);
       const start = new Date(d);
       start.setDate(d.getDate() - diffToMonday);
@@ -489,14 +476,12 @@
       end.setDate(start.getDate() + 6);
       return { from: isoDate(start), to: isoDate(end) };
     }
-
     function last7Range() {
       const end = new Date();
       const start = new Date();
       start.setDate(end.getDate() - 6);
       return { from: isoDate(start), to: isoDate(end) };
     }
-
     function thisMonthRange() {
       const now = new Date();
       const start = new Date(now.getFullYear(), now.getMonth(), 1);
@@ -512,19 +497,16 @@
       if (role === "staff") cls = "pill green";
       badge.innerHTML = `<span class="${cls}">Role: ${role.toUpperCase()}</span>`;
     }
-
     function setMessage(el, msg, color) {
       el.style.color = color || "#e67e22";
       el.innerText = msg || "";
     }
-
     function pillForStatus(s) {
       if (s === "booked") return `<span class="pill blue">BOOKED</span>`;
       if (s === "in_progress") return `<span class="pill orange">IN PROGRESS</span>`;
       if (s === "completed") return `<span class="pill green">COMPLETED</span>`;
       return `<span class="pill">UNKNOWN</span>`;
     }
-
     function overlaps(aStart, aEnd, bStart, bEnd) {
       return aStart < bEnd && aEnd > bStart;
     }
@@ -544,18 +526,16 @@
     }
 
     /***********************
-     * FIREBASE IMPORTS
+     * FIREBASE
      ***********************/
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import {
       getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
       signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-
     import {
       getFirestore, collection, addDoc, serverTimestamp, query, where,
-      getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc,
-      orderBy, limit, startAfter
+      getDocs, doc, getDoc, setDoc, updateDoc, deleteDoc, orderBy
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -578,17 +558,13 @@
     let currentRole = "guest";
     let currentSelectedService = null;
 
-    // staff cache (for dropdowns)
+    // Staff cache for dropdowns
     let staffCache = [];
 
-    // Admin pagination state
-    const adminPager = {
-      cursorStack: [],     // stores cursors (lastDoc) for prev navigation
-      currentCursor: null, // startAfter cursor for current page
-      lastRawDoc: null,    // last raw doc from fetch (used for next)
-      hasMore: false,
-      loading: false
-    };
+    // Admin: all bookings loaded on demand, then filter+paginate locally (stable)
+    let adminAllBookings = [];
+    let adminFilteredBookings = [];
+    let adminPage = 1;
 
     /***********************
      * UI INIT: SERVICES
@@ -635,7 +611,7 @@
     $("admin-to-date").value = todayISO();
 
     /***********************
-     * STAFF LOADING (stable)
+     * STAFF LOADING (simple + stable)
      ***********************/
     async function loadStaffCache() {
       staffCache = [];
@@ -675,9 +651,17 @@
       });
     }
 
-    async function refreshStaffLists() {
-      await loadStaffCache();
-      populateStaffDropdowns();
+    async function refreshStaffListsSafe() {
+      // Important: never break login due to staff read issues
+      try {
+        await loadStaffCache();
+        populateStaffDropdowns();
+      } catch (e) {
+        console.error("Staff list load failed:", e);
+        // Keep app working; show warning only
+        $("status").style.color = "#e67e22";
+        $("status").innerText += " | Staff list not loaded: " + e.message;
+      }
     }
 
     /***********************
@@ -706,10 +690,13 @@
 
     $("login").onclick = async () => {
       try {
+        $("status").style.color = "#3498db";
+        $("status").innerText = "Logging in...";
         await signInWithEmailAndPassword(auth, $("email").value, $("password").value);
-        alert("Login successful");
+        // onAuthStateChanged will update UI
       } catch (e) {
-        alert(e.message);
+        $("status").style.color = "#e74c3c";
+        $("status").innerText = "Login failed: " + e.message;
       }
     };
 
@@ -723,7 +710,7 @@
     };
 
     /***********************
-     * CUSTOMER BOOKING FLOW
+     * CUSTOMER BOOKING
      ***********************/
     function startCustomerBooking(service) {
       currentSelectedService = service;
@@ -736,7 +723,6 @@
     $("cancel-booking").onclick = () => {
       $("appointment-section").style.display = "none";
       $("services-section").style.display = "block";
-
       $("customerName").value = "";
       $("phone").value = "";
       $("barber").value = "";
@@ -773,7 +759,7 @@
       const endMinutes = startMinutes + currentSelectedService.duration;
 
       try {
-        // simple query then JS conflict check (avoids composite index errors) [1](https://firebase.google.com/docs/web/setup)[2](https://releasealert.dev/github/firebase/firebase-js-sdk)
+        // simple query then conflict check in JS (avoids composite index needs) [1](https://firebase.google.com/docs/web/setup)[2](https://releasealert.dev/github/firebase/firebase-js-sdk)
         const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
         const snap = await getDocs(q1);
 
@@ -816,15 +802,15 @@
           `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`,
           "#27ae60"
         );
-
         setTimeout(() => $("cancel-booking").click(), 3000);
+
       } catch (err) {
         setMessage(statusEl, "Error booking appointment: " + err.message, "#e74c3c");
       }
     };
 
     /***********************
-     * STAFF: CHECK-IN/OUT
+     * STAFF: CHECK IN/OUT + PRESENCE
      ***********************/
     async function loadStaffPresence() {
       const u = auth.currentUser;
@@ -837,6 +823,7 @@
         $("staff-presence").textContent = "Not registered as staff";
         return;
       }
+
       const data = snap.data();
       const checkedIn = !!data.checkedIn;
       $("staff-presence").className = checkedIn ? "pill green" : "pill orange";
@@ -866,6 +853,14 @@
         alert("Check-out failed: " + e.message);
       }
     };
+
+    async function creatorIsCheckedIn() {
+      if (!REQUIRE_CHECKIN_FOR_STAFF_MANUAL) return true;
+      const u = auth.currentUser;
+      if (!u) return false;
+      const snap = await getDoc(doc(db, "staff", u.email));
+      return snap.exists() && !!snap.data().checkedIn;
+    }
 
     /***********************
      * STAFF: VIEW OWN BOOKINGS
@@ -908,8 +903,9 @@
           <td>${a.durationMin || "-"} min</td>
           <td>${pillForStatus(a.status)}</td>
           <td>
-            startStart</button>
-            <button data-id="${a.id}" data-action="complete" ${canComplete ? ""ff-bookings-body").appendChild(tr);
+            <button data-id="${a.id}" data-action="start" ${canStart ? ""       </td>
+        `;
+        $("staff-bookings-body").appendChild(tr);
       });
     }
 
@@ -918,7 +914,6 @@
     $("staff-bookings-body").addEventListener("click", async (e) => {
       const btn = e.target.closest("button");
       if (!btn) return;
-
       const id = btn.getAttribute("data-id");
       const action = btn.getAttribute("data-action");
       if (!id || !action) return;
@@ -938,19 +933,8 @@
     });
 
     /***********************
-     * STAFF: MANUAL BOOKING (Option 2, requires creator check-in)
+     * STAFF: MANUAL BOOKING (Option 2)
      ***********************/
-    async function creatorIsCheckedInOrBypass() {
-      if (!REQUIRE_CHECKIN_FOR_STAFF_MANUAL) return true;
-      const u = auth.currentUser;
-      if (!u) return false;
-
-      const ref = doc(db, "staff", u.email);
-      const snap = await getDoc(ref);
-      if (!snap.exists()) return false;
-      return !!snap.data().checkedIn;
-    }
-
     $("staff-create-booking").onclick = async () => {
       const msg = $("staff-manual-status");
       setMessage(msg, "", "#e67e22");
@@ -958,7 +942,7 @@
       const u = auth.currentUser;
       if (!u) return setMessage(msg, "Staff must be logged in.", "#e74c3c");
 
-      const ok = await creatorIsCheckedInOrBypass();
+      const ok = await creatorIsCheckedIn();
       if (!ok) return setMessage(msg, "You must be Checked In to create manual bookings.", "#e74c3c");
 
       const serviceIndex = Number($("staff-service").value);
@@ -1021,7 +1005,6 @@
         });
 
         setMessage(msg, "✅ Walk-in booking created successfully.", "#27ae60");
-
         $("staff-customer-name").value = "";
         $("staff-customer-phone").value = "";
         $("staff-manual-time").value = "";
@@ -1033,7 +1016,7 @@
     };
 
     /***********************
-     * ADMIN: FILTER PRESET -> SET FROM/TO
+     * ADMIN: FILTERS + LOCAL PAGINATION (no Firestore pagination)
      ***********************/
     function applyAdminPreset(preset) {
       if (preset === "today") {
@@ -1057,158 +1040,90 @@
       } else if (preset === "all_time") {
         $("admin-from-date").value = "";
         $("admin-to-date").value = "";
-      } // custom -> leave as is
+      }
     }
 
-    $("admin-preset").addEventListener("change", () => {
-      applyAdminPreset($("admin-preset").value);
-    });
+    $("admin-preset").addEventListener("change", () => applyAdminPreset($("admin-preset").value));
 
-    /***********************
-     * ADMIN: PAGINATED FETCH
-     *
-     * We fetch (PAGE_SIZE * FETCH_MULTIPLIER) docs and then apply status/date filters client-side.
-     * This avoids needing composite indexes for combinations (date + status + orderBy), which Firestore
-     * may otherwise require. [1](https://firebase.google.com/docs/web/setup)[2](https://releasealert.dev/github/firebase/firebase-js-sdk)
-     ***********************/
-    async function adminFetchPage(direction = "reset") {
-      if (adminPager.loading) return;
-      adminPager.loading = true;
+    function dateInRange(dateStr, fromStr, toStr) {
+      // dateStr is YYYY-MM-DD; lexical compare works
+      if (fromStr && dateStr < fromStr) return false;
+      if (toStr && dateStr > toStr) return false;
+      return true;
+    }
 
-      const tbody = $("bookings-body");
-      const info = $("admin-page-info");
-      const btnPrev = $("admin-prev");
-      const btnNext = $("admin-next");
-
-      btnPrev.disabled = true;
-      btnNext.disabled = true;
-      info.textContent = "Loading...";
-
-      // Determine cursor based on direction
-      if (direction === "reset") {
-        adminPager.cursorStack = [];
-        adminPager.currentCursor = null;
-      } else if (direction === "next") {
-        if (!adminPager.lastRawDoc) {
-          adminPager.loading = false;
-          info.textContent = "No more pages.";
-          return;
-        }
-        adminPager.cursorStack.push(adminPager.currentCursor); // save current cursor for Prev
-        adminPager.currentCursor = adminPager.lastRawDoc;       // move cursor forward
-      } else if (direction === "prev") {
-        if (adminPager.cursorStack.length === 0) {
-          adminPager.loading = false;
-          info.textContent = "Already at first page.";
-          return;
-        }
-        adminPager.currentCursor = adminPager.cursorStack.pop(); // go back
-      }
-
-      const preset = $("admin-preset").value;
+    function adminApplyFiltersLocal() {
       const statusMode = $("admin-status-filter").value;
       const fromDate = $("admin-from-date").value;
       const toDate = $("admin-to-date").value;
 
-      // Build base query
-      let baseQ;
-      const coll = collection(db, "appointments");
-      const fetchLimit = PAGE_SIZE * FETCH_MULTIPLIER;
+      adminFilteredBookings = adminAllBookings.filter(a => {
+        if (statusMode !== "all" && a.status !== statusMode) return false;
+        if (a.date && !dateInRange(a.date, fromDate, toDate)) return false;
+        if (!a.date && (fromDate || toDate)) return false; // if no date and a range is used, exclude
+        return true;
+      });
 
-      // If preset is all_time OR from/to empty -> use createdAt ordering
-      const isAllTime = (preset === "all_time") || (!fromDate && !toDate);
-
-      if (isAllTime) {
-        baseQ = query(coll, orderBy("createdAt", "desc"), limit(fetchLimit));
-        if (adminPager.currentCursor) {
-          baseQ = query(coll, orderBy("createdAt", "desc"), startAfter(adminPager.currentCursor), limit(fetchLimit));
-        }
-      } else {
-        // Use date range ordering (date is YYYY-MM-DD string)
-        const f = fromDate || "0000-01-01";
-        const t = toDate || "9999-12-31";
-        baseQ = query(coll, where("date", ">=", f), where("date", "<=", t), orderBy("date", "desc"), limit(fetchLimit));
-        if (adminPager.currentCursor) {
-          baseQ = query(coll, where("date", ">=", f), where("date", "<=", t), orderBy("date", "desc"), startAfter(adminPager.currentCursor), limit(fetchLimit));
-        }
-      }
-
-      try {
-        const snap = await getDocs(baseQ);
-
-        // raw docs for pagination
-        adminPager.lastRawDoc = snap.docs.length ? snap.docs[snap.docs.length - 1] : null;
-        adminPager.hasMore = snap.docs.length === fetchLimit;
-
-        // Apply status filter client-side (to avoid composite index needs) [1](https://firebase.google.com/docs/web/setup)[2](https://releasealert.dev/github/firebase/firebase-js-sdk)
-        const rows = [];
-        snap.forEach((d) => {
-          const a = d.data();
-          if (statusMode !== "all" && a.status !== statusMode) return;
-          rows.push({ id: d.id, ...a });
-        });
-
-        // If after filtering we have less than PAGE_SIZE but there are more raw docs,
-        // show what we have (simple + stable). (Optional: could loop-fetch more.)
-        const pageRows = rows.slice(0, PAGE_SIZE);
-
-        // Render
-        tbody.innerHTML = "";
-        if (pageRows.length === 0) {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `<td colspan="6" class="muted">No bookings found for the selected filters on this page.</td>`;
-          tbody.appendChild(tr);
-        } else {
-          pageRows.forEach((a) => {
-            const detailsId = `details-${a.id}`;
-            const tr = document.createElement("tr");
-            tr.innerHTML = `
-              <td>${a.date || "N/A"}</td>
-              <td>${a.time || "N/A"}</td>
-              <td>${a.barberName || a.barberEmail || "N/A"}</td>
-              <td>${a.serviceName || "N/A"}</td>
-              <td>${pillForStatus(a.status)}</td>
-              <td><button class="btn-warning" data-toggle="${detailsId}">View</button></td>
-            `;
-
-            const trDetails = document.createElement("tr");
-            trDetails.id = detailsId;
-            trDetails.style.display = "none";
-            trDetails.innerHTML = `
-              <td colspan="6">
-                <div style="line-height:1.6;">
-                  <strong>Customer:</strong> ${a.customerName || "N/A"}<br/>
-                  <strong>Phone:</strong> ${a.phone || "N/A"}<br/>
-                  <strong>Customer Email:</strong> ${a.email || "Walk-in"}<br/>
-                  <strong>Duration:</strong> ${a.durationMin ?? "N/A"} min<br/>
-                  <strong>Price:</strong> $${a.servicePrice ?? "N/A"}<br/>
-                  <strong>Created By:</strong> ${a.createdBy || "N/A"} (${a.createdByRole || "N/A"})<br/>
-                </div>
-              </td>
-            `;
-            tbody.appendChild(tr);
-            tbody.appendChild(trDetails);
-          });
-        }
-
-        // Controls
-        btnPrev.disabled = adminPager.cursorStack.length === 0;
-        btnNext.disabled = !adminPager.hasMore;
-        info.textContent = `Showing ${pageRows.length} (page size ${PAGE_SIZE}) • ${adminPager.cursorStack.length + 1} page(s) loaded`;
-
-      } catch (err) {
-        console.error(err);
-        tbody.innerHTML = "";
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="6" style="color:#e74c3c; font-weight:800;">Error loading bookings: ${err.message}</td>`;
-        tbody.appendChild(tr);
-        info.textContent = "Error";
-      } finally {
-        adminPager.loading = false;
-      }
+      adminPage = 1;
+      adminRenderPage();
     }
 
-    // Toggle details rows (admin only)
+    function adminRenderPage() {
+      const tbody = $("bookings-body");
+      const info = $("admin-page-info");
+      const prev = $("admin-prev");
+      const next = $("admin-next");
+
+      const total = adminFilteredBookings.length;
+      const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+      adminPage = Math.min(adminPage, totalPages);
+
+      const start = (adminPage - 1) * PAGE_SIZE;
+      const pageRows = adminFilteredBookings.slice(start, start + PAGE_SIZE);
+
+      tbody.innerHTML = "";
+      if (pageRows.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="6" class="muted">No bookings found for selected filter.</td>`;
+        tbody.appendChild(tr);
+      } else {
+        pageRows.forEach(a => {
+          const detailsId = `details-${a.id}`;
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${a.date || "N/A"}</td>
+            <td>${a.time || "N/A"}</td>
+            <td>${a.barberName || a.barberEmail || "N/A"}</td>
+            <td>${a.serviceName || "N/A"}</td>
+            <td>${pillForStatus(a.status)}</td>
+            <td><button class="btn-warning" data-toggle="${detailsId}">View</button></td>
+          `;
+
+          const trDetails = document.createElement("tr");
+          trDetails.id = detailsId;
+          trDetails.style.display = "none";
+          trDetails.innerHTML = `
+            <td colspan="6">
+              <div style="line-height:1.6;">
+                <strong>Customer:</strong> ${a.customerName || "N/A"}<br/>
+                <strong>Phone:</strong> ${a.phone || "N/A"}<br/>
+                <strong>Customer Email:</strong> ${a.email || "Walk-in"}<br/>
+                <strong>Duration:</strong> ${a.durationMin ?? "N/A"} min<br/>
+                <strong>Price:</strong> $${a.servicePrice ?? "N/A"}<br/>
+                <strong>Created By:</strong> ${a.createdBy || "N/A"} (${a.createdByRole || "N/A"})<br/>
+              </div>
+            </td>
+          `;
+          tbody.appendChild(tr);
+          tbody.appendChild(trDetails);
+        });
+      }
+
+      prev.disabled = adminPage <= 1;
+      next.disabled = adminPage >= totalPages;
+      info.textContent = `Page ${adminPage}/${totalPages} • Showing ${pageRows.length} of ${total}`;
+    }
+
     $("bookings-body").addEventListener("click", (e) => {
       const btn = e.target.closest("button[data-toggle]");
       if (!btn) return;
@@ -1220,16 +1135,26 @@
       btn.textContent = hidden ? "Hide" : "View";
     });
 
-    $("admin-apply-filters").onclick = async () => adminFetchPage("reset");
-    $("admin-reset-filters").onclick = async () => {
+    $("admin-apply-filters").onclick = adminApplyFiltersLocal;
+
+    $("admin-reset-filters").onclick = () => {
       $("admin-preset").value = "today";
       $("admin-status-filter").value = "all";
       applyAdminPreset("today");
-      await adminFetchPage("reset");
+      adminApplyFiltersLocal();
     };
 
-    $("admin-prev").onclick = async () => adminFetchPage("prev");
-    $("admin-next").onclick = async () => adminFetchPage("next");
+    $("admin-prev").onclick = () => { adminPage = Math.max(1, adminPage - 1); adminRenderPage(); };
+    $("admin-next").onclick = () => { adminPage = adminPage + 1; adminRenderPage(); };
+
+    async function adminLoadBookingsOnce() {
+      $("admin-page-info").textContent = "Loading...";
+      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      adminAllBookings = [];
+      snap.forEach(d => adminAllBookings.push({ id: d.id, ...d.data() }));
+      adminApplyFiltersLocal();
+    }
 
     /***********************
      * ADMIN NAVIGATION
@@ -1237,16 +1162,16 @@
     $("admin-open-bookings").onclick = async () => {
       $("admin-bookings-panel").style.display = "block";
       $("admin-staff-section").style.display = "none";
-      // defaults
-      if (!$("admin-from-date").value && !$("admin-to-date").value) applyAdminPreset($("admin-preset").value);
-      await adminFetchPage("reset");
+      // default
+      applyAdminPreset($("admin-preset").value);
+      await adminLoadBookingsOnce();
     };
 
     $("admin-open-staff").onclick = async () => {
       $("admin-bookings-panel").style.display = "none";
       $("admin-staff-section").style.display = "block";
       await loadStaffAdminTable();
-      await refreshStaffLists();
+      await refreshStaffListsSafe();
     };
 
     /***********************
@@ -1255,7 +1180,6 @@
     async function loadStaffAdminTable() {
       const tbody = $("staff-body");
       tbody.innerHTML = "";
-
       const snap = await getDocs(collection(db, "staff"));
       const rows = [];
       snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
@@ -1263,15 +1187,14 @@
 
       if (rows.length === 0) {
         const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="7" class="muted">No staff entries. Add staff to enable staff role.</td>`;
+        tr.innerHTML = `<td colspan="7" class="muted">No staff entries.</td>`;
         tbody.appendChild(tr);
         return;
       }
 
-      rows.forEach((s) => {
+      rows.forEach(s => {
         const lastIn = s.lastCheckIn ? s.lastCheckIn.toDate().toLocaleString() : "—";
         const lastOut = s.lastCheckOut ? s.lastCheckOut.toDate().toLocaleString() : "—";
-
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${s.name || "N/A"}</td>
@@ -1297,8 +1220,7 @@
 
       try {
         await setDoc(doc(db, "staff", email), {
-          name,
-          email,
+          name, email,
           active: true,
           checkedIn: false,
           createdAt: serverTimestamp(),
@@ -1307,9 +1229,8 @@
 
         $("staffName").value = "";
         $("staffEmail").value = "";
-
         await loadStaffAdminTable();
-        await refreshStaffLists();
+        await refreshStaffListsSafe();
         alert("Staff added/enabled successfully.");
       } catch (e) {
         alert("Failed to add staff: " + e.message);
@@ -1318,19 +1239,17 @@
 
     $("refresh-staff-list").onclick = async () => {
       await loadStaffAdminTable();
-      await refreshStaffLists();
+      await refreshStaffListsSafe();
     };
 
     $("staff-body").addEventListener("click", async (e) => {
       const btn = e.target.closest("button");
       if (!btn) return;
-
       const email = btn.getAttribute("data-email");
       const action = btn.getAttribute("data-action");
       if (!email || !action) return;
 
       const ref = doc(db, "staff", email);
-
       try {
         if (action === "toggle") {
           const snap = await getDoc(ref);
@@ -1338,20 +1257,18 @@
           const current = snap.data();
           await updateDoc(ref, { active: !current.active, updatedAt: serverTimestamp() });
         }
-
         if (action === "remove") {
           await deleteDoc(ref);
         }
-
         await loadStaffAdminTable();
-        await refreshStaffLists();
+        await refreshStaffListsSafe();
       } catch (err) {
         alert("Action failed: " + err.message);
       }
     });
 
     /***********************
-     * AUTH STATE (CRASH-PROOF)
+     * AUTH STATE (LOGIN-SAFE)
      ***********************/
     onAuthStateChanged(auth, async (user) => {
       try {
@@ -1365,17 +1282,16 @@
 
           currentRole = await determineRole(user);
           setBadge(currentRole);
-
           showSectionForRole(currentRole);
 
-          await refreshStaffLists();
+          // Never block login UI on staff list load:
+          refreshStaffListsSafe();
 
           if (currentRole === "staff") {
             await loadStaffPresence();
             await loadStaffBookings();
           }
-
-          // Admin: dashboard only (no auto loading bookings)
+          // Admin: dashboard only; no auto bookings load
 
         } else {
           $("status").style.color = "#27ae60";
@@ -1386,20 +1302,18 @@
           currentRole = "guest";
           showSectionForRole("guest");
 
-          await refreshStaffLists();
+          // Optional preload
+          refreshStaffListsSafe();
         }
       } catch (err) {
         console.error("Post-login init failed:", err);
         $("status").style.color = "#e74c3c";
-        $("status").innerText = "⚠️ Logged in, but loading failed: " + err.message;
+        $("status").innerText = "⚠️ Logged in, but app init failed: " + err.message;
         $("auth-section").style.display = "none";
         $("logout-section").style.display = "block";
       }
     });
 
-    // initial dropdown preload
-    refreshStaffLists().catch(() => {});
   </script>
 </body>
 </html>
-``
