@@ -1,8 +1,12 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <!-- ✅ Important for mobile scaling -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barber Shop Booking</title>
+
   <style>
     /* Reset some default styles */
     * {
@@ -142,24 +146,82 @@
       outline: none;
     }
 
-    /* Responsive */
+    /* ✅ Make admin table scrollable on mobile */
+    #admin-section {
+      width: 100%;
+    }
+
+    /* ✅ Mobile responsiveness */
     @media (max-width: 600px) {
-      .container {
-        width: 90%;
-        padding: 1.5em 2em;
+
+      body {
+        padding: 0 10px;
       }
 
+      .container {
+        width: 100%;
+        margin: 1em 0;
+        padding: 1.2em 1.4em;
+        border-radius: 8px;
+      }
+
+      h2 {
+        font-size: 1.4em;
+        text-align: center;
+      }
+
+      h3 {
+        font-size: 1.2em;
+        text-align: center;
+      }
+
+      input,
+      select {
+        font-size: 0.95em;
+        padding: 0.6em;
+      }
+
+      /* ✅ Buttons stack vertically */
       button {
         width: 100%;
-        margin: 0.5em 0;
+        margin: 0.4em 0;
+        font-size: 0.95em;
       }
 
-      button + button {
-        margin-left: 0;
+      #cancel-booking {
+        margin-left: 0 !important;
+      }
+
+      /* ✅ Services list better on mobile */
+      #services-list li {
+        font-size: 0.95em;
+        padding: 12px;
+      }
+
+      /* ✅ Admin table scroll fix */
+      #admin-section {
+        overflow-x: auto;
+      }
+
+      table {
+        min-width: 720px; /* force horizontal scroll instead of breaking layout */
+        font-size: 0.85em;
+      }
+
+      th,
+      td {
+        padding: 0.6em;
+      }
+
+      #status,
+      #appointment-status {
+        font-size: 0.9em;
+        text-align: center;
       }
     }
   </style>
 </head>
+
 <body>
 
   <div class="container">
@@ -293,6 +355,7 @@
       servicesSection.style.display = "block";
       signupBtn.disabled = false;
       loginBtn.disabled = false;
+
       // Clear booking form and status
       document.getElementById("customerName").value = "";
       document.getElementById("phone").value = "";
@@ -463,7 +526,8 @@
         const querySnapshot = await getDocs(q);
 
         if (!querySnapshot.empty) {
-          appointmentStatus.innerText = `Sorry, ${barber} is not available at ${date} ${time}. Please choose another time or barber.`;
+          appointmentStatus.innerText =
+            `Sorry, ${barber} is not available at ${date} ${time}. Please choose another time or barber.`;
           return;
         }
 
@@ -480,7 +544,8 @@
           createdAt: serverTimestamp(),
         });
 
-        appointmentStatus.innerText = `Appointment for ${serviceName} booked with ${barber} on ${date} at ${time}. Thank you, ${customerName}!`;
+        appointmentStatus.innerText =
+          `Appointment for ${serviceName} booked with ${barber} on ${date} at ${time}. Thank you, ${customerName}!`;
 
         document.getElementById("cancel-booking").click();
 
@@ -518,3 +583,4 @@
 
 </body>
 </html>
+``
