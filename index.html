@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -195,7 +196,7 @@
     </div>
 
     <!-- CUSTOMER: BOOKING -->
-    <div id="appointment-section" style="display;" class="section">
+    <div id="appointment-section" style="display:none;" class="section">
       <h3>Book an Appointment</h3>
 
       <p><strong>Selected Service:</strong> <span id="selected-service"></span></p>
@@ -225,5 +226,194 @@
 
       <p id="appointment-status" role="alert" aria-live="polite"></p>
     </div>
+
+    <!-- STAFF DASHBOARD -->
+    <div id="staff-section" style="display:none;" class="section">
+      <h3>Staff Dashboard</h3>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div>
+          <div class="muted">Your status:</div>
+          <div id="staff-presence" class="pill">Unknown</div>
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <button id="staff-checkin" class="btn-success">Check In</button>
+          <button id="staff-checkout" class="btn-warning">Check Out</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <h3>Your Bookings</h3>
+        <div class="row">
+          <div>
+            <label for="staff-booking-date">Bookings Date:</label>
+            <input type="date" id="staff-booking-date" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="refresh-staff-bookings">Refresh Bookings</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table aria-label="Staff Bookings">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Service</th>
+                <th>Start</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="staff-bookings-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ✅ STAFF: Manual Booking (Option 2 - choose ANY staff) -->
+      <div class="section">
+        <h3>Manual Booking (Walk-in)</h3>
+        <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
+
+        <label for="staff-service">Service</label>
+        <select id="staff-service"></select>
+
+        <label for="staff-customer-name">Customer Name</label>
+        <input id="staff-customer-name" type="text" placeholder="Walk-in customer name" />
+
+        <label for="staff-customer-phone">Customer Phone</label>
+        <input id="staff-customer-phone" type="tel" placeholder="Customer phone number" />
+
+        <label for="staff-manual-barber">Assign Staff</label>
+        <select id="staff-manual-barber"></select>
+
+        <div class="row">
+          <div>
+            <label for="staff-manual-date">Date</label>
+            <input id="staff-manual-date" type="date" />
+          </div>
+          <div>
+            <label for="staff-manual-time">Start Time</label>
+            <input id="staff-manual-time" type="time" />
+          </div>
+        </div>
+
+        <button id="staff-create-booking" class="btn-success">Create Booking</button>
+        <p id="staff-manual-status" role="alert" aria-live="polite"></p>
+      </div>
+    </div>
+
+    <!-- ✅ ADMIN DASHBOARD -->
+    <div id="admin-section" style="display:none;" class="section">
+      <h3>Admin Dashboard</h3>
+
+      <div class="row">
+        <div>
+          <button id="admin-open-bookings">📋 View Bookings</button>
+        </div>
+        <div>
+          <button id="admin-open-staff">👥 Manage Staff</button>
+        </div>
+      </div>
+
+      <!-- ✅ Bookings Panel (hidden until admin clicks) -->
+      <div id="admin-bookings-panel" style="display:none;" class="section">
+        <h3>Bookings</h3>
+
+        <div class="row">
+          <div>
+            <label for="admin-date-filter">Date Filter</label>
+            <select id="admin-date-filter">
+              <option value="today">Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="all">All</option>
+              <option value="custom">Custom Date</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="admin-custom-date">Custom Date</label>
+            <input type="date" id="admin-custom-date" />
+          </div>
+        </div>
+
+        <div class="row">
+          <div>
+            <label for="admin-status-filter">Status Filter</label>
+            <select id="admin-status-filter">
+              <option value="all">All</option>
+              <option value="booked">Booked</option>
+              <option value="in_progress">In Progress</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div>
+            <label>&nbsp;</label>
+            <button id="refresh-admin-bookings">Refresh</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table aria-label="All Bookings">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>Start</th>
+                <th>Staff</th>
+                <th>Service</th>
+                <th>Status</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody id="bookings-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ✅ ADMIN: STAFF MANAGEMENT (separate section; shown only when clicked) -->
+    <div id="admin-staff-section" style="display:none;" class="section">
+      <h3>Admin: Manage Staff</h3>
+
+      <div class="row">
+        <div>
+          <label for="staffName">Staff Name:</label>
+          <input id="staffName" type="text" placeholder="e.g., John Barber" />
+        </div>
+        <div>
+          <label for="staffEmail">Staff Email:</label>
+          <input id="staffEmail" type="email" placeholder="staff@email.com" />
+        </div>
+      </div>
+
+      <button id="add-staff" class="btn-success">Add / Enable Staff</button>
+      <button id="refresh-staff-list">Refresh Staff List</button>
+
+      <div class="muted">
+        Staff must sign up normally; Admin enables staff role here.
+      </div>
+
+      <div class="table-scroll">
+        <table aria-label="Staff Table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email (Doc ID)</th>
+              <th>Active</th>
+              <th>Checked In</th>
+              <th>Last Check In</th>
+              <th>Last Check Out</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="staff-body"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
-  /</body>
+</body>
