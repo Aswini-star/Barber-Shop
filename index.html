@@ -192,4 +192,36 @@
       <ul id="services-list" style="list-style:none; padding-left: 0;"></ul>
       <div class="muted">Service duration is fixed and overlapping time is blocked.</div>
     </div>
+    <!-- CUSTOMER: BOOKING -->
+    <div id="appointment-section" style="display:none;" class="section">
+      <h3>Book an Appointment</h3>
+
+      <p><strong>Selected Service:</strong> <span id="selected-service"></span></p>
+
+      <label for="customerName">Name:</label>
+      <input type="text" id="customerName" placeholder="Your full name" />
+
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phone" placeholder="Your phone number" />
+
+      <label for="barber">Select Staff:</label>
+      <select id="barber"></select>
+
+      <div class="row">
+        <div>
+          <label for="date">Select Date:</label>
+          <input type="date" id="date" />
+        </div>
+        <div>
+          <label for="time">Select Start Time:</label>
+          <input type="time" id="time" />
+        </div>
+      </div>
+
+      <button id="book-appointment" class="btn-success">Book Appointment</button>
+      <button id="cancel-booking" class="btn-danger">Cancel</button>
+
+      <p id="appointment-status" role="alert" aria-live="polite"></p>
+    </div>
+
   </body>
