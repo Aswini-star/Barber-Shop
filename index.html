@@ -5,35 +5,129 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barber Shop - Home</title>
+
   <style>
+    :root{
+      --bg:#0f172a;
+      --text:#e2e8f0;
+      --muted:#94a3b8;
+      --border:rgba(255,255,255,0.15);
+      --card:rgba(255,255,255,0.07);
+      --shadow:0 18px 40px rgba(0,0,0,0.35);
+      --amber:rgba(245, 158, 11, 0.45);
+      --green:rgba(34, 197, 94, 0.45);
+    }
+
+    *{ box-sizing:border-box; margin:0; padding:0; }
     body{
-      margin:0;
       min-height:100vh;
       display:grid;
       place-items:center;
-      font-family: Arial, Helvetica, sans-serif;
-      background:#0f172a;
-      color:#e2e8f0;
       padding:24px;
+      font-family: Arial, Helvetica, sans-serif;
+      background:
+        radial-gradient(900px circle at 20% 10%, rgba(245, 158, 11, 0.25), transparent 45%),
+        radial-gradient(800px circle at 80% 40%, rgba(34, 197, 94, 0.18), transparent 50%),
+        var(--bg);
+      color:var(--text);
     }
+
+    .container{
+      width:min(960px, 92vw);
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      border:1px solid var(--border);
+      border-radius:18px;
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+
+    header{
+      padding:26px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:16px;
+      flex-wrap:wrap;
+    }
+
+    .brand h1{
+      font-size:28px;
+      margin-bottom:8px;
+      letter-spacing:0.5px;
+    }
+
+    .brand p{
+      color:var(--muted);
+      line-height:1.5;
+      font-size:14px;
+    }
+
+    .badge{
+      padding:8px 12px;
+      border:1px solid var(--border);
+      border-radius:999px;
+      background: rgba(0,0,0,0.18);
+      color:var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+      align-self:flex-start;
+    }
+
+    .main{
+      padding:26px;
+      display:grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap:18px;
+    }
+
     .card{
-      width:min(900px, 92vw);
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.15);
-      border-radius: 18px;
-      padding: 26px;
-      box-shadow: 0 18px 40px rgba(0,0,0,0.35);
+      background: var(--card);
+      border:1px solid var(--border);
+      border-radius:16px;
+      padding:22px;
     }
-    h1{ margin:0 0 10px; }
-    p{ margin:0 0 18px; color:#94a3b8; line-height:1.5; }
-    .btn-row{ display:flex; gap:12px; flex-wrap:wrap; }
+
+    .card h2{
+      font-size:22px;
+      margin-bottom:10px;
+    }
+
+    .card p{
+      color:var(--muted);
+      line-height:1.6;
+      font-size:14px;
+    }
+
+    .services{
+      margin-top:14px;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.8;
+      font-size:14px;
+    }
+
+    .cta h3{
+      font-size:18px;
+      margin-bottom:6px;
+    }
+
+    .btn-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    /* IMPORTANT: Use <a> for navigation on GitHub Pages */
     a.btn{
       text-decoration:none;
-      color:#e2e8f0;
+      color:var(--text);
       font-weight:700;
-      border-radius:12px;
+      font-size:14px;
       padding:12px 16px;
-      border:1px solid rgba(255,255,255,0.15);
+      border-radius:12px;
+      border:1px solid var(--border);
       background: rgba(0,0,0,0.25);
       display:inline-flex;
       align-items:center;
@@ -41,25 +135,95 @@
       min-width:160px;
       transition: transform .15s ease, filter .15s ease;
     }
-    a.btn:hover{ transform: translateY(-1px); filter: brightness(1.08); }
-    .continue{
-      border-color: rgba(245, 158, 11, 0.45);
-      background: linear-gradient(135deg, rgba(245,158,11,0.25), rgba(245,158,11,0.12));
+
+    a.btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.08);
     }
+
+    .continue{
+      border-color: var(--amber);
+      background: linear-gradient(135deg, rgba(245,158,11,0.25), rgba(245,158,11,0.10));
+    }
+
     .login{
-      border-color: rgba(34, 197, 94, 0.45);
+      border-color: var(--green);
       background: linear-gradient(135deg, rgba(34,197,94,0.22), rgba(34,197,94,0.10));
+    }
+
+    footer{
+      padding:18px 26px;
+      border-top:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    @media (max-width: 780px){
+      .main{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
-<body>
-  <div class="card">
-    <h1>Royal Cut Barber Shop</h1>
-    <p>12, Anna Salai, T. Nagar,<br/>Chennai, Tamil Nadu - 600017</p>
 
-    <div class="btn-row">
-      ./barber_v3.htmlContinue</a>
-      <a class="btn login" href="./bardiv>
+<body>
+  <div class="container">
+
+    <header>
+      <div class="brand">
+        <!-- ✅ Change your shop name here -->
+        <h1>Royal Cut Barber Shop</h1>
+
+        <!-- ✅ Change your address here -->
+        <p>
+          12, Anna Salai, T. Nagar,<br />
+          Chennai, Tamil Nadu - 600017
+        </p>
+      </div>
+
+      <div class="badge">Open: 9:00 AM – 9:00 PM • Mon–Sun</div>
+    </header>
+
+    <section class="main">
+      <div class="card">
+        <h2>Fresh Cuts • Clean Shaves • Great Style</h2>
+        <p>
+          Welcome to Royal Cut — your grooming destination.
+          Walk in or book your slot in seconds.
+        </p>
+
+        <ul class="services">
+          <li>Haircut & Styling</li>
+          <li>Beard Trim & Shaping</li>
+          <li>Facial & Grooming</li>
+          <li>Kids Haircut</li>
+        </ul>
+      </div>
+
+      <div class="card cta">
+        <h3>Get Started</h3>
+        <p>Click continue to open your barber page, or login to proceed.</p>
+
+        <div class="btn-row">
+          <!-- ✅ Correct working link on GitHub Pages (same folder) -->
+          <a class="btn continue" href="./barber_v<!-- ✅ For now login opens same page. Change to login.html later if you create it -->
+          ./barber_v3.htmlLogin</a>
+        </div>
+
+        <p style="margin-top:10px; font-size:12px; color:var(--muted);">
+          Tip: Open the homepage using:
+          <b>https://aswini-star.github.io/Barber-Shop/</b>
+        </p>
+      </div>
+    </section>
+
+    <footer>
+      <span>© 2026 Royal Cut Barber Shop</span>
+      <span>Call: +91 98765 43210</span>
+    </footer>
+
   </div>
 </body>
 </html>
