@@ -292,6 +292,13 @@
         <button id="login">Login</button>
       </div>
           </div>
+    
+<p style="text-align:center; margin-top:8px;">
+  #
+    Forgot Password?
+  </a>
+</p>
+
 
     <!-- LOGOUT -->
     <div id="logout-section">
@@ -758,6 +765,25 @@ function showSectionForRole(role) {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    
+import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+$("forgot-password").onclick = async () => {
+  const email = $("email").value.trim();
+
+  if (!email) {
+    alert("Please enter your email address before requesting password reset.");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent! Check your inbox.");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+};
+
     /***********************
      * STATE
      ***********************/
@@ -1594,6 +1620,7 @@ async function profit_exportCSV() {
 </body>
 
 </html>
+
 
 
 
