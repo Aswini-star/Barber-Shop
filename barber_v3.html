@@ -341,83 +341,90 @@
     </div>
 
     <!-- STAFF DASHBOARD -->
-    <div id="staff-section" style="display:none;" class="section">
-      <h3>Staff Dashboard</h3>
+    
+<!-- STAFF DASHBOARD (REPLACEMENT - CLEAN + WORKING) -->
+<div id="staff-section" style="display:none;" class="section">
+  <h3>Staff Dashboard</h3>
 
-      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-        <div>
-          <div class="muted">Your status:</div>
-          <div id="staff-presence" class="pill">Unknown</div>
-        </div>
-        <div style="flex:1; min-width:240px;">
-          <button id="staff-checkin" class="btn-success">Check In</button>
-          <button id="staff-checkout" class="btn-warning">Check Out</button>
-        </div>
+  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+    <div>
+      <div class="muted">Your status:</div>
+      <div id="staff-presence" class="pill">Unknown</div>
+    </div>
+
+    <div style="display:flex; gap:10px; flex-wrap:wrap;">
+      <button id="staff-checkin" class="btn-success">Check In</button>
+      <button id="staff-checkout" class="btn-warning">Check Out</button>
+    </div>
+  </div>
+
+  <div class="section">
+    <h3>Your Bookings</h3>
+
+    <div class="row">
+      <div>
+        <label for="staff-booking-date">Bookings Date:</label>
+        <input type="date" id="staff-booking-date" />
       </div>
-
-      <div class="section">
-        <h3>Your Bookings</h3>
-        <div class="row">
-          <div>
-            <label for="staff-booking-date">Bookings Date:</label>
-            <input type="date" id="staff-booking-date" />
-          </div>
-          <div>
-            <label>&nbsp;</label>
-            <button id="refresh-staff-bookings">Refresh Bookings</button>
-          </div>
-        </div>
-
-        <div class="table-scroll">
-          <table aria-label="Staff Bookings">
-            <thead>
-              <tr>
-                <th>Customer</th>
-                <th>Phone</th>
-                <th>Service</th>
-                <th>Start</th>
-                <th>Duration</th>
-                <th>Status</th>
-                <th>Action</th>
-              </tr>
-            </thead>
-            <tbody id="staff-bookings-body"></tbody>
-          </table>
-        </div>
-      </div>
-
-      <!-- ✅ STAFF: Manual Booking (Option 2 - choose ANY staff) -->
-      <div class="section">
-        <h3>Manual Booking (Walk-in)</h3>
-        <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
-
-        <label for="staff-service">Service</label>
-        <select id="staff-service"></select>
-
-        <label for="staff-customer-name">Customer Name</label>
-        <input id="staff-customer-name" type="text" placeholder="Walk-in customer name" />
-
-        <label for="staff-customer-phone">Customer Phone</label>
-        <input id="staff-customer-phone" type="tel" placeholder="Customer phone number" />
-
-        <label for="staff-manual-barber">Assign Staff</label>
-        <select id="staff-manual-barber"></select>
-
-        <div class="row">
-          <div>
-            <label for="staff-manual-date">Date</label>
-            <input id="staff-manual-date" type="date" />
-          </div>
-          <div>
-            <label for="staff-manual-time">Start Time</label>
-            <input id="staff-manual-time" type="time" />
-          </div>
-        </div>
-
-        <button id="staff-create-booking" class="btn-success">Create Booking</button>
-        <p id="staff-manual-status" role="alert" aria-live="polite"></p>
+      <div>
+        <label>&nbsp;</label>
+        <button id="refresh-staff-bookings">Refresh Bookings</button>
       </div>
     </div>
+
+    <p id="staff-bookings-status" class="muted" style="margin:6px 0 0;"></p>
+
+    <div class="table-scroll">
+      <table aria-label="Staff Bookings">
+        <thead>
+          <tr>
+            <th>Customer</th>
+            <th>Phone</th>
+            <th>Service</th>
+            <th>Start</th>
+            <th>Duration</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody id="staff-bookings-body"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- OPTIONAL: Manual Booking (Walk-in) -->
+  <div class="section">
+    <h3>Manual Booking (Walk-in)</h3>
+    <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
+
+    <label for="staff-service">Service</label>
+    <select id="staff-service"></select>
+
+    <label for="staff-customer-name">Customer Name</label>
+    <input id="staff-customer-name" type="text" placeholder="Walk-in customer name" />
+
+    <label for="staff-customer-phone">Customer Phone</label>
+    <input id="staff-customer-phone" type="tel" placeholder="Customer phone number" />
+
+    <label for="staff-manual-barber">Assign Staff</label>
+    <select id="staff-manual-barber"></select>
+
+    <div class="row">
+      <div>
+        <label for="staff-manual-date">Date</label>
+        <input id="staff-manual-date" type="date" />
+      </div>
+      <div>
+        <label for="staff-manual-time">Start Time</label>
+        <input id="staff-manual-time" type="time" />
+      </div>
+    </div>
+
+    <button id="staff-create-booking" class="btn-success">Create Booking</button>
+    <p id="staff-manual-status" role="alert" aria-live="polite"></p>
+  </div>
+</div>
+
 
     <!-- ✅ ADMIN DASHBOARD -->
     <div id="admin-section" style="display:none;" class="section">
@@ -979,65 +986,151 @@ function showSectionForRole(role) {
      * STAFF: VIEW OWN BOOKINGS
      ***********************/
     
+
+/***********************
+ * STAFF: FULL WORKING MODULE
+ ***********************/
+
+// Ensure default dates exist when staff section shows
+function initStaffDates() {
+  if ($("staff-booking-date")) $("staff-booking-date").value = todayISO();
+  if ($("staff-manual-date")) $("staff-manual-date").value = todayISO();
+}
+
+// Load staff presence (checked in / out)
+async function loadStaffPresence() {
+  const u = auth.currentUser;
+  if (!u) return;
+
+  const badge = $("staff-presence");
+  try {
+    const ref = doc(db, "staff", u.email);
+    const snap = await getDoc(ref);
+
+    if (!snap.exists()) {
+      badge.className = "pill orange";
+      badge.textContent = "Not registered as staff";
+      return;
+    }
+
+    const data = snap.data();
+    const checkedIn = !!data.checkedIn;
+
+    badge.className = checkedIn ? "pill green" : "pill orange";
+    badge.textContent = checkedIn ? "Checked In" : "Checked Out";
+  } catch (e) {
+    badge.className = "pill red";
+    badge.textContent = "Status error";
+    console.error("loadStaffPresence error:", e);
+  }
+}
+
+// Staff check-in
+async function staffCheckIn() {
+  const u = auth.currentUser;
+  if (!u) return alert("Please login.");
+
+  try {
+    await updateDoc(doc(db, "staff", u.email), {
+      checkedIn: true,
+      lastCheckIn: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    await loadStaffPresence();
+    alert("Checked in!");
+  } catch (e) {
+    alert("Check-in failed: " + e.message);
+  }
+}
+
+// Staff check-out
+async function staffCheckOut() {
+  const u = auth.currentUser;
+  if (!u) return alert("Please login.");
+
+  try {
+    await updateDoc(doc(db, "staff", u.email), {
+      checkedIn: false,
+      lastCheckOut: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    await loadStaffPresence();
+    alert("Checked out!");
+  } catch (e) {
+    alert("Check-out failed: " + e.message);
+  }
+}
+
+// Render staff bookings table
 async function loadStaffBookings() {
   const u = auth.currentUser;
   if (!u) return;
 
   const tbody = $("staff-bookings-body");
+  const statusEl = $("staff-bookings-status");
+  if (!tbody) return;
+
   tbody.innerHTML = "";
+  if (statusEl) statusEl.textContent = "Loading...";
 
-  const date = $("staff-booking-date").value || todayISO();
+  const date = ($("staff-booking-date")?.value || todayISO()).trim();
 
-  // query only by barberEmail then filter by date in JS (stable)
-  const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
-  const snap = await getDocs(q1);
+  try {
+    // Stable query: barberEmail == staff email
+    const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
+    const snap = await getDocs(q1);
 
-  const rows = [];
-  snap.forEach(d => {
-    const a = d.data();
+    const rows = [];
+    snap.forEach((d) => {
+      const a = d.data();
+      const rowDate = String(a.date || "").trim();
+      if (rowDate !== date) return;
 
-    // ✅ safer compare (trims spaces)
-    if (String(a.date || "").trim() !== String(date).trim()) return;
+      rows.push({ id: d.id, ...a });
+    });
 
-    rows.push({ id: d.id, ...a });
-  });
+    rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
 
-  rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
+    if (rows.length === 0) {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="7" class="muted">No bookings found for ${date}.</td>`;
+      tbody.appendChild(tr);
+      if (statusEl) statusEl.textContent = `0 bookings for ${date}`;
+      return;
+    }
 
-  if (rows.length === 0) {
+    if (statusEl) statusEl.textContent = `${rows.length} bookings for ${date}`;
+
+    rows.forEach((a) => {
+      const tr = document.createElement("tr");
+
+      const canStart = a.status === "booked";
+      const canComplete = a.status === "in_progress";
+
+      tr.innerHTML = `
+        <td>${a.customerName || "N/A"}</td>
+        <td>${a.phone || "N/A"}</td>
+        <td>${a.serviceName || "N/A"}</td>
+        <td>${a.time || "N/A"}</td>
+        <td>${a.durationMin ?? "-"} min</td>
+        <td>${pillForStatus(a.status)}</td>
+        <td>
+          <button
+            class="btn-warning"
+            data-id="${a.id}"
+            data-action="start"
+            });
+  } catch (err) {
+    console.error("loadStaffBookings error:", err);
+    if (statusEl) statusEl.textContent = "Error loading bookings.";
     const tr = document.createElement("tr");
-    tr.innerHTML = `<td colspan="7" class="muted">No bookings found for ${date}.</td>`;
+    tr.innerHTML = `<td colspan="7" class="muted">Error loading bookings: ${err.message}</td>`;
     tbody.appendChild(tr);
-    return;
   }
-
-  rows.forEach(a => {
-    const tr = document.createElement("tr");
-
-    const canStart = a.status === "booked";
-    const canComplete = a.status === "in_progress";
-
-    tr.innerHTML = `
-      <td>${a.customerName || "N/A"}</td>
-      <td>${a.phone || "N/A"}</td>
-      <td>${a.serviceName || "N/A"}</td>
-      <td>${a.time || "N/A"}</td>
-      <td>${a.durationMin || "-"} min</td>
-      <td>${pillForStatus(a.status)}</td>
-      <td>
-        startStart</button>
-
-        completeComplete</button>
-      </td>
-    `;
-
-    tbody.appendChild(tr);
-  });
 }
-    
-$("refresh-staff-bookings").onclick = loadStaffBookings;
 
-$("staff-bookings-body").addEventListener("click", async (e) => {
+// Handle Start / Complete clicks (event delegation)
+async function onStaffBookingsClick(e) {
   const btn = e.target.closest("button");
   if (!btn) return;
 
@@ -1068,7 +1161,121 @@ $("staff-bookings-body").addEventListener("click", async (e) => {
   } catch (err) {
     alert("Update failed: " + err.message);
   }
-});
+}
+
+/***********************
+ * STAFF: Manual Walk-in Booking (optional)
+ ***********************/
+async function staffCreateWalkInBooking() {
+  const msg = $("staff-manual-status");
+  if (msg) msg.textContent = "";
+
+  const u = auth.currentUser;
+  if (!u) return alert("Please login.");
+
+  const serviceIndex = Number($("staff-service")?.value);
+  const service = services[serviceIndex];
+
+  const customerName = $("staff-customer-name")?.value.trim();
+  const phone = $("staff-customer-phone")?.value.trim();
+  const barberEmail = $("staff-manual-barber")?.value;
+  const date = $("staff-manual-date")?.value;
+  const time = $("staff-manual-time")?.value;
+
+  if (!service) return msg && (msg.textContent = "Select a service.");
+  if (!customerName) return msg && (msg.textContent = "Enter customer name.");
+  if (!phone) return msg && (msg.textContent = "Enter customer phone.");
+  if (!barberEmail) return msg && (msg.textContent = "Select staff.");
+  if (!date || !time) return msg && (msg.textContent = "Select date and time.");
+
+  const startMinutes = minutesFromTimeStr(time);
+  const endMinutes = startMinutes + service.duration;
+
+  try {
+    // Conflict check for chosen staff
+    const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
+    const snap = await getDocs(q1);
+
+    let conflict = false;
+    snap.forEach((d) => {
+      const a = d.data();
+      if (String(a.date || "").trim() !== String(date).trim()) return;
+      if (a.active !== true) return;
+
+      const aStart = a.startMinutes ?? minutesFromTimeStr(a.time);
+      const aEnd = a.endMinutes ?? (aStart + (a.durationMin || 0));
+
+      if (overlaps(startMinutes, endMinutes, aStart, aEnd)) conflict = true;
+    });
+
+    if (conflict) {
+      if (msg) msg.style.color = "#e67e22";
+      if (msg) msg.textContent = "Time slot already booked for that staff. Choose another time.";
+      return;
+    }
+
+    const barber = staffCache.find(s => s.email === barberEmail);
+    const barberName = barber?.name || barberEmail;
+
+    await addDoc(collection(db, "appointments"), {
+      userId: "walkin",
+      email: "Walk-in",
+      customerName,
+      phone,
+      barberEmail,
+      barberName,
+      serviceName: service.name,
+      servicePrice: service.price,
+      durationMin: service.duration,
+      date,
+      time,
+      startMinutes,
+      endMinutes,
+      status: "booked",
+      active: true,
+      createdBy: u.email,
+      createdByRole: "staff",
+      createdAt: serverTimestamp(),
+    });
+
+    if (msg) msg.style.color = "#27ae60";
+    if (msg) msg.textContent = "✅ Walk-in booking created successfully.";
+
+    // Clear
+    $("staff-customer-name").value = "";
+    $("staff-customer-phone").value = "";
+    $("staff-manual-time").value = "";
+
+    // Refresh bookings (if assigned to current staff)
+    if (barberEmail === u.email) await loadStaffBookings();
+
+  } catch (err) {
+    console.error("staffCreateWalkInBooking error:", err);
+    if (msg) msg.style.color = "#e74c3c";
+    if (msg) msg.textContent = "Error: " + err.message;
+  }
+}
+
+/***********************
+ * STAFF: Hook up events safely
+ ***********************/
+function wireStaffEvents() {
+  // Buttons
+  const btnIn = $("staff-checkin");
+  const btnOut = $("staff-checkout");
+  const btnRefresh = $("refresh-staff-bookings");
+  const tbody = $("staff-bookings-body");
+  const btnCreate = $("staff-create-booking");
+
+  if (btnIn) btnIn.onclick = staffCheckIn;
+  if (btnOut) btnOut.onclick = staffCheckOut;
+  if (btnRefresh) btnRefresh.onclick = loadStaffBookings;
+  if (tbody) tbody.addEventListener("click", onStaffBookingsClick);
+
+  if (btnCreate) btnCreate.onclick = staffCreateWalkInBooking;
+
+  initStaffDates();
+}
 
 
     /***********************
@@ -1489,6 +1696,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
 
