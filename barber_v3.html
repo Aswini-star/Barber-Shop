@@ -1034,6 +1034,42 @@ async function loadStaffBookings() {
     tbody.appendChild(tr);
   });
 }
+    
+$("refresh-staff-bookings").onclick = loadStaffBookings;
+
+$("staff-bookings-body").addEventListener("click", async (e) => {
+  const btn = e.target.closest("button");
+  if (!btn) return;
+
+  const id = btn.getAttribute("data-id");
+  const action = btn.getAttribute("data-action");
+  if (!id || !action) return;
+
+  try {
+    const ref = doc(db, "appointments", id);
+
+    if (action === "start") {
+      await updateDoc(ref, {
+        status: "in_progress",
+        active: true,
+        startedAt: serverTimestamp()
+      });
+    }
+
+    if (action === "complete") {
+      await updateDoc(ref, {
+        status: "completed",
+        active: false,
+        completedAt: serverTimestamp()
+      });
+    }
+
+    await loadStaffBookings();
+  } catch (err) {
+    alert("Update failed: " + err.message);
+  }
+});
+
 
     /***********************
      * STAFF: MANUAL BOOKING (Option 2: choose ANY staff)
@@ -1453,6 +1489,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
 
