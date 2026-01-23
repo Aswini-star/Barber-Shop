@@ -983,17 +983,17 @@ function showSectionForRole(role) {
         const canStart = a.status === "booked";
         const canComplete = a.status === "in_progress";
         tr.innerHTML = `
-          <td>${a.customerName || "N/A"}</td>
-          <td>${a.phone || "N/A"}</td>
-          <td>${a.serviceName || "N/A"}</td>
-          <td>${a.time || "N/A"}</td>
-          <td>${a.durationMin || "-"} min</td>
-          <td>${pillForStatus(a.status)}</td>
-          <td>
-            startStart</button>
-            completeComplete</button>
-          </td>
-        `;
+  <td>${a.customerName || "N/A"}</td>
+  <td>${a.phone || "N/A"}</td>
+  <td>${a.serviceName || "N/A"}</td>
+  <td>${a.time || "N/A"}</td>
+  <td>${a.durationMin || "-"} min</td>
+  <td>${pillForStatus(a.status)}</td>
+  <td>
+    ${canStart ? `<button data-id="${a.id}" data-action="start">Start</button>` : ""}
+    ${canComplete ? `<button data-id="${a.id}" data-action="complete">Complete</button>` : ""}
+  </td>
+`;
         $("staff-bookings-body").appendChild(tr);
       });
     }
@@ -1321,6 +1321,7 @@ function showSectionForRole(role) {
 </body>
 
 </html>
+
 
 
 
