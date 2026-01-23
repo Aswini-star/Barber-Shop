@@ -766,23 +766,7 @@ function showSectionForRole(role) {
     const auth = getAuth(app);
     const db = getFirestore(app);
     
-import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
 
-$("forgot-password").onclick = async () => {
-  const email = $("email").value.trim();
-
-  if (!email) {
-    alert("Please enter your email address before requesting password reset.");
-    return;
-  }
-
-  try {
-    await sendPasswordResetEmail(auth, email);
-    alert("Password reset email sent! Check your inbox.");
-  } catch (err) {
-    alert("Error: " + err.message);
-  }
-};
 
     /***********************
      * STATE
@@ -914,6 +898,23 @@ $("forgot-password").onclick = async () => {
         alert(e.message);
       }
     };
+    import { sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+
+$("forgot-password").onclick = async () => {
+  const email = $("email").value.trim();
+
+  if (!email) {
+    alert("Please enter your email address before requesting password reset.");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Password reset email sent! Check your inbox.");
+  } catch (err) {
+    alert("Error: " + err.message);
+  }
+};
     /***********************
      * CUSTOMER BOOKING FLOW
      ***********************/
@@ -1620,6 +1621,7 @@ async function profit_exportCSV() {
 </body>
 
 </html>
+
 
 
 
