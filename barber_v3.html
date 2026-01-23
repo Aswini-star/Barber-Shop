@@ -1,284 +1,83 @@
+
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Barber Shop Booking</title>
 
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #f4f7f8;
-      color: #333;
-      margin: 0;
-      padding: 0;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      background: #f4f7f8; color: #333; margin: 0; padding: 0;
+      min-height: 100vh; display: flex; flex-direction: column; align-items: center;
     }
-
-    h2,
-    h3 {
-      color: #2c3e50;
-      margin-bottom: 0.5em;
-    }
-
+    h2, h3 { color: #; margin-bottom: 0.5em; }
     .container {
-      background: #fff;
-      padding: 2em 3em;
-      margin: 2em auto;
-      width: 100%;
-      max-width: 620px;
-      border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      background: #fff; padding: 2em 3em; margin: 2em auto; width: 100%; max-width: 620px;
+      border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);
     }
-
-    input,
-    select {
-      width: 100%;
-      padding: 0.6em 0.8em;
-      margin: 0.5em 0 1.1em 0;
-      border: 1.5px solid #ccc;
-      border-radius: 6px;
-      font-size: 1em;
-      transition: border-color 0.3s ease;
+    input, select {
+      width: 100%; padding: 0.6em 0.8em; margin: 0.5em 0 1.1em 0;
+      border: 1.5px solid #ccc; border-radius: 6px; font-size: 1em; transition: border-color 0.3s ease;
     }
-
-    input:focus,
-    select:focus {
-      border-color: #3498db;
-      outline: none;
-    }
-
+    input:focus, select:focus { border-color: #3498db; outline: none; }
     button {
-      background-color: #3498db;
-      color: #fff;
-      border: none;
-      padding: 0.75em 1.2em;
-      border-radius: 6px;
-      font-size: 1em;
-      cursor: pointer;
-      margin-right: 0.8em;
-      transition: background-color 0.3s ease;
+      background-color: #3498db; color: #fff; border: none; padding: 0.75em 1.2em; border-radius: 6px;
+      font-size: 1em; cursor: pointer; margin-right: 0.8em; transition: background-color 0.3s ease;
     }
-
-    button:hover:not(:disabled) {
-      background-color: #2980b9;
-    }
-
-    button:disabled {
-      background-color: #95a5a6;
-      cursor: not-allowed;
-    }
-
-    .btn-danger {
-      background: #e74c3c;
-    }
-
-    .btn-danger:hover {
-      background: #c0392b;
-    }
-
-    .btn-dark {
-      background: #2c3e50;
-    }
-
-    .btn-dark:hover {
-      background: #1f2a36;
-    }
-
-    .btn-success {
-      background: #27ae60;
-    }
-
-    .btn-success:hover {
-      background: #1e8b4c;
-    }
-
-    .btn-warning {
-      background: #f39c12;
-    }
-
-    .btn-warning:hover {
-      background: #d68910;
-    }
-
-    #status {
-      margin: 0.8em 0;
-      font-weight: 700;
-      text-align: center;
-      color: #27ae60;
-    }
-
-    .section {
-      margin-top: 1em;
-      padding-top: 1em;
-      border-top: 1px dashed #e0e0e0;
-    }
-
-    .muted {
-      color: #7f8c8d;
-      font-size: 0.92em;
-    }
-
+    button:hover:not(:disabled) { background-color: #2980b9; }
+    button:disabled { background-color: #95a5a6; cursor: not-allowed; }
+    .btn-danger { background: #e74c3c; } .btn-danger:hover { background: #c0392b; }
+    .btn-dark { background: #2c3e50; } .btn-dark:hover { background: #1f2a36; }
+    .btn-success { background: #27ae60; } .btn-success:hover { background: #1e8b4c; }
+    .btn-warning { background: #f39c12; } .btn-warning:hover { background: #d68910; }
+    #status { margin: 0.8em 0; font-weight: 700; text-align: center; color: #27ae60; }
+    .section { margin-top: 1em; padding-top: 1em; border-top: 1px dashed #e0e0e0; }
+    .muted { color: #7f8c8d; font-size: 0.92em; }
     .pill {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 999px;
-      font-size: 0.85em;
-      font-weight: 800;
-      background: #ecf0f1;
-      color: #2c3e50;
+      display: inline-block; padding: 4px 10px; border-radius: 999px; font-size: 0.85em; font-weight: 800;
+      background: #ecf0f1; color: #2c3e50;
     }
-
-    .pill.green {
-      background: #e8f8f0;
-      color: #1e8449;
-    }
-
-    .pill.orange {
-      background: #fff3e6;
-      color: #b35400;
-    }
-
-    .pill.red {
-      background: #fdecea;
-      color: #a61b1b;
-    }
-
-    .pill.blue {
-      background: #e8f1ff;
-      color: #1f4aa8;
-    }
-
-    .row {
-      display: flex;
-      gap: 10px;
-    }
-
-    .row>div {
-      flex: 1;
-    }
-
+    .pill.green { background: #e8f8f0; color: #1e8449; }
+    .pill.orange { background: #fff3e6; color: #b35400; }
+    .pill.red { background: #fdecea; color: #a61b1b; }
+    .pill.blue { background: #e8f1ff; color: #1f4aa8; }
+    .row { display: flex; gap: 10px; }
+    .row>div { flex: 1; }
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 1em;
-      font-size: 0.9em;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.07);
-      border-radius: 8px;
-      overflow: hidden;
+      width: 100%; border-collapse: collapse; margin-top: 1em; font-size: 0.9em;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.07); border-radius: 8px; overflow: hidden;
     }
-
-    th,
-    td {
-      padding: 0.75em 0.8em;
-      text-align: left;
-      border-bottom: 1px solid #ecf0f1;
-      vertical-align: top;
-    }
-
+    th, td { padding: 0.75em 0.8em; text-align: left; border-bottom: 1px solid #ecf0f1; vertical-align: top; }
     th {
-      background-color: #3498db;
-      color: white;
-      font-weight: 800;
-      text-transform: uppercase;
-      font-size: 0.8em;
-      letter-spacing: 0.02em;
+      background-color: #3498db; color: white; font-weight: 800; text-transform: uppercase;
+      font-size: 0.8em; letter-spacing: 0.02em;
     }
-
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-
-    .table-scroll {
-      overflow-x: auto;
-      width: 100%;
-    }
-
+    tr:nth-child(even) { background-color: #f9f9f9; }
+    .table-scroll { overflow-x: auto; width: 100%; }
     #services-list li {
-      padding: 12px;
-      border: 1px solid #ddd;
-      margin-bottom: 10px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background-color 0.2s ease;
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
+      padding: 12px; border: 1px solid #ddd; margin-bottom: 10px; border-radius: 8px; cursor: pointer;
+      transition: background-color 0.2s ease; display: flex; justify-content: space-between; gap: 10px;
     }
-
-    #services-list li:hover,
-    #services-list li:focus {
-      background-color: #d6e9fc;
-      outline: none;
+    #services-list li:hover, #services-list li:focus { background-color: #d6e9fc; outline: none; }
+    #logout-section { display: none; margin: 0.5em 0 0.9em; text-align: center; }
+    #role-badge { display: none; text-align: center; margin-bottom: 0.6em; }
+    #appointment-status, #staff-manual-status {
+      margin-top: 0.8em; font-weight: 800; min-height: 1.4em; text-align: center; color: #e67e22;
     }
-
-    #logout-section {
-      display: none;
-      margin: 0.5em 0 0.9em;
-      text-align: center;
-    }
-
-    #role-badge {
-      display: none;
-      text-align: center;
-      margin-bottom: 0.6em;
-    }
-
-    #appointment-status,
-    #staff-manual-status {
-      margin-top: 0.8em;
-      font-weight: 800;
-      min-height: 1.4em;
-      text-align: center;
-      color: #e67e22;
-    }
-
     @media (max-width: 600px) {
-      body {
-        padding: 0 10px;
-      }
-
-      .container {
-        width: 100%;
-        margin: 1em 0;
-        padding: 1.2em 1.4em;
-        border-radius: 8px;
-      }
-
-      h2 {
-        font-size: 1.35em;
-        text-align: center;
-      }
-
-      h3 {
-        font-size: 1.15em;
-        text-align: center;
-      }
-
-      button {
-        width: 100%;
-        margin: 0.4em 0;
-      }
-
-      .row {
-        flex-direction: column;
-      }
-
-      .table-scroll table {
-        min-width: 880px;
-      }
+      body { padding: 0 10px; }
+      .container { width: 100%; margin: 1em 0; padding: 1.2em 1.4em; border-radius: 8px; }
+      h2 { font-size: 1.35em; text-align: center; }
+      h3 { font-size: 1.15em; text-align: center; }
+      button { width: 100%; margin: 0.4em 0; }
+      .row { flex-direction: column; }
+      .table-scroll table { min-width: 880px; }
     }
   </style>
 </head>
-
 <body>
   <div class="container">
     <h2>Barber Shop Booking</h2>
@@ -291,7 +90,7 @@
         <button id="signup">Sign Up</button>
         <button id="login">Login</button>
       </div>
-          </div>
+    </div>
 
     <!-- LOGOUT -->
     <div id="logout-section">
@@ -386,7 +185,7 @@
         </div>
       </div>
 
-      <!-- ✅ STAFF: Manual Booking (Option 2 - choose ANY staff) -->
+      <!-- ✅ STAFF: Manual Booking (Walk-in) -->
       <div class="section">
         <h3>Manual Booking (Walk-in)</h3>
         <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
@@ -424,15 +223,12 @@
       <h3>Admin Dashboard</h3>
 
       <div class="row">
-        <div>
-          <button id="admin-open-bookings">📋 View Bookings</button>
-        </div>
-        <div>
-          <button id="admin-open-staff">👥 Manage Staff</button>
-        </div>
+        <div><button id="admin-open-bookings">📋 View Bookings</button></div>
+        <div><button id="admin-open-staff">👥 Manage Staff</button></div>
+        <div><button id="admin-open-profit">💰 Profit</button></div>
       </div>
 
-      <!-- ✅ Bookings Panel (hidden until admin clicks) -->
+      <!-- ✅ Bookings Panel -->
       <div id="admin-bookings-panel" style="display:none;" class="section">
         <h3>Bookings</h3>
 
@@ -446,7 +242,6 @@
               <option value="custom">Custom Date</option>
             </select>
           </div>
-
           <div>
             <label for="admin-custom-date">Custom Date</label>
             <input type="date" id="admin-custom-date" />
@@ -463,7 +258,6 @@
               <option value="completed">Completed</option>
             </select>
           </div>
-
           <div>
             <label>&nbsp;</label>
             <button id="refresh-admin-bookings">Refresh</button>
@@ -486,9 +280,73 @@
           </table>
         </div>
       </div>
+
+      <!-- ✅ PROFIT PANEL -->
+      <div id="admin-profit-panel" style="display:none;" class="section">
+        <h3>Profit</h3>
+
+        <div class="row" style="gap:8px; align-items:flex-end;">
+          <div>
+            <label for="profit-date-mode">Date Mode</label>
+            <select id="profit-date-mode">
+              <option value="today" selected>Today</option>
+              <option value="yesterday">Yesterday</option>
+              <option value="custom">Custom Date</option>
+              <option value="month">Month (YYYY-MM)</option>
+              <option value="range">Custom Range</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="profit-status-filter">Status</label>
+            <select id="profit-status-filter">
+              <option value="completed" selected>completed</option>
+              <option value="paid">paid</option>
+              <option value="all">all</option>
+              <option value="pending">pending</option>
+              <option value="cancelled">cancelled</option>
+              <option value="no-show">no-show</option>
+            </select>
+          </div>
+
+          <div id="profit-date-custom-wrap" style="display:none;">
+            <label for="profit-custom-date">Custom Date</label>
+            <input id="profit-custom-date" type="date" />
+          </div>
+
+          <div id="profit-month-wrap" style="display:none;">
+            <label for="profit-month">Month</label>
+            <input id="profit-month" type="month" />
+          </div>
+
+          <div id="profit-range-wrap" style="display:none;">
+            <label for="profit-range-start">Range</label>
+            <div style="display:flex; gap:6px;">
+              <input id="profit-range-start" type="date" />
+              <input id="profit-range-end" type="date" />
+            </div>
+          </div>
+
+          <div>
+            <button id="btn-calc-profit" class="btn-success">Calculate Profit</button>
+            <button id="btn-export-profit" class="btn-warning">Export CSV</button>
+          </div>
+        </div>
+
+        <div id="profit-results" style="margin-top:14px;">
+          <div class="card" style="padding:12px; line-height:1.7;">
+            <div><strong>Period:</strong> <span id="profit-period-label">—</span></div>
+            <div><strong>Status Filter:</strong> <span id="profit-status-label">completed</span></div>
+            <div><strong>Total Bookings:</strong> <span id="profit-bookings-count">0</span></div>
+            <div><strong>Total Revenue / Profit:</strong> $<span id="profit-total">0.00</span></div>
+            <div><strong>Average Ticket:</strong> $<span id="profit-avg">0.00</span></div>
+            <div><strong>Total Tips:</strong> $<span id="profit-tips">0.00</span></div>
+          </div>
+        </div>
+      </div>
     </div>
 
-    <!-- ✅ ADMIN: STAFF MANAGEMENT (separate section; shown only when clicked) -->
+    <!-- ✅ ADMIN: STAFF MANAGEMENT -->
     <div id="admin-staff-section" style="display:none;" class="section">
       <h3>Admin: Manage Staff</h3>
 
@@ -527,7 +385,6 @@
         </table>
       </div>
     </div>
-
   </div>
 
   <script type="module">
@@ -535,41 +392,14 @@
      * CONFIG + HELPERS
      ***********************/
     const adminEmails = ["skrajadba@gmail.com"]; // admin email(s)
-    const services = [{
-        name: "Haircut",
-        price: 25,
-        duration: 30
-      },
-      {
-        name: "Beard Trim",
-        price: 15,
-        duration: 15
-      },
-      {
-        name: "Hair Coloring",
-        price: 40,
-        duration: 60
-      },
-      {
-        name: "Shave",
-        price: 20,
-        duration: 30
-      },
-      {
-        name: "Haircut-Beard Trim",
-        price: 40,
-        duration: 45
-      },
-      {
-        name: "Haircut-Shave",
-        price: 45,
-        duration: 60
-      },
-      {
-        name: "Haircut-Hair Coloring",
-        price: 40,
-        duration: 45
-      }
+    const services = [
+      { name: "Haircut", price: 25, duration: 30 },
+      { name: "Beard Trim", price: 15, duration: 15 },
+      { name: "Hair Coloring", price: 40, duration: 60 },
+      { name: "Shave", price: 20, duration: 30 },
+      { name: "Haircut-Beard Trim", price: 40, duration: 45 },
+      { name: "Haircut-Shave", price: 45, duration: 60 },
+      { name: "Haircut-Hair Coloring", price: 40, duration: 45 }
     ];
     const $ = (id) => document.getElementById(id);
 
@@ -577,20 +407,17 @@
       const [hh, mm] = t.split(":").map(Number);
       return hh * 60 + mm;
     }
-
     function todayISO() {
       const d = new Date();
       const pad = (n) => String(n).padStart(2, "0");
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     }
-
     function yesterdayISO() {
       const d = new Date();
       d.setDate(d.getDate() - 1);
       const pad = (n) => String(n).padStart(2, "0");
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
     }
-
     function setBadge(role) {
       const badge = $("role-badge");
       badge.style.display = "block";
@@ -599,82 +426,68 @@
       if (role === "staff") cls = "pill green";
       badge.innerHTML = `<span class="${cls}">Role: ${role.toUpperCase()}</span>`;
     }
-
     function setMessage(el, msg, color) {
       el.style.color = color || "#e67e22";
       el.innerText = msg || "";
     }
-
     function pillForStatus(s) {
       if (s === "booked") return `<span class="pill blue">BOOKED</span>`;
       if (s === "in_progress") return `<span class="pill orange">IN PROGRESS</span>`;
       if (s === "completed") return `<span class="pill green">COMPLETED</span>`;
       return `<span class="pill">UNKNOWN</span>`;
     }
-
     function overlaps(aStart, aEnd, bStart, bEnd) {
       return aStart < bEnd && aEnd > bStart;
     }
 
-    
+    function showSectionForRole(role) {
+      // Hide all primary UI sections
+      $("services-section").style.display = "none";
+      $("appointment-section").style.display = "none";
+      $("staff-section").style.display = "none";
+      $("admin-section").style.display = "none";
+      $("admin-staff-section").style.display = "none";
+      $("admin-bookings-panel").style.display = "none";
+      $("admin-profit-panel").style.display = "none"; // hide profit panel
 
-function showSectionForRole(role) {
-  // Hide all primary UI sections
-  $("services-section").style.display = "none";
-  $("appointment-section").style.display = "none";
-  $("staff-section").style.display = "none";
-  $("admin-section").style.display = "none";
-  $("admin-staff-section").style.display = "none";
+      if (role === "guest") { return; }
+      if (role === "customer") {
+        $("services-section").style.display = "block";
+      } else if (role === "staff") {
+        $("staff-section").style.display = "block";
+      } else if (role === "admin") {
+        $("admin-section").style.display = "block";
+      } else {
+        $("services-section").style.display = "block";
+      }
+    }
 
-  // Hide admin panel by default
-  $("admin-bookings-panel").style.display = "none";
-
-  // ✅ Guest should NOT see services
-  if (role === "guest") {
-    return; // show nothing except auth-section (handled elsewhere)
-  }
-
-  // Logged-in roles
-  if (role === "customer") {
-    $("services-section").style.display = "block";
-  } else if (role === "staff") {
-    $("staff-section").style.display = "block";
-  } else if (role === "admin") {
-    $("admin-section").style.display = "block";
-  } else {
-    // fallback: treat unknown role as customer
-    $("services-section").style.display = "block";
-  }
-}
+    // CSV helpers (used by Profit export too)
+    function escapeCSV(value) {
+      const s = value === null || value === undefined ? "" : String(value);
+      const escaped = s.replace(/"/g, '""');
+      return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
+    }
+    function downloadCSV(filename, csvText) {
+      const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url; a.download = filename; document.body.appendChild(a);
+      a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+    }
 
     /***********************
      * FIREBASE IMPORTS
      ***********************/
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import {
-      initializeApp
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
     import {
-      getFirestore,
-      collection,
-      addDoc,
-      serverTimestamp,
-      query,
-      where,
-      getDocs,
-      doc,
-      getDoc,
-      setDoc,
-      updateDoc,
-      deleteDoc,
-      orderBy
+      getFirestore, collection, addDoc, serverTimestamp, query, where, getDocs,
+      doc, getDoc, setDoc, updateDoc, deleteDoc, orderBy
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
       authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -686,13 +499,15 @@ function showSectionForRole(role) {
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+
     /***********************
      * STATE
      ***********************/
     let currentUser = null;
     let currentRole = "guest";
     let currentSelectedService = null;
-    let staffCache = []; // all staff docs [{email, name, active, checkedIn...}]
+    let staffCache = [];
+
     /***********************
      * UI INIT: SERVICES
      ***********************/
@@ -716,10 +531,8 @@ function showSectionForRole(role) {
         list.appendChild(li);
       });
     }
-
     function populateStaffServiceSelect() {
-      const sel = $("staff-service");
-      if (!sel) return;
+      const sel = $("staff-service"); if (!sel) return;
       sel.innerHTML = "";
       services.forEach((s, idx) => {
         const opt = document.createElement("option");
@@ -733,51 +546,39 @@ function showSectionForRole(role) {
     $("staff-booking-date").value = todayISO();
     $("staff-manual-date").value = todayISO();
     $("admin-custom-date").value = todayISO();
+
     /***********************
-     * STAFF LOADING (stable - no compound indexes)
+     * STAFF LOADING
      ***********************/
     async function loadStaffCache() {
       staffCache = [];
       const snap = await getDocs(collection(db, "staff"));
-      snap.forEach(d => staffCache.push({
-        email: d.id,
-        ...d.data()
-      }));
+      snap.forEach(d => staffCache.push({ email: d.id, ...d.data() }));
       staffCache.sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
     }
-
     function populateStaffDropdowns() {
       // Customer booking staff dropdown
-      const customerSel = $("barber");
-      customerSel.innerHTML = "";
+      const customerSel = $("barber"); customerSel.innerHTML = "";
       const def1 = document.createElement("option");
-      def1.value = "";
-      def1.textContent = "Select Staff";
-      customerSel.appendChild(def1);
-      // Staff manual booking staff dropdown (Option 2)
-      const manualSel = $("staff-manual-barber");
-      manualSel.innerHTML = "";
+      def1.value = ""; def1.textContent = "Select Staff"; customerSel.appendChild(def1);
+      // Staff manual booking dropdown
+      const manualSel = $("staff-manual-barber"); manualSel.innerHTML = "";
       const def2 = document.createElement("option");
-      def2.value = "";
-      def2.textContent = "Select Staff";
-      manualSel.appendChild(def2);
+      def2.value = ""; def2.textContent = "Select Staff"; manualSel.appendChild(def2);
       const activeStaff = staffCache.filter(s => s.active === true);
       activeStaff.forEach(st => {
         const label = st.name ? `${st.name} (${st.email})` : st.email;
         const opt1 = document.createElement("option");
-        opt1.value = st.email;
-        opt1.textContent = label;
-        customerSel.appendChild(opt1);
+        opt1.value = st.email; opt1.textContent = label; customerSel.appendChild(opt1);
         const opt2 = document.createElement("option");
-        opt2.value = st.email;
-        opt2.textContent = label;
-        manualSel.appendChild(opt2);
+        opt2.value = st.email; opt2.textContent = label; manualSel.appendChild(opt2);
       });
     }
     async function refreshStaffLists() {
       await loadStaffCache();
       populateStaffDropdowns();
     }
+
     /***********************
      * ROLE
      ***********************/
@@ -789,6 +590,7 @@ function showSectionForRole(role) {
       if (snap.exists() && snap.data().active === true) return "staff";
       return "customer";
     }
+
     /***********************
      * AUTH
      ***********************/
@@ -796,26 +598,21 @@ function showSectionForRole(role) {
       try {
         await createUserWithEmailAndPassword(auth, $("email").value, $("password").value);
         alert("Signup successful");
-      } catch (e) {
-        alert(e.message);
-      }
+      } catch (e) { alert(e.message); }
     };
     $("login").onclick = async () => {
       try {
         await signInWithEmailAndPassword(auth, $("email").value, $("password").value);
         alert("Login successful");
-      } catch (e) {
-        alert(e.message);
-      }
+      } catch (e) { alert(e.message); }
     };
     $("logout").onclick = async () => {
       try {
         await signOut(auth);
         alert("Logged out");
-      } catch (e) {
-        alert(e.message);
-      }
+      } catch (e) { alert(e.message); }
     };
+
     /***********************
      * CUSTOMER BOOKING FLOW
      ***********************/
@@ -844,6 +641,7 @@ function showSectionForRole(role) {
       const user = auth.currentUser;
       if (!user) return setMessage(statusEl, "You must be logged in to book an appointment.", "#e67e22");
       if (!currentSelectedService) return setMessage(statusEl, "Please select a service first.", "#e67e22");
+
       const customerName = $("customerName").value.trim();
       const phone = $("phone").value.trim();
       const barberEmail = $("barber").value;
@@ -853,12 +651,12 @@ function showSectionForRole(role) {
       if (!phone) return setMessage(statusEl, "Please enter your phone number.", "#e67e22");
       if (!barberEmail) return setMessage(statusEl, "Please select staff.", "#e67e22");
       if (!date || !time) return setMessage(statusEl, "Please select both date and time.", "#e67e22");
+
       const barber = staffCache.find(s => s.email === barberEmail);
       const barberName = barber?.name || barberEmail;
       const startMinutes = minutesFromTimeStr(time);
       const endMinutes = startMinutes + currentSelectedService.duration;
       try {
-        // Query only by barberEmail (simple) and filter conflicts in JS
         const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
         const snap = await getDocs(q1);
         let conflict = false;
@@ -876,41 +674,28 @@ function showSectionForRole(role) {
         await addDoc(collection(db, "appointments"), {
           userId: user.uid,
           email: user.email,
-          customerName,
-          phone,
-          barberEmail,
-          barberName,
+          customerName, phone,
+          barberEmail, barberName,
           serviceName: currentSelectedService.name,
           servicePrice: currentSelectedService.price,
           durationMin: currentSelectedService.duration,
-          date,
-          time,
-          startMinutes,
-          endMinutes,
-          status: "booked",
-          active: true,
-          createdBy: user.email,
-          createdByRole: "customer",
+          date, time, startMinutes, endMinutes,
+          status: "booked", active: true,
+          createdBy: user.email, createdByRole: "customer",
           createdAt: serverTimestamp(),
         });
-        setMessage(statusEl,
-          `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`,
-          "#27ae60"
-        );
-        // Option A: return after 3 seconds
-        setTimeout(() => {
-          $("cancel-booking").click();
-        }, 3000);
+        setMessage(statusEl, `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`, "#27ae60");
+        setTimeout(() => { $("cancel-booking").click(); }, 3000);
       } catch (err) {
         setMessage(statusEl, "Error booking appointment: " + err.message, "#e74c3c");
       }
     };
+
     /***********************
      * STAFF: CHECK-IN/OUT
      ***********************/
     async function loadStaffPresence() {
-      const u = auth.currentUser;
-      if (!u) return;
+      const u = auth.currentUser; if (!u) return;
       const ref = doc(db, "staff", u.email);
       const snap = await getDoc(ref);
       if (!snap.exists()) {
@@ -925,51 +710,33 @@ function showSectionForRole(role) {
     }
     $("staff-checkin").onclick = async () => {
       try {
-        const u = auth.currentUser;
-        if (!u) return;
-        await updateDoc(doc(db, "staff", u.email), {
-          checkedIn: true,
-          lastCheckIn: serverTimestamp()
-        });
-        await loadStaffPresence();
-        alert("Checked in!");
-      } catch (e) {
-        alert("Check-in failed: " + e.message);
-      }
+        const u = auth.currentUser; if (!u) return;
+        await updateDoc(doc(db, "staff", u.email), { checkedIn: true, lastCheckIn: serverTimestamp() });
+        await loadStaffPresence(); alert("Checked in!");
+      } catch (e) { alert("Check-in failed: " + e.message); }
     };
     $("staff-checkout").onclick = async () => {
       try {
-        const u = auth.currentUser;
-        if (!u) return;
-        await updateDoc(doc(db, "staff", u.email), {
-          checkedIn: false,
-          lastCheckOut: serverTimestamp()
-        });
-        await loadStaffPresence();
-        alert("Checked out!");
-      } catch (e) {
-        alert("Check-out failed: " + e.message);
-      }
+        const u = auth.currentUser; if (!u) return;
+        await updateDoc(doc(db, "staff", u.email), { checkedIn: false, lastCheckOut: serverTimestamp() });
+        await loadStaffPresence(); alert("Checked out!");
+      } catch (e) { alert("Check-out failed: " + e.message); }
     };
+
     /***********************
      * STAFF: VIEW OWN BOOKINGS
      ***********************/
     async function loadStaffBookings() {
-      const u = auth.currentUser;
-      if (!u) return;
+      const u = auth.currentUser; if (!u) return;
       $("staff-bookings-body").innerHTML = "";
       const date = $("staff-booking-date").value || todayISO();
-      // query only by barberEmail then filter by date in JS (stable)
       const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
       const snap = await getDocs(q1);
       const rows = [];
       snap.forEach(d => {
         const a = d.data();
         if (a.date !== date) return;
-        rows.push({
-          id: d.id,
-          ...a
-        });
+        rows.push({ id: d.id, ...a });
       });
       rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
       if (rows.length === 0) {
@@ -983,50 +750,40 @@ function showSectionForRole(role) {
         const canStart = a.status === "booked";
         const canComplete = a.status === "in_progress";
         tr.innerHTML = `
-  <td>${a.customerName || "N/A"}</td>
-  <td>${a.phone || "N/A"}</td>
-  <td>${a.serviceName || "N/A"}</td>
-  <td>${a.time || "N/A"}</td>
-  <td>${a.durationMin || "-"} min</td>
-  <td>${pillForStatus(a.status)}</td>
-  <td>
-    ${canStart ? `<button data-id="${a.id}" data-action="start">Start</button>` : ""}
-    ${canComplete ? `<button data-id="${a.id}" data-action="complete">Complete</button>` : ""}
-  </td>
-`;
+          <td>${a.customerName || "N/A"}</td>
+          <td>${a.phone || "N/A"}</td>
+          <td>${a.serviceName || "N/A"}</td>
+          <td>${a.time || "N/A"}</td>
+          <td>${a.durationMin || "-"} min</td>
+          <td>${pillForStatus(a.status)}</td>
+          <td>
+            ${canStart ? `startStart</button>` : ""}
+            ${canComplete ? `completeComplete</button>` : ""}
+          </td>
+        `;
         $("staff-bookings-body").appendChild(tr);
       });
     }
     $("refresh-staff-bookings").onclick = loadStaffBookings;
     $("staff-bookings-body").addEventListener("click", async (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
+      const btn = e.target.closest("button"); if (!btn) return;
       const id = btn.getAttribute("data-id");
       const action = btn.getAttribute("data-action");
       if (!id || !action) return;
       try {
         const ref = doc(db, "appointments", id);
         if (action === "start") {
-          await updateDoc(ref, {
-            status: "in_progress",
-            active: true,
-            startedAt: serverTimestamp()
-          });
+          await updateDoc(ref, { status: "in_progress", active: true, startedAt: serverTimestamp() });
         }
         if (action === "complete") {
-          await updateDoc(ref, {
-            status: "completed",
-            active: false,
-            completedAt: serverTimestamp()
-          });
+          await updateDoc(ref, { status: "completed", active: false, completedAt: serverTimestamp() });
         }
         await loadStaffBookings();
-      } catch (err) {
-        alert("Update failed: " + err.message);
-      }
+      } catch (err) { alert("Update failed: " + err.message); }
     });
+
     /***********************
-     * STAFF: MANUAL BOOKING (Option 2: choose ANY staff)
+     * STAFF: MANUAL BOOKING
      ***********************/
     $("staff-create-booking").onclick = async () => {
       const msg = $("staff-manual-status");
@@ -1044,12 +801,12 @@ function showSectionForRole(role) {
       if (!phone) return setMessage(msg, "Enter customer phone.", "#e67e22");
       if (!barberEmail) return setMessage(msg, "Select staff to assign.", "#e67e22");
       if (!date || !time) return setMessage(msg, "Select date and time.", "#e67e22");
+
       const barber = staffCache.find(s => s.email === barberEmail);
       const barberName = barber?.name || barberEmail;
       const startMinutes = minutesFromTimeStr(time);
       const endMinutes = startMinutes + service.duration;
       try {
-        // check conflicts for selected staff
         const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
         const snap = await getDocs(q1);
         let conflict = false;
@@ -1067,35 +824,26 @@ function showSectionForRole(role) {
         await addDoc(collection(db, "appointments"), {
           userId: "walkin",
           email: "Walk-in",
-          customerName,
-          phone,
-          barberEmail,
-          barberName,
+          customerName, phone,
+          barberEmail, barberName,
           serviceName: service.name,
           servicePrice: service.price,
           durationMin: service.duration,
-          date,
-          time,
-          startMinutes,
-          endMinutes,
-          status: "booked",
-          active: true,
-          createdBy: u.email,
-          createdByRole: "staff",
+          date, time, startMinutes, endMinutes,
+          status: "booked", active: true,
+          createdBy: u.email, createdByRole: "staff",
           createdAt: serverTimestamp(),
         });
         setMessage(msg, "✅ Walk-in booking created successfully.", "#27ae60");
         $("staff-customer-name").value = "";
         $("staff-customer-phone").value = "";
         $("staff-manual-time").value = "";
-        // refresh own bookings if booking was assigned to current staff
         if (barberEmail === u.email) await loadStaffBookings();
-      } catch (err) {
-        setMessage(msg, "Error: " + err.message, "#e74c3c");
-      }
+      } catch (err) { setMessage(msg, "Error: " + err.message, "#e74c3c"); }
     };
+
     /***********************
-     * ADMIN: Bookings (load only on click + filters + details toggle)
+     * ADMIN: Bookings (on click)
      ***********************/
     async function loadAllBookingsForAdmin() {
       const tbody = $("bookings-body");
@@ -1105,6 +853,7 @@ function showSectionForRole(role) {
       const customDate = $("admin-custom-date").value;
       const today = todayISO();
       const yesterday = yesterdayISO();
+
       const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
       const snap = await getDocs(q);
       const rows = [];
@@ -1116,10 +865,7 @@ function showSectionForRole(role) {
         if (dateMode === "custom" && customDate && a.date !== customDate) return;
         // status filter
         if (statusMode !== "all" && a.status !== statusMode) return;
-        rows.push({
-          id: d.id,
-          ...a
-        });
+        rows.push({ id: d.id, ...a });
       });
       if (rows.length === 0) {
         const tr = document.createElement("tr");
@@ -1158,40 +904,39 @@ function showSectionForRole(role) {
       });
     }
     $("bookings-body").addEventListener("click", (e) => {
-      const btn = e.target.closest("button[data-toggle]");
-      if (!btn) return;
+      const btn = e.target.closest("button[data-toggle]"); if (!btn) return;
       const id = btn.getAttribute("data-toggle");
-      const row = document.getElementById(id);
-      if (!row) return;
+      const row = document.getElementById(id); if (!row) return;
       const hidden = row.style.display === "none";
       row.style.display = hidden ? "table-row" : "none";
       btn.textContent = hidden ? "Hide" : "View";
     });
     $("refresh-admin-bookings").onclick = loadAllBookingsForAdmin;
-    // Admin dashboard navigation
+
+    // Admin nav: bookings & staff
     $("admin-open-bookings").onclick = async () => {
       $("admin-bookings-panel").style.display = "block";
       $("admin-staff-section").style.display = "none";
+      $("admin-profit-panel").style.display = "none";
       await loadAllBookingsForAdmin();
     };
     $("admin-open-staff").onclick = async () => {
       $("admin-bookings-panel").style.display = "none";
       $("admin-staff-section").style.display = "block";
+      $("admin-profit-panel").style.display = "none";
       await loadStaffAdminTable();
       await refreshStaffLists();
     };
+
     /***********************
-     * ADMIN: Staff CRUD (stable)
+     * ADMIN: Staff CRUD
      ***********************/
     async function loadStaffAdminTable() {
       const tbody = $("staff-body");
       tbody.innerHTML = "";
       const snap = await getDocs(collection(db, "staff"));
       const rows = [];
-      snap.forEach(d => rows.push({
-        id: d.id,
-        ...d.data()
-      }));
+      snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
       rows.sort((a, b) => (a.name || a.id).localeCompare(b.name || b.id));
       if (rows.length === 0) {
         const tr = document.createElement("tr");
@@ -1225,31 +970,21 @@ function showSectionForRole(role) {
       if (!email) return alert("Enter staff email");
       try {
         await setDoc(doc(db, "staff", email), {
-          name,
-          email,
-          active: true,
-          checkedIn: false,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }, {
-          merge: true
-        });
-        $("staffName").value = "";
-        $("staffEmail").value = "";
+          name, email, active: true, checkedIn: false,
+          createdAt: serverTimestamp(), updatedAt: serverTimestamp()
+        }, { merge: true });
+        $("staffName").value = ""; $("staffEmail").value = "";
         await loadStaffAdminTable();
         await refreshStaffLists();
         alert("Staff added/enabled successfully.");
-      } catch (e) {
-        alert("Failed to add staff: " + e.message);
-      }
+      } catch (e) { alert("Failed to add staff: " + e.message); }
     };
     $("refresh-staff-list").onclick = async () => {
       await loadStaffAdminTable();
       await refreshStaffLists();
     };
     $("staff-body").addEventListener("click", async (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
+      const btn = e.target.closest("button"); if (!btn) return;
       const email = btn.getAttribute("data-email");
       const action = btn.getAttribute("data-action");
       if (!email || !action) return;
@@ -1259,20 +994,14 @@ function showSectionForRole(role) {
           const snap = await getDoc(ref);
           if (!snap.exists()) return alert("Staff doc missing");
           const current = snap.data();
-          await updateDoc(ref, {
-            active: !current.active,
-            updatedAt: serverTimestamp()
-          });
+          await updateDoc(ref, { active: !current.active, updatedAt: serverTimestamp() });
         }
-        if (action === "remove") {
-          await deleteDoc(ref);
-        }
+        if (action === "remove") { await deleteDoc(ref); }
         await loadStaffAdminTable();
         await refreshStaffLists();
-      } catch (err) {
-        alert("Action failed: " + err.message);
-      }
+      } catch (err) { alert("Action failed: " + err.message); }
     });
+
     /***********************
      * AUTH STATE (CRASH-PROOF)
      ***********************/
@@ -1286,16 +1015,13 @@ function showSectionForRole(role) {
           $("logout-section").style.display = "block";
           currentRole = await determineRole(user);
           setBadge(currentRole);
-          // update UI for role
           showSectionForRole(currentRole);
-          // refresh staff list cache for dropdowns (customer booking + staff manual booking)
           await refreshStaffLists();
           if (currentRole === "staff") {
             await loadStaffPresence();
             await loadStaffBookings();
           }
-          // For admin: DO NOT auto-load bookings; dashboard only
-          // For customer: no extra auto load
+          // Admin: dashboard only, no auto-load bookings
         } else {
           $("status").style.color = "#27ae60";
           $("status").innerText = "Not logged in";
@@ -1304,7 +1030,6 @@ function showSectionForRole(role) {
           $("role-badge").style.display = "none";
           currentRole = "guest";
           showSectionForRole("guest");
-          // preload staff dropdowns (optional)
           await refreshStaffLists();
         }
       } catch (err) {
@@ -1317,11 +1042,172 @@ function showSectionForRole(role) {
     });
     // Initial load for dropdowns
     refreshStaffLists().catch(() => {});
+
+    /***********************
+     * ADMIN: PROFIT (Daily / Monthly / Custom / Range)
+     ***********************/
+    function money(n) { return Number(n || 0).toFixed(2); }
+    function matchStatusForProfit(aStatus, statusMode) {
+      if (!statusMode || statusMode === "all") return true;
+      return (aStatus || "").toLowerCase() === statusMode.toLowerCase();
+    }
+    function inDateRangeISO(dateISO, startISO, endISO) {
+      if (!dateISO) return false;
+      if (startISO && dateISO < startISO) return false;
+      if (endISO && dateISO > endISO) return false;
+      return true;
+    }
+    function summarizeProfit(rows) {
+      let totalRevenue = 0, totalTips = 0, bookings = 0;
+      for (const a of rows) {
+        const price = Number(a.servicePrice ?? 0);
+        const tip = Number(a.tip ?? 0); // will be 0 if not present
+        totalRevenue += price;
+        totalTips += tip;
+        bookings++;
+      }
+      return {
+        bookings,
+        totalRevenue,
+        totalTips,
+        avgTicket: bookings ? totalRevenue / bookings : 0
+      };
+    }
+    function buildProfitCSV(rows, summary, meta) {
+      const headers = [
+        "BookingId","Date","StartTime","StaffName","StaffEmail","Service",
+        "DurationMin","Price","Tip","Status","CustomerName","CustomerPhone",
+        "CustomerEmail","CreatedBy","CreatedByRole"
+      ];
+      const lines = [];
+      lines.push(headers.map(escapeCSV).join(","));
+      for (const a of rows) {
+        lines.push([
+          a.id, a.date || "", a.time || "", a.barberName || "", a.barberEmail || "",
+          a.serviceName || "", a.durationMin ?? "", a.servicePrice ?? "", a.tip ?? "",
+          a.status || "", a.customerName || "", a.phone || "", a.email || "",
+          a.createdBy || "", a.createdByRole || ""
+        ].map(escapeCSV).join(","));
+      }
+      lines.push("");
+      lines.push(escapeCSV(`Period: ${meta.period}`));
+      lines.push(escapeCSV(`Status Filter: ${meta.status}`));
+      lines.push(escapeCSV(`Total Bookings: ${summary.bookings}`));
+      lines.push(escapeCSV(`Total Revenue/Profit: $${money(summary.totalRevenue)}`));
+      lines.push(escapeCSV(`Average Ticket: $${money(summary.avgTicket)}`));
+      lines.push(escapeCSV(`Total Tips: $${money(summary.totalTips)}`));
+      return lines.join("\n");
+    }
+    function wireProfitDateModeUI() {
+      const mode = $("profit-date-mode").value;
+      $("profit-date-custom-wrap").style.display = (mode === "custom") ? "block" : "none";
+      $("profit-month-wrap").style.display = (mode === "month") ? "block" : "none";
+      $("profit-range-wrap").style.display = (mode === "range") ? "block" : "none";
+    }
+    async function fetchProfitRows() {
+      const dateMode = $("profit-date-mode").value;
+      const statusMode = $("profit-status-filter").value || "completed";
+      const today = todayISO();
+      const yesterday = yesterdayISO();
+
+      let startISO = null, endISO = null, periodLabel = "";
+      if (dateMode === "today") {
+        startISO = today; endISO = today; periodLabel = `Today (${today})`;
+      } else if (dateMode === "yesterday") {
+        startISO = yesterday; endISO = yesterday; periodLabel = `Yesterday (${yesterday})`;
+      } else if (dateMode === "custom") {
+        const d = $("profit-custom-date").value?.trim();
+        if (!d) throw new Error("Select a custom date.");
+        startISO = d; endISO = d; periodLabel = `Date: ${d}`;
+      } else if (dateMode === "month") {
+        const m = $("profit-month").value?.trim(); // yyyy-mm
+        if (!m) throw new Error("Select a month (YYYY-MM).");
+        const [y, mm] = m.split("-");
+        const firstDay = `${y}-${mm}-01`;
+        const lastDate = new Date(Number(y), Number(mm), 0); // day 0 of next month = last of current
+        const lastDay = lastDate.toISOString().slice(0,10);
+        startISO = firstDay; endISO = lastDay; periodLabel = `Month: ${m}`;
+      } else if (dateMode === "range") {
+        const s = $("profit-range-start").value?.trim();
+        const e = $("profit-range-end").value?.trim();
+        if (!s || !e) throw new Error("Select both start and end dates for the range.");
+        if (e < s) throw new Error("Range end date cannot be before start date.");
+        startISO = s; endISO = e; periodLabel = `Range: ${s} to ${e}`;
+      } else {
+        startISO = today; endISO = today; periodLabel = `Today (${today})`;
+      }
+
+      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
+      const rows = [];
+      snap.forEach((d) => {
+        const a = d.data();
+        const rowDate = String(a.date || "").trim();
+        if (!inDateRangeISO(rowDate, startISO, endISO)) return;
+        if (!matchStatusForProfit(a.status, statusMode)) return;
+        rows.push({ id: d.id, ...a });
+      });
+
+      return { rows, periodLabel, statusMode };
+    }
+    async function calculateAndRenderProfit() {
+      try {
+        const { rows, periodLabel, statusMode } = await fetchProfitRows();
+        const summary = summarizeProfit(rows);
+        $("profit-period-label").innerText = periodLabel;
+        $("profit-status-label").innerText = statusMode;
+        $("profit-bookings-count").innerText = String(summary.bookings);
+        $("profit-total").innerText = money(summary.totalRevenue);
+        $("profit-avg").innerText = money(summary.avgTicket);
+        $("profit-tips").innerText = money(summary.totalTips);
+
+        // cache for export
+        window.__lastProfitRows = rows;
+        window.__lastProfitSummary = summary;
+        window.__lastProfitMeta = { period: periodLabel, status: statusMode };
+      } catch (err) {
+        console.error("[Profit] Error:", err);
+        alert("Profit calculation failed: " + err.message);
+      }
+    }
+    async function exportProfitCSV() {
+      try {
+        if (!window.__lastProfitRows) await calculateAndRenderProfit();
+        const rows = window.__lastProfitRows || [];
+        if (rows.length === 0) {
+          alert("No bookings found for selected filter to export.");
+          return;
+        }
+        const summary = window.__lastProfitSummary;
+        const meta = window.__lastProfitMeta;
+        const csv = buildProfitCSV(rows, summary, meta);
+        const dateMode = $("profit-date-mode").value;
+        const statusMode = $("profit-status-filter").value || "completed";
+        const fn = `profit_${dateMode}_${statusMode}_${todayISO()}.csv`;
+        downloadCSV(fn, csv);
+      } catch (err) {
+        console.error("[Profit] CSV Error:", err);
+        alert("Export failed: " + err.message);
+      }
+    }
+
+    // Profit nav + controls
+    const openProfit = document.getElementById("admin-open-profit");
+    if (openProfit) {
+      openProfit.onclick = async () => {
+        $("admin-bookings-panel").style.display = "none";
+        $("admin-staff-section").style.display = "none";
+        $("admin-profit-panel").style.display = "block";
+        wireProfitDateModeUI();
+        await calculateAndRenderProfit(); // auto-show results on open
+      };
+    }
+    const modeSel = document.getElementById("profit-date-mode");
+    if (modeSel) modeSel.addEventListener("change", wireProfitDateModeUI);
+    const btnCalc = document.getElementById("btn-calc-profit");
+    if (btnCalc) btnCalc.addEventListener("click", calculateAndRenderProfit);
+    const btnExport = document.getElementById("btn-export-profit");
+    if (btnExport) btnExport.addEventListener("click", exportProfitCSV);
   </script>
 </body>
-
 </html>
-
-
-
-
