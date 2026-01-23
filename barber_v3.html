@@ -1205,51 +1205,66 @@ function showSectionForRole(role) {
       await refreshStaffLists();
     };
     
+
 /***********************
- * ADMIN: EXPORT BOOKINGS TO CSV
+ * ADMIN: EXPORT BOOKINGS TO CSV (robust)
  ***********************/
 function escapeCSV(value) {
-  // Convert null/undefined to empty string
-  const s = (value === null || value === undefined) ? "" : String(value);
-
-  // Escape quotes by doubling them, and wrap fields that contain special chars
-  const needsQuotes = /[",\n]/.test(s);
+  const s = value === null || value === undefined ? "" : String(value);
   const escaped = s.replace(/"/g, '""');
-  return needsQuotes ? `"${escaped}"` : escaped;
+  return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
 }
 
 function downloadCSV(filename, csvText) {
-  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
   const url = URL.createObjectURL(blob);
 
   const a = document.createElement("a");
   a.href = url;
   a.download = filename;
+
+  // ✅ required for some browsers
   document.body.appendChild(a);
   a.click();
-  a.remove();
+  document.body.removeChild(a);
 
   URL.revokeObjectURL(url);
 }
 
-// const rowDate = String(a.date || "").trim();// ✅ Export the same filtered rows as admin table
+async function exportAdminBookingsCSV() {
+  // ✅ If there is any error, you will see it clearly
+  try {
+    const dateMode = $("admin-date-filter").value;
+    const statusMode = $("admin-status-filter").value;
+    const customDate = $("admin-custom-date").value;
 
-      // ✅ apply same filters
+    const today = todayISO();
+    const yesterday = yesterdayISO();
+
+    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+
+    const filtered = [];
+    snap.forEach((d) => {
+      const a = d.data();
+      const rowDate = String(a.date || "").trim();
+
+      // date filter
       if (dateMode === "today" && rowDate !== today) return;
       if (dateMode === "yesterday" && rowDate !== yesterday) return;
       if (dateMode === "custom" && customDate && rowDate !== String(customDate).trim()) return;
 
+      // status filter
       if (statusMode !== "all" && a.status !== statusMode) return;
 
-      rows.push({ id: d.id, ...a });
+      filtered.push({ id: d.id, ...a });
     });
 
-    if (rows.length === 0) {
+    if (filtered.length === 0) {
       alert("No bookings found for selected filter to export.");
       return;
     }
 
-    // ✅ CSV headers (you can add/remove fields here)
     const headers = [
       "BookingId",
       "Date",
@@ -1267,12 +1282,11 @@ function downloadCSV(filename, csvText) {
       "CreatedByRole"
     ];
 
-    // ✅ Build CSV
-    const csvLines = [];
-    csvLines.push(headers.map(escapeCSV).join(","));
+    const lines = [];
+    lines.push(headers.map(escapeCSV).join(","));
 
-    rows.forEach((a) => {
-      const line = [
+    for (const a of filtered) {
+      lines.push([
         a.id,
         a.date || "",
         a.time || "",
@@ -1287,40 +1301,30 @@ function downloadCSV(filename, csvText) {
         a.email || "",
         a.createdBy || "",
         a.createdByRole || ""
-      ];
-      csvLines.push(line.map(escapeCSV).join(","));
-    });
+      ].map(escapeCSV).join(","));
+    }
 
-    const csvText = csvLines.join("\n");
+    const csv = lines.join("\n");
+    const filename = `bookings_${dateMode}_${statusMode}_${todayISO()}.csv`;
+    downloadCSV(filename, csv);
 
-    // ✅ Filename includes filter + date
-    const stamp = todayISO();
-    const fileName = `bookings_${dateMode}_${statusMode}_${stamp}.csv`;
-
-    downloadCSV(fileName, csvText);
   } catch (err) {
+    console.error("CSV Export Error:", err);
     alert("Export failed: " + err.message);
   }
 }
 
-// Button handler
-$("export-admin-bookings").onclick = exportAdminBookingsCSV;
-async function exportAdminBookingsCSV() {
-  try {
-    const dateMode = $("admin-date-filter").value;
-    const statusMode = $("admin-status-filter").value;
-    const customDate = $("admin-custom-date").value;
-
-    const today = todayISO();
-    const yesterday = yesterdayISO();
-
-    // Fetch bookings (same as loadAllBookingsForAdmin)
-    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-
-    const rows = [];
-    snap.forEach((d) => {
-      const a = d.data();
+/***********************
+ * Attach handler safely AFTER DOM is ready
+ ***********************/
+window.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("export-admin-bookings");
+  if (!btn) {
+    console.warn("Export button not found. Check id='export-admin-bookings' in HTML.");
+    return;
+  }
+  btn.addEventListener("click", exportAdminBookingsCSV);
+});
 
     /***********************
      * ADMIN: Staff CRUD (stable)
@@ -1463,6 +1467,7 @@ async function exportAdminBookingsCSV() {
 </body>
 
 </html>
+
 
 
 
