@@ -3,7 +3,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
   <title>Royal Cut Barber Shop</title>
 
   <style>
@@ -14,121 +14,98 @@
       --border: rgba(255,255,255,0.16);
       --text:#eaf0ff;
       --muted: rgba(234,240,255,0.72);
-      --shadow: 0 22px 60px rgba(0,0,0,0.45);
-      --accent1:#f59e0b; /* amber */
-      --accent2:#22c55e; /* green */
-      --accent3:#60a5fa; /* blue */
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+      --accent:#f59e0b;
     }
 
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    html, body { height:100%; }
     body{
       margin:0;
-      color:var(--text);
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
       background:
-        radial-gradient(1200px circle at 15% 10%, rgba(245,158,11,0.26), transparent 45%),
-        radial-gradient(900px circle at 85% 30%, rgba(34,197,94,0.22), transparent 50%),
-        radial-gradient(950px circle at 60% 120%, rgba(96,165,250,0.20), transparent 55%),
+        radial-gradient(900px circle at 20% 15%, rgba(245,158,11,0.22), transparent 45%),
+        radial-gradient(900px circle at 80% 35%, rgba(96,165,250,0.18), transparent 52%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
+      padding:14px;
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:16px; /* ✅ smaller padding for mobile */
+
+      /* ✅ stops horizontal scroll on mobile */
+      overflow-x:hidden;
     }
 
-    /* subtle noise */
-    .noise{
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      opacity:0.06;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
-      mix-blend-mode: overlay;
+    /* ✅ makes sure nothing can force width beyond screen */
+    .shell, header, section, .card, .hero, .chips, .chip, .btn {
+      max-width:100%;
     }
 
     .shell{
-      width:min(1100px, 100%);
-      border:1px solid var(--border);
-      border-radius:20px;
+      width:100%;
+      max-width: 980px;
+      border: 1px solid var(--border);
+      border-radius: 18px;
       overflow:hidden;
       box-shadow: var(--shadow);
       background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      backdrop-filter: blur(10px);
     }
 
-    /* HEADER */
     header{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:12px;
-      padding:16px 16px;
+      padding:14px;
       border-bottom:1px solid var(--border);
-      flex-wrap:wrap; /* ✅ allow wrap on small screens */
+      display:flex;
+      flex-direction:column;  /* ✅ mobile-first stack */
+      gap:10px;
     }
 
-    .logo{
+    .top{
       display:flex;
-      align-items:center;
       gap:12px;
-      min-width: 0; /* ✅ prevents overflow */
-      flex: 1 1 auto;
+      align-items:center;
+      min-width:0;
     }
 
     .mark{
       width:42px;
       height:42px;
-      flex: 0 0 auto;
       border-radius:14px;
       display:grid;
       place-items:center;
-      background:
-        linear-gradient(135deg, rgba(245,158,11,0.30), rgba(34,197,94,0.22)),
-        rgba(255,255,255,0.06);
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
       border:1px solid rgba(255,255,255,0.18);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
-      position:relative;
-      overflow:hidden;
     }
-    .mark:before{
-      content:"";
-      position:absolute;
-      inset:-40%;
-      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), transparent 45%);
-      transform: rotate(18deg);
-    }
+
     .mark span{
-      position:relative;
       font-weight:900;
-      letter-spacing:0.8px;
-      font-size:16px;
+      letter-spacing:0.7px;
     }
 
     .brand{
-      min-width:0; /* ✅ allows wrapping */
+      min-width:0;
     }
+
     .brand h1{
-      font-size:16px; /* ✅ smaller on mobile */
       margin:0;
-      letter-spacing:0.3px;
-      line-height:1.2;
-      overflow-wrap:anywhere;
-    }
-    .brand p{
-      margin:3px 0 0;
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.4;
+      font-size: clamp(16px, 4.8vw, 22px);  /* ✅ scales on mobile */
+      line-height:1.15;
       overflow-wrap:anywhere;
     }
 
-    .top-actions{
+    .brand p{
+      margin:4px 0 0;
+      color:var(--muted);
+      font-size: clamp(12px, 3.4vw, 14px);
+      line-height:1.35;
+      overflow-wrap:anywhere;
+    }
+
+    .pills{
       display:flex;
-      gap:8px;
       flex-wrap:wrap;
-      justify-content:flex-start;
-      width:100%; /* ✅ stack under logo on mobile */
+      gap:8px;
     }
 
     .pill{
@@ -136,79 +113,60 @@
       align-items:center;
       gap:8px;
       padding:8px 10px;
-      border-radius:999px;
       border:1px solid var(--border);
+      border-radius: 999px;
       background: rgba(0,0,0,0.18);
       color: var(--muted);
-      font-size:12px;
-      white-space:normal; /* ✅ allow wrap */
+      font-size: 12px;
+      line-height:1.2;
+
+      /* ✅ allow wrap to avoid overflow */
+      white-space:normal;
+      max-width:100%;
     }
+
     .dot{
       width:8px;
       height:8px;
       border-radius:50%;
-      background: var(--accent2);
-      box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
-      flex: 0 0 auto;
+      background:#22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+      flex:0 0 auto;
     }
 
-    /* MAIN GRID */
-    .grid{
+    main{
+      padding:14px;
       display:grid;
-      grid-template-columns: 1.25fr 0.75fr;
-      gap:16px;
-      padding:16px;
+      gap:12px; /* ✅ single column by default */
     }
 
     .hero{
       border:1px solid var(--border);
-      border-radius:18px;
-      padding:18px;
-      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
-      position:relative;
+      border-radius:16px;
+      padding:14px;
+      background: rgba(255,255,255,0.06);
       overflow:hidden;
-    }
-    .hero:after{
-      content:"";
-      position:absolute;
-      right:-90px;
-      top:-90px;
-      width:240px;
-      height:240px;
-      border-radius:50%;
-      background: radial-gradient(circle, rgba(245,158,11,0.30), transparent 60%);
-    }
-    .hero:before{
-      content:"";
-      position:absolute;
-      left:-120px;
-      bottom:-120px;
-      width:280px;
-      height:280px;
-      border-radius:50%;
-      background: radial-gradient(circle, rgba(96,165,250,0.25), transparent 60%);
     }
 
     .hero h2{
       margin:0 0 8px;
-      font-size: clamp(22px, 6vw, 34px); /* ✅ scales perfectly */
+      font-size: clamp(20px, 6.2vw, 32px);  /* ✅ fits mobile */
       line-height:1.12;
-      position:relative;
     }
+
     .hero p{
-      margin:0 0 14px;
-      color: var(--muted);
+      margin:0 0 12px;
+      color:var(--muted);
+      font-size: 14px;
       line-height:1.6;
-      font-size:14px;
-      position:relative;
     }
 
     .chips{
       display:flex;
       flex-wrap:wrap;
-      gap:10px;
-      position:relative;
+      gap:8px;
     }
+
     .chip{
       display:inline-flex;
       align-items:center;
@@ -216,203 +174,143 @@
       padding:10px 12px;
       border-radius:999px;
       border:1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.18);
-      font-size:13px;
+      background: rgba(0,0,0,0.16);
       color: var(--muted);
-      max-width: 100%;
+      font-size: 13px;
+      max-width:100%;
     }
+
     .chip b{
       color: var(--text);
       font-weight:800;
     }
 
-    /* RIGHT PANEL */
-    .panel{
-      display:grid;
-      gap:14px;
-    }
-
     .card{
       border:1px solid var(--border);
-      border-radius:18px;
+      border-radius:16px;
+      padding:14px;
       background: rgba(255,255,255,0.06);
-      padding:16px;
     }
+
     .card h3{
       margin:0 0 6px;
-      font-size:15px;
+      font-size: 15px;
     }
+
     .card p{
       margin:0;
       color: var(--muted);
-      font-size:14px;
+      font-size: 14px;
       line-height:1.55;
     }
 
-    .btn-row{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
+    .btn{
       margin-top:12px;
+      width:100%;               /* ✅ full-width on mobile */
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid rgba(245,158,11,0.55);
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
+      color:var(--text);
+      font-weight:900;
+      letter-spacing:0.2px;
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
     }
 
-    button{
-      cursor:pointer;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,0.16);
-      padding:12px 14px;
-      font-weight:900;
-      color: var(--text);
-      background: rgba(0,0,0,0.20);
-      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
-      flex: 1 1 170px;
-      min-width: 0;                 /* ✅ no overflow */
-    }
-    button:hover{
+    .btn:hover{
       transform: translateY(-1px);
       filter: brightness(1.08);
-      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-    }
-
-    .btn-continue{
-      border-color: rgba(245,158,11,0.55);
-      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
-    }
-    .btn-login{
-      border-color: rgba(34,197,94,0.55);
-      background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.10));
-    }
-
-    .mini{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px;
-      margin-top:12px;
-    }
-    .stat{
-      padding:12px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.16);
-    }
-    .stat .k{
-      font-size:12px;
-      color: var(--muted);
-    }
-    .stat .v{
-      margin-top:4px;
-      font-size:15px;
-      font-weight:900;
+      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
     }
 
     footer{
-      padding:14px 16px;
+      padding:12px 14px;
       border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size: 12px;
       display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:8px;
-      flex-wrap:wrap;
-      color: var(--muted);
-      font-size:12px;
+      flex-direction:column;    /* ✅ stack on mobile */
+      gap:6px;
     }
 
-    /* ✅ MOBILE BREAKPOINT (Main fix) */
-    @media (max-width: 860px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    /* ✅ EXTRA SMALL PHONES */
-    @media (max-width: 420px){
-      body{ padding:12px; }
-      header{ padding:14px; }
-      .grid{ padding:14px; gap:14px; }
-      .hero{ padding:16px; }
-      .card{ padding:14px; }
-      .mini{ grid-template-columns: 1fr; } /* ✅ stack stats */
-      .top-actions{ gap:6px; }
-      button{ width:100%; flex-basis: 100%; } /* ✅ full width buttons */
+    /* ✅ Desktop enhancements (only when screen is wide enough) */
+    @media (min-width: 900px){
+      header{
+        flex-direction:row;
+        align-items:flex-start;
+        justify-content:space-between;
+      }
+      .pills{
+        justify-content:flex-end;
+      }
+      main{
+        grid-template-columns: 1.35fr 0.65fr; /* ✅ 2 columns on desktop */
+        align-items:start;
+      }
+      footer{
+        flex-direction:row;
+        justify-content:space-between;
+        align-items:center;
+      }
     }
   </style>
 </head>
 
 <body>
-  <div class="noise" aria-hidden="true"></div>
-
-  <main class="shell">
+  <div class="shell">
     <header>
-      <div class="logo">
+      <div class="top">
         <div class="mark" aria-hidden="true"><span>RC</span></div>
         <div class="brand">
+          <!-- ✅ Change name/address here -->
           <h1>Royal Cut Barber Shop</h1>
           <p>12, Anna Salai, T. Nagar, Chennai - 600017</p>
         </div>
       </div>
 
-      <div class="top-actions">
+      <div class="pills">
         <div class="pill"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
         <div class="pill">⭐ 4.8 • 2.1k+ Customers</div>
       </div>
     </header>
 
-    <section class="grid">
-      <div class="hero">
+    <main>
+      <section class="hero">
         <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
         <p>
-          Step in for a premium grooming experience. Quick walk-ins and easy booking —
-          crafted with care, hygiene, and style.
+          Premium grooming with hygiene-first service. Walk-ins are welcome —
+          or continue to explore services and bookings.
         </p>
 
         <div class="chips">
           <div class="chip">💈 <b>Haircut</b> & Styling</div>
           <div class="chip">🧔 <b>Beard</b> Trim & Shape</div>
-          <div class="chip">🧼 <b>Facial</b> & Cleanup</div>
+          <div class="chip">🧼 <b>Cleanup</b> & Facial</div>
           <div class="chip">👦 <b>Kids</b> Haircut</div>
         </div>
-      </div>
+      </section>
 
-      <aside class="panel">
-        <div class="card">
-          <h3>Continue to Services</h3>
-          <p>Click continue to open your barber page. Login is optional for bookings.</p>
+      <aside class="card">
+        <h3>Continue</h3>
+        <p>Tap the button below to open your barber page.</p>
+        <button class="btn" id="continueBtn">Continue</button>
 
-          <div class="btn-row">
-            <button class="btn-continue" id="continueBtn">Continue</button>
-            <button class="btn-login" id="loginBtn">Login</button>
-          </div>
-
-          <div class="mini">
-            <div class="stat">
-              <div class="k">Average Time</div>
-              <div class="v">20–30 mins</div>
-            </div>
-            <div class="stat">
-              <div class="k">Hygiene</div>
-              <div class="v">Sanitized Tools</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>Location</h3>
-          <p>Near T. Nagar bus stop • Parking available • Walk-ins welcome</p>
-        </div>
+        <p style="margin-top:10px; font-size:12px; color: var(--muted);">
+          Opens: <b>barber_v3.html</b>
+        </p>
       </aside>
-    </section>
+    </main>
 
     <footer>
       <span>© 2026 Royal Cut Barber Shop</span>
       <span>Call: +91 98765 43210</span>
     </footer>
-  </main>
+  </div>
 
   <script>
     document.getElementById("continueBtn").addEventListener("click", () => {
       window.location.assign("./barber_v3.html");
-    });
-
-    document.getElementById("loginBtn").addEventListener("click", () => {
-      window.location.assign("./barber_v3.html"); // change later to ./login.html
     });
   </script>
 </body>
