@@ -529,6 +529,70 @@
     </div>
 
   </div>
+  
+<!-- ADMIN: PROFIT PANEL -->
+<section id="admin-profit-panel" style="display:none; margin-top: 20px;">
+  <h3>Profit</h3>
+  <div class="row" style="gap:8px; align-items:flex-end;">
+    <div class="col">
+>      <label for="profit-date-mode">Date Mode</label>
+      </select>
+    </div>
+
+    <div class="col" id="profit-date-custom-wrap" style="display:none;">
+      <label for="profit-custom-date">Custom Date</label>
+      <input id="profit-custom-date" type="date" />
+    </div>
+
+    <div class="col" id="profit-month-wrap" style="display:none;">
+      <label for="profit-month">Month</label>
+      <input id="profit-month" type="month" />
+    </div>
+
+    <div class="col" id="profit-range-wrap" style="display:none;">
+      <label for="profit-range-start">Range</label>
+      <div style="display:flex; gap:6px;">
+        <input id="profit-range-start" type="date" />
+        <input id="profit-range-end" type="date" />
+      </div>
+    </div>
+
+    <div class="col">
+      <button id="btn-calc-profit" class="btn-primary">Calculate Profit</button>
+      <button id="btn-export-profit" class="btn-secondary">Export CSV</button>
+    </div>
+  </div>
+
+  <div id="profit-results" style="margin-top:14px;">
+    <div class="card" style="padding:12px; line-height:1.7;">
+      <div><strong>Period:</strong> <span id="profit-period-label">—</span></div>
+      <div><strong>Status Filter:</strong> <span id="profit-status-label">completed</span></div>
+      <div><strong>Total Bookings:</strong> <span id="profit-bookings-count">0</span></div>
+      <div><strong>Total Revenue / Profit:</strong> $<span id="profit-total">0.00</span></div>
+      <div><strong>Average Ticket:</strong> $<span id="profit-avg">0.00</span></div>
+      <div><strong>Total Tips:</strong> $<span id="profit-tips">0.00</span></div>
+    </div>
+  </div>
+</section>
+``
+      <select id="profit-date-mode">
+        <option value="today">Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="custom">Custom Date</option>
+        <option value="month">Month (YYYY-MM)</option>
+        <option value="range">Custom Range</option>
+      </select>
+    </div>
+
+    <div class="col">
+      <label for="profit-status-filter">Status</label>
+      <select id="profit-status-filter">
+        <option value="completed" selected>completed</option>
+        <option value="paid">paid</option>
+        <option value="all">all</option>
+        <option value="pending">pending</option>
+        <option value="cancelled">cancelled</option>
+
 
   <script type="module">
     /***********************
@@ -1315,12 +1379,277 @@ function showSectionForRole(role) {
         $("logout-section").style.display = "block";
       }
     });
+    
+/***********************
+ * ADMIN: PROFIT (Daily / Monthly / Date-wise / Range)
+ ***********************/
+function money(n) {
+  const v = Number(n || 0);
+  return v.toFixed(2);
+}
+
+// Decide if a given appointment matches the status filter
+function matchStatusForProfit(aStatus, statusMode) {
+  if (!statusMode || statusMode === "all") return true;
+  return (aStatus || "").toLowerCase() === statusMode.toLowerCase();
+}
+
+// Inclusive date range check (both bounds are YYYY-MM-DD or empty)
+function inDateRangeISO(dateISO, startISO, endISO) {
+  if (!dateISO) return false;
+  if (startISO && dateISO < startISO) return false;
+  if (endISO && dateISO > endISO) return false;
+  return true;
+}
+
+// Calculate profit totals from a filtered array of appointments
+function summarizeProfit(rows) {
+  let totalRevenue = 0;
+  let totalTips = 0;
+  let bookings = 0;
+
+  for (const a of rows) {
+    // Base revenue: servicePrice
+    const price = Number(a.servicePrice ?? 0);
+
+    // Optional: include tip if you store tips
+    const tip = Number(a.tip ?? 0);
+    // Optional: account for cost if you store it
+    // const cost = Number(a.cost ?? 0); // uncomment if you have cost field
+    // const revenue = Math.max(0, price - cost); // profit after cost
+    // For now we assume profit == price (plus tips if desired):
+    const revenue = price;
+
+    totalRevenue += revenue;
+    totalTips += tip;
+    bookings += 1;
+  }
+
+  const avgTicket = bookings ? (totalRevenue / bookings) : 0;
+
+  return {
+    bookings,
+    totalRevenue,
+    totalTips,
+    avgTicket
+  };
+}
+
+// Build a CSV from rows + summary
+function buildProfitCSV(rows, summary, meta) {
+  const headers = [
+    "BookingId",
+    "Date",
+    "StartTime",
+    "StaffName",
+    "StaffEmail",
+    "Service",
+    "DurationMin",
+    "Price",
+    "Tip",
+    "Status",
+    "CustomerName",
+    "CustomerPhone",
+    "CustomerEmail",
+    "CreatedBy",
+    "CreatedByRole"
+  ];
+  const lines = [];
+  lines.push(headers.map(escapeCSV).join(","));
+
+  for (const a of rows) {
+    lines.push([
+      a.id,
+      a.date || "",
+      a.time || "",
+      a.barberName || "",
+      a.barberEmail || "",
+      a.serviceName || "",
+      a.durationMin ?? "",
+      a.servicePrice ?? "",
+      a.tip ?? "",        // will be blank if not used
+      a.status || "",
+      a.customerName || "",
+      a.phone || "",
+      a.email || "",
+      a.createdBy || "",
+      a.createdByRole || ""
+    ].map(escapeCSV).join(","));
+  }
+
+  // Summary block (blank line + key metrics)
+  lines.push("");
+  lines.push(escapeCSV(`Period: ${meta.period}`));
+  lines.push(escapeCSV(`Status Filter: ${meta.status}`));
+  lines.push(escapeCSV(`Total Bookings: ${summary.bookings}`));
+  lines.push(escapeCSV(`Total Revenue/Profit: $${money(summary.totalRevenue)}`));
+  lines.push(escapeCSV(`Average Ticket: $${money(summary.avgTicket)}`));
+  lines.push(escapeCSV(`Total Tips: $${money(summary.totalTips)}`));
+
+  return lines.join("\n");
+}
+
+// Fetch & filter appointments using the chosen profit mode
+async function fetchProfitRows() {
+  const dateMode = $("profit-date-mode").value;
+  const statusMode = $("profit-status-filter").value || "completed";
+  const today = todayISO();
+  const yesterday = yesterdayISO();
+
+  // compute date boundaries
+  let startISO = null;
+  let endISO = null;
+  let periodLabel = "";
+
+  if (dateMode === "today") {
+    startISO = today; endISO = today; periodLabel = `Today (${today})`;
+  } else if (dateMode === "yesterday") {
+    startISO = yesterday; endISO = yesterday; periodLabel = `Yesterday (${yesterday})`;
+  } else if (dateMode === "custom") {
+    const d = $("profit-custom-date").value?.trim();
+    if (!d) throw new Error("Select a custom date.");
+    startISO = d; endISO = d; periodLabel = `Date: ${d}`;
+  } else if (dateMode === "month") {
+    const m = $("profit-month").value?.trim(); // yyyy-mm
+    if (!m) throw new Error("Select a month (YYYY-MM).");
+    // Range is first..last of that month
+    const [y, mm] = m.split("-");
+    const firstDay = `${y}-${mm}-01`;
+    // compute last day of month
+    const endDate = new Date(Number(y), Number(mm), 0); // day 0 of next month = last day
+    const lastDay = endDate.toISOString().slice(0, 10);
+    startISO = firstDay; endISO = lastDay; periodLabel = `Month: ${m}`;
+  } else if (dateMode === "range") {
+    const s = $("profit-range-start").value?.trim();
+    const e = $("profit-range-end").value?.trim();
+    if (!s || !e) throw new Error("Select both start and end dates for the range.");
+    if (e < s) throw new Error("Range end date cannot be before start date.");
+    startISO = s; endISO = e; periodLabel = `Range: ${s} to ${e}`;
+  } else {
+    // fallback to today
+    startISO = today; endISO = today; periodLabel = `Today (${today})`;
+  }
+
+  // Fetch appointments (ordered by createdAt keeps parity with your tables)
+  const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+
+  const rows = [];
+  snap.forEach((d) => {
+    const a = d.data();
+
+    const rowDate = String(a.date || "").trim();
+    // Date filter (inclusive)
+    if (!inDateRangeISO(rowDate, startISO, endISO)) return;
+
+    // Status filter
+    if (!matchStatusForProfit(a.status, statusMode)) return;
+
+    // Ensure price exists or treat missing as 0
+    // You can add more guards here if needed
+    rows.push({ id: d.id, ...a });
+  });
+
+  return { rows, periodLabel, statusMode, startISO, endISO };
+}
+
+async function calculateAndRenderProfit() {
+  try {
+    const { rows, periodLabel, statusMode } = await fetchProfitRows();
+    const summary = summarizeProfit(rows);
+
+    // Update UI
+    $("profit-period-label").innerText = periodLabel;
+    $("profit-status-label").innerText = statusMode;
+    $("profit-bookings-count").innerText = String(summary.bookings);
+    $("profit-total").innerText = money(summary.totalRevenue);
+    $("profit-avg").innerText = money(summary.avgTicket);
+    $("profit-tips").innerText = money(summary.totalTips);
+
+    if (rows.length === 0) {
+      // Helpful toast/alert but not intrusive
+      console.info("No bookings found for selected profit filter.");
+    }
+
+    // Keep last computation cached for CSV export
+    window.__lastProfitRows = rows;
+    window.__lastProfitSummary = summary;
+    window.__lastProfitMeta = { period: periodLabel, status: statusMode };
+  } catch (err) {
+    console.error("Profit calculation failed:", err);
+    alert("Profit calculation failed: " + err.message);
+  }
+}
+
+async function exportProfitCSV() {
+  try {
+    // If nothing cached (first export without calc), compute now
+    if (!window.__lastProfitRows) {
+      await calculateAndRenderProfit();
+    }
+    const rows = window.__lastProfitRows || [];
+    const summary = window.__lastProfitSummary || { bookings:0, totalRevenue:0, avgTicket:0, totalTips:0 };
+    const meta = window.__lastProfitMeta || { period: "—", status: "—" };
+
+    if (rows.length === 0) {
+      alert("No bookings found for selected filter to export.");
+      return;
+    }
+    const csv = buildProfitCSV(rows, summary, meta);
+
+    // Form filename (compact & informative)
+    const dateMode = $("profit-date-mode").value;
+    const statusMode = $("profit-status-filter").value || "completed";
+    const fn = `profit_${dateMode}_${statusMode}_${todayISO()}.csv`;
+    downloadCSV(fn, csv);
+  } catch (err) {
+    console.error("Profit CSV export failed:", err);
+    alert("Export failed: " + err.message);
+  }
+}
+
+// Toggle date inputs based on date mode
+function wireProfitDateModeUI() {
+  const mode = $("profit-date-mode").value;
+  $("profit-date-custom-wrap").style.display = (mode === "custom") ? "block" : "none";
+  $("profit-month-wrap").style.display = (mode === "month") ? "block" : "none";
+  $("profit-range-wrap").style.display = (mode === "range") ? "block" : "none";
+}
+
+/***********************
+ * Attach handlers
+ ***********************/
+window.addEventListener("DOMContentLoaded", () => {
+  // Nav to open Profit panel
+  const openProfit = document.getElementById("admin-open-profit");
+  if (openProfit) {
+    openProfit.onclick = async () => {
+      $("admin-bookings-panel").style.display = "none";
+      $("admin-staff-section").style.display = "none";
+      $("admin-profit-panel").style.display = "block";
+      wireProfitDateModeUI();
+    };
+  }
+
+  // Profit controls
+  const modeSel = document.getElementById("profit-date-mode");
+  if (modeSel) modeSel.addEventListener("change", wireProfitDateModeUI);
+
+  const btnCalc = document.getElementById("btn-calc-profit");
+  if (btnCalc) btnCalc.addEventListener("click", calculateAndRenderProfit);
+
+  const btnExport = document.getElementById("btn-export-profit");
+  if (btnExport) btnExport.addEventListener("click", exportProfitCSV);
+});
+``
+
     // Initial load for dropdowns
     refreshStaffLists().catch(() => {});
   </script>
 </body>
 
 </html>
+
 
 
 
