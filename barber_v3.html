@@ -578,18 +578,33 @@
       return hh * 60 + mm;
     }
 
-    function todayISO() {
-      const d = new Date();
-      const pad = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
+    
+// ✅ Always compute date in Asia/Kolkata to avoid timezone problems
+function isoDateInKolkata(dateObj = new Date()) {
+  // en-CA gives YYYY-MM-DD format
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Kolkata",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(dateObj);
+}
 
-    function yesterdayISO() {
-      const d = new Date();
-      d.setDate(d.getDate() - 1);
-      const pad = (n) => String(n).padStart(2, "0");
-      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
+function todayISO() {
+  return isoDateInKolkata(new Date());
+}
+
+function yesterdayISO() {
+  const d = new Date();
+  d.setDate(d.getDate() - 1);
+  return isoDateInKolkata(d);
+}
+
+// ✅ Normalize stored dates (trim + ensure string)
+function normalizeISODate(value) {
+  return String(value || "").trim(); // keeps "YYYY-MM-DD" clean
+}
+
 
     function setBadge(role) {
       const badge = $("role-badge");
@@ -1321,6 +1336,7 @@ function showSectionForRole(role) {
 </body>
 
 </html>
+
 
 
 
