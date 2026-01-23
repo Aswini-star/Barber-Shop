@@ -879,10 +879,17 @@
           <td>${a.time || "N/A"}</td>
           <td>${a.durationMin || "-"} min</td>
           <td>${pillForStatus(a.status)}</td>
-          <td>
-            startStart</button>
-            completeComplete</button>
-          </td>
+          
+<td>
+  start
+    Start
+  </button>
+
+  complete
+    Complete
+  </button>
+</td>
+
         `;
         $("staff-bookings-body").appendChild(tr);
       });
@@ -1132,10 +1139,16 @@
           <td>${s.checkedIn ? `<span class="pill green">IN</span>` : `<span class="pill orange">OUT</span>`}</td>
           <td>${lastIn}</td>
           <td>${lastOut}</td>
-          <td>
-            toggleEnable/Disable</button>
-            removeRemove</button>
-          </td>
+          
+<td>
+  toggle
+    ${s.active ? "Disable" : "Enable"}
+  </button>
+
+  <button
+    class="btn-danger"
+   >
+
         `;
         tbody.appendChild(tr);
       });
