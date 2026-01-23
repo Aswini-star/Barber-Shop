@@ -982,6 +982,10 @@ function showSectionForRole(role) {
 /***********************
  * STAFF: VIEW OWN BOOKINGS (FIXED Start/Complete buttons)
  ***********************/
+
+/***********************
+ * STAFF: VIEW OWN BOOKINGS (FIXED Start/Complete buttons)
+ ***********************/
 async function loadStaffBookings() {
   const u = auth.currentUser;
   if (!u) return;
@@ -1028,13 +1032,12 @@ async function loadStaffBookings() {
       <td>
         startStart</button>
 
-        completeComplete</button>
-      </td>
-    `;
+        <button
+          class="btn-success"
+          data-id="${a.id}"
+          data-action="complete"
+         
 
-    tbody.appendChild(tr);
-  });
-}
 
     $("refresh-staff-bookings").onclick = loadStaffBookings;
     $("staff-bookings-body").addEventListener("click", async (e) => {
@@ -1482,6 +1485,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
 
