@@ -620,23 +620,32 @@
     }
 
     
+
 function showSectionForRole(role) {
-  // hide all primary UI sections first
+  // Hide all primary UI sections
   $("services-section").style.display = "none";
   $("appointment-section").style.display = "none";
   $("staff-section").style.display = "none";
   $("admin-section").style.display = "none";
   $("admin-staff-section").style.display = "none";
-  // also hide panels by default
+
+  // Hide admin panel by default
   $("admin-bookings-panel").style.display = "none";
+
+  // ✅ Guest should NOT see services
+  if (role === "guest") {
+    return; // show nothing except auth-section (handled elsewhere)
+  }
+
+  // Logged-in roles
   if (role === "customer") {
     $("services-section").style.display = "block";
   } else if (role === "staff") {
     $("staff-section").style.display = "block";
   } else if (role === "admin") {
     $("admin-section").style.display = "block";
-    // admin-staff-section shown only when admin clicks Manage Staff
   } else {
+    // fallback: treat unknown role as customer
     $("services-section").style.display = "block";
   }
 }
@@ -1315,4 +1324,5 @@ function showSectionForRole(role) {
 </body>
 
 </html>
+
 
