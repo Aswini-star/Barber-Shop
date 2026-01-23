@@ -978,77 +978,63 @@ function showSectionForRole(role) {
     /***********************
      * STAFF: VIEW OWN BOOKINGS
      ***********************/
-    async function loadStaffBookings() {
-      const u = auth.currentUser;
-      if (!u) return;
-      $("staff-bookings-body").innerHTML = "";
-      const date = $("staff-booking-date").value || todayISO();
-      // query only by barberEmail then filter by date in JS (stable)
-      const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
-      const snap = await getDocs(q1);
-      const rows = [];
-      snap.forEach(d => {
-        const a = d.data();
-        if (a.date !== date) return;
-        rows.push({
-          id: d.id,
-          ...a
-        });
-      });
-      rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
-      if (rows.length === 0) {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `<td colspan="7" class="muted">No bookings found for ${date}.</td>`;
-        $("staff-bookings-body").appendChild(tr);
-        return;
-      }
-      rows.forEach(a => {
-        const tr = document.createElement("tr");
-        const canStart = a.status === "booked";
-        const canComplete = a.status === "in_progress";
-        tr.innerHTML = `
-          <td>${a.customerName || "N/A"}</td>
-          <td>${a.phone || "N/A"}</td>
-          <td>${a.serviceName || "N/A"}</td>
-          <td>${a.time || "N/A"}</td>
-          <td>${a.durationMin || "-"} min</td>
-          <td>${pillForStatus(a.status)}</td>
-          <td>
-            startStart</button>
-            completeComplete</button>
-          </td>
-        `;
-        $("staff-bookings-body").appendChild(tr);
-      });
-    }
-    $("refresh-staff-bookings").onclick = loadStaffBookings;
-    $("staff-bookings-body").addEventListener("click", async (e) => {
-      const btn = e.target.closest("button");
-      if (!btn) return;
-      const id = btn.getAttribute("data-id");
-      const action = btn.getAttribute("data-action");
-      if (!id || !action) return;
-      try {
-        const ref = doc(db, "appointments", id);
-        if (action === "start") {
-          await updateDoc(ref, {
-            status: "in_progress",
-            active: true,
-            startedAt: serverTimestamp()
-          });
-        }
-        if (action === "complete") {
-          await updateDoc(ref, {
-            status: "completed",
-            active: false,
-            completedAt: serverTimestamp()
-          });
-        }
-        await loadStaffBookings();
-      } catch (err) {
-        alert("Update failed: " + err.message);
-      }
-    });
+    
+async function loadStaffBookings() {
+  const u = auth.currentUser;
+  if (!u) return;
+
+  const tbody = $("staff-bookings-body");
+  tbody.innerHTML = "";
+
+  const date = $("staff-booking-date").value || todayISO();
+
+  // query only by barberEmail then filter by date in JS (stable)
+  const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
+  const snap = await getDocs(q1);
+
+  const rows = [];
+  snap.forEach(d => {
+    const a = d.data();
+
+    // ✅ safer compare (trims spaces)
+    if (String(a.date || "").trim() !== String(date).trim()) return;
+
+    rows.push({ id: d.id, ...a });
+  });
+
+  rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
+
+  if (rows.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="7" class="muted">No bookings found for ${date}.</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+
+  rows.forEach(a => {
+    const tr = document.createElement("tr");
+
+    const canStart = a.status === "booked";
+    const canComplete = a.status === "in_progress";
+
+    tr.innerHTML = `
+      <td>${a.customerName || "N/A"}</td>
+      <td>${a.phone || "N/A"}</td>
+      <td>${a.serviceName || "N/A"}</td>
+      <td>${a.time || "N/A"}</td>
+      <td>${a.durationMin || "-"} min</td>
+      <td>${pillForStatus(a.status)}</td>
+      <td>
+        startStart</button>
+
+        completeComplete</button>
+      </td>
+    `;
+
+    tbody.appendChild(tr);
+  });
+}
+
     /***********************
      * STAFF: MANUAL BOOKING (Option 2: choose ANY staff)
      ***********************/
@@ -1467,6 +1453,7 @@ window.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
+
 
 
 
