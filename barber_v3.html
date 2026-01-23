@@ -1204,6 +1204,124 @@ function showSectionForRole(role) {
       await loadStaffAdminTable();
       await refreshStaffLists();
     };
+    
+/***********************
+ * ADMIN: EXPORT BOOKINGS TO CSV
+ ***********************/
+function escapeCSV(value) {
+  // Convert null/undefined to empty string
+  const s = (value === null || value === undefined) ? "" : String(value);
+
+  // Escape quotes by doubling them, and wrap fields that contain special chars
+  const needsQuotes = /[",\n]/.test(s);
+  const escaped = s.replace(/"/g, '""');
+  return needsQuotes ? `"${escaped}"` : escaped;
+}
+
+function downloadCSV(filename, csvText) {
+  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  URL.revokeObjectURL(url);
+}
+
+// const rowDate = String(a.date || "").trim();// ✅ Export the same filtered rows as admin table
+
+      // ✅ apply same filters
+      if (dateMode === "today" && rowDate !== today) return;
+      if (dateMode === "yesterday" && rowDate !== yesterday) return;
+      if (dateMode === "custom" && customDate && rowDate !== String(customDate).trim()) return;
+
+      if (statusMode !== "all" && a.status !== statusMode) return;
+
+      rows.push({ id: d.id, ...a });
+    });
+
+    if (rows.length === 0) {
+      alert("No bookings found for selected filter to export.");
+      return;
+    }
+
+    // ✅ CSV headers (you can add/remove fields here)
+    const headers = [
+      "BookingId",
+      "Date",
+      "StartTime",
+      "StaffName",
+      "StaffEmail",
+      "Service",
+      "DurationMin",
+      "Price",
+      "Status",
+      "CustomerName",
+      "CustomerPhone",
+      "CustomerEmail",
+      "CreatedBy",
+      "CreatedByRole"
+    ];
+
+    // ✅ Build CSV
+    const csvLines = [];
+    csvLines.push(headers.map(escapeCSV).join(","));
+
+    rows.forEach((a) => {
+      const line = [
+        a.id,
+        a.date || "",
+        a.time || "",
+        a.barberName || "",
+        a.barberEmail || "",
+        a.serviceName || "",
+        a.durationMin ?? "",
+        a.servicePrice ?? "",
+        a.status || "",
+        a.customerName || "",
+        a.phone || "",
+        a.email || "",
+        a.createdBy || "",
+        a.createdByRole || ""
+      ];
+      csvLines.push(line.map(escapeCSV).join(","));
+    });
+
+    const csvText = csvLines.join("\n");
+
+    // ✅ Filename includes filter + date
+    const stamp = todayISO();
+    const fileName = `bookings_${dateMode}_${statusMode}_${stamp}.csv`;
+
+    downloadCSV(fileName, csvText);
+  } catch (err) {
+    alert("Export failed: " + err.message);
+  }
+}
+
+// Button handler
+$("export-admin-bookings").onclick = exportAdminBookingsCSV;
+async function exportAdminBookingsCSV() {
+  try {
+    const dateMode = $("admin-date-filter").value;
+    const statusMode = $("admin-status-filter").value;
+    const customDate = $("admin-custom-date").value;
+
+    const today = todayISO();
+    const yesterday = yesterdayISO();
+
+    // Fetch bookings (same as loadAllBookingsForAdmin)
+    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+    const snap = await getDocs(q);
+
+    const rows = [];
+    snap.forEach((d) => {
+      const a = d.data();
+
     /***********************
      * ADMIN: Staff CRUD (stable)
      ***********************/
@@ -1345,6 +1463,7 @@ function showSectionForRole(role) {
 </body>
 
 </html>
+
 
 
 
