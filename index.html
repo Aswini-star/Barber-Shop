@@ -273,7 +273,7 @@
         </div>
       </div>
 
-      <!-- STAFF: Manual Booking -->
+      <!-- ✅ STAFF: Manual Booking (Option 2 - choose ANY staff) -->
       <div class="section">
         <h3>Manual Booking (Walk-in)</h3>
         <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
@@ -306,7 +306,7 @@
       </div>
     </div>
 
-    <!-- ADMIN DASHBOARD -->
+    <!-- ✅ ADMIN DASHBOARD -->
     <div id="admin-section" style="display:none;" class="section">
       <h3>Admin Dashboard</h3>
 
@@ -319,6 +319,7 @@
         </div>
       </div>
 
+      <!-- ✅ Bookings Panel (hidden until admin clicks) -->
       <div id="admin-bookings-panel" style="display:none;" class="section">
         <h3>Bookings</h3>
 
@@ -374,7 +375,7 @@
       </div>
     </div>
 
-    <!-- ADMIN: STAFF MANAGEMENT -->
+    <!-- ✅ ADMIN: STAFF MANAGEMENT (separate section; shown only when clicked) -->
     <div id="admin-staff-section" style="display:none;" class="section">
       <h3>Admin: Manage Staff</h3>
 
@@ -430,6 +431,7 @@
       { name: "Haircut-Beard Trim", price: 40, duration: 45 },
       { name: "Haircut-Shave", price: 45, duration: 60 },
       { name: "Haircut-Hair Coloring", price: 40, duration: 45 }
+      
     ];
 
     const $ = (id) => document.getElementById(id);
@@ -450,12 +452,6 @@
       d.setDate(d.getDate() - 1);
       const pad = (n) => String(n).padStart(2, "0");
       return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
-    }
-
-    // ✅ Suggestion included: Block past bookings
-    function isPast(date, time) {
-      const dt = new Date(`${date}T${time}:00`);
-      return dt.getTime() < Date.now();
     }
 
     function setBadge(role) {
@@ -484,11 +480,14 @@
     }
 
     function showSectionForRole(role) {
+      // hide all primary UI sections first
       $("services-section").style.display = "none";
       $("appointment-section").style.display = "none";
       $("staff-section").style.display = "none";
       $("admin-section").style.display = "none";
       $("admin-staff-section").style.display = "none";
+
+      // also hide panels by default
       $("admin-bookings-panel").style.display = "none";
 
       if (role === "customer") {
@@ -497,6 +496,7 @@
         $("staff-section").style.display = "block";
       } else if (role === "admin") {
         $("admin-section").style.display = "block";
+        // admin-staff-section shown only when admin clicks Manage Staff
       } else {
         $("services-section").style.display = "block";
       }
@@ -590,16 +590,12 @@
     renderServices();
     populateStaffServiceSelect();
 
-    // set default dates
     $("staff-booking-date").value = todayISO();
     $("staff-manual-date").value = todayISO();
     $("admin-custom-date").value = todayISO();
 
-    // ✅ Suggestion included: prevent choosing past date for customer booking
-    $("date").min = todayISO();
-
     /***********************
-     * STAFF LOADING
+     * STAFF LOADING (stable - no compound indexes)
      ***********************/
     async function loadStaffCache() {
       staffCache = [];
@@ -617,7 +613,7 @@
       def1.textContent = "Select Staff";
       customerSel.appendChild(def1);
 
-      // Staff manual booking staff dropdown
+      // Staff manual booking staff dropdown (Option 2)
       const manualSel = $("staff-manual-barber");
       manualSel.innerHTML = "";
       const def2 = document.createElement("option");
@@ -625,27 +621,20 @@
       def2.textContent = "Select Staff";
       manualSel.appendChild(def2);
 
-      // ✅ Suggestion included:
-      // - Customers see only staff who are ACTIVE + CHECKED IN
-      const bookableForCustomers = staffCache.filter(s => s.active === true && s.checkedIn === true);
+      const activeStaff = staffCache.filter(s => s.active === true);
 
-      // - Manual booking can assign ANY active staff
-      const activeForManual = staffCache.filter(s => s.active === true);
-
-      bookableForCustomers.forEach(st => {
+      activeStaff.forEach(st => {
         const label = st.name ? `${st.name} (${st.email})` : st.email;
-        const opt = document.createElement("option");
-        opt.value = st.email;
-        opt.textContent = label;
-        customerSel.appendChild(opt);
-      });
 
-      activeForManual.forEach(st => {
-        const label = st.name ? `${st.name} (${st.email})` : st.email;
-        const opt = document.createElement("option");
-        opt.value = st.email;
-        opt.textContent = label;
-        manualSel.appendChild(opt);
+        const opt1 = document.createElement("option");
+        opt1.value = st.email;
+        opt1.textContent = label;
+        customerSel.appendChild(opt1);
+
+        const opt2 = document.createElement("option");
+        opt2.value = st.email;
+        opt2.textContent = label;
+        manualSel.appendChild(opt2);
       });
     }
 
@@ -704,7 +693,6 @@
       $("selected-service").textContent = `${service.name} ($${service.price}) - ${service.duration} min`;
       $("services-section").style.display = "none";
       $("appointment-section").style.display = "block";
-      $("date").value = todayISO();
       setMessage($("appointment-status"), "", "#e67e22");
     }
 
@@ -741,11 +729,6 @@
       if (!barberEmail) return setMessage(statusEl, "Please select staff.", "#e67e22");
       if (!date || !time) return setMessage(statusEl, "Please select both date and time.", "#e67e22");
 
-      // ✅ Suggestion included: prevent booking in the past
-      if (isPast(date, time)) {
-        return setMessage(statusEl, "You cannot book a past time.", "#e67e22");
-      }
-
       const barber = staffCache.find(s => s.email === barberEmail);
       const barberName = barber?.name || barberEmail;
 
@@ -753,7 +736,7 @@
       const endMinutes = startMinutes + currentSelectedService.duration;
 
       try {
-        // Query only by barberEmail and filter conflicts in JS
+        // Query only by barberEmail (simple) and filter conflicts in JS
         const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
         const snap = await getDocs(q1);
 
@@ -794,12 +777,12 @@
           createdAt: serverTimestamp(),
         });
 
-        setMessage(
-          statusEl,
+        setMessage(statusEl,
           `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`,
           "#27ae60"
         );
 
+        // Option A: return after 3 seconds
         setTimeout(() => {
           $("cancel-booking").click();
         }, 3000);
@@ -837,7 +820,6 @@
         if (!u) return;
         await updateDoc(doc(db, "staff", u.email), { checkedIn: true, lastCheckIn: serverTimestamp() });
         await loadStaffPresence();
-        await refreshStaffLists(); // keep customer dropdown updated
         alert("Checked in!");
       } catch (e) {
         alert("Check-in failed: " + e.message);
@@ -850,7 +832,6 @@
         if (!u) return;
         await updateDoc(doc(db, "staff", u.email), { checkedIn: false, lastCheckOut: serverTimestamp() });
         await loadStaffPresence();
-        await refreshStaffLists(); // keep customer dropdown updated
         alert("Checked out!");
       } catch (e) {
         alert("Check-out failed: " + e.message);
@@ -867,6 +848,7 @@
       $("staff-bookings-body").innerHTML = "";
       const date = $("staff-booking-date").value || todayISO();
 
+      // query only by barberEmail then filter by date in JS (stable)
       const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
       const snap = await getDocs(q1);
 
@@ -890,8 +872,6 @@
         const tr = document.createElement("tr");
         const canStart = a.status === "booked";
         const canComplete = a.status === "in_progress";
-
-        // ✅ Fixed broken buttons + added data-id / data-action
         tr.innerHTML = `
           <td>${a.customerName || "N/A"}</td>
           <td>${a.phone || "N/A"}</td>
@@ -900,10 +880,11 @@
           <td>${a.durationMin || "-"} min</td>
           <td>${pillForStatus(a.status)}</td>
           <td>
-            <button class="btn-warning"
-              data-id="${a.id}"
-              data-action="start"
-              ${canStart ? ""           data-action    $("staff-bookings-body").appendChild(tr);
+            startStart</button>
+            completeComplete</button>
+          </td>
+        `;
+        $("staff-bookings-body").appendChild(tr);
       });
     }
 
@@ -935,7 +916,7 @@
     });
 
     /***********************
-     * STAFF: MANUAL BOOKING (choose ANY staff)
+     * STAFF: MANUAL BOOKING (Option 2: choose ANY staff)
      ***********************/
     $("staff-create-booking").onclick = async () => {
       const msg = $("staff-manual-status");
@@ -958,11 +939,6 @@
       if (!barberEmail) return setMessage(msg, "Select staff to assign.", "#e67e22");
       if (!date || !time) return setMessage(msg, "Select date and time.", "#e67e22");
 
-      // ✅ Suggestion included: prevent booking in the past
-      if (isPast(date, time)) {
-        return setMessage(msg, "You cannot create a booking in the past.", "#e67e22");
-      }
-
       const barber = staffCache.find(s => s.email === barberEmail);
       const barberName = barber?.name || barberEmail;
 
@@ -970,6 +946,7 @@
       const endMinutes = startMinutes + service.duration;
 
       try {
+        // check conflicts for selected staff
         const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
         const snap = await getDocs(q1);
 
@@ -1016,6 +993,7 @@
         $("staff-customer-phone").value = "";
         $("staff-manual-time").value = "";
 
+        // refresh own bookings if booking was assigned to current staff
         if (barberEmail === u.email) await loadStaffBookings();
 
       } catch (err) {
@@ -1024,7 +1002,7 @@
     };
 
     /***********************
-     * ADMIN: Bookings
+     * ADMIN: Bookings (load only on click + filters + details toggle)
      ***********************/
     async function loadAllBookingsForAdmin() {
       const tbody = $("bookings-body");
@@ -1037,25 +1015,19 @@
       const today = todayISO();
       const yesterday = yesterdayISO();
 
-      // ✅ Suggestion included: safer ordering (fallback if createdAt missing / query fails)
-      let snap;
-      try {
-        const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-        snap = await getDocs(q);
-      } catch (err) {
-        console.warn("orderBy(createdAt) failed, falling back to orderBy(date):", err.message);
-        const q2 = query(collection(db, "appointments"), orderBy("date", "desc"));
-        snap = await getDocs(q2);
-      }
+      const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+      const snap = await getDocs(q);
 
       const rows = [];
       snap.forEach((d) => {
         const a = d.data();
 
+        // date filter
         if (dateMode === "today" && a.date !== today) return;
         if (dateMode === "yesterday" && a.date !== yesterday) return;
         if (dateMode === "custom" && customDate && a.date !== customDate) return;
 
+        // status filter
         if (statusMode !== "all" && a.status !== statusMode) return;
 
         rows.push({ id: d.id, ...a });
@@ -1115,6 +1087,7 @@
 
     $("refresh-admin-bookings").onclick = loadAllBookingsForAdmin;
 
+    // Admin dashboard navigation
     $("admin-open-bookings").onclick = async () => {
       $("admin-bookings-panel").style.display = "block";
       $("admin-staff-section").style.display = "none";
@@ -1129,7 +1102,7 @@
     };
 
     /***********************
-     * ADMIN: Staff CRUD
+     * ADMIN: Staff CRUD (stable)
      ***********************/
     async function loadStaffAdminTable() {
       const tbody = $("staff-body");
@@ -1148,12 +1121,10 @@
       }
 
       rows.forEach((s) => {
-        const lastIn = (s.lastCheckIn && typeof s.lastCheckIn.toDate === "function") ? s.lastCheckIn.toDate().toLocaleString() : "—";
-        const lastOut = (s.lastCheckOut && typeof s.lastCheckOut.toDate === "function") ? s.lastCheckOut.toDate().toLocaleString() : "—";
+        const lastIn = s.lastCheckIn ? s.lastCheckIn.toDate().toLocaleString() : "—";
+        const lastOut = s.lastCheckOut ? s.lastCheckOut.toDate().toLocaleString() : "—";
 
         const tr = document.createElement("tr");
-
-        // ✅ Fixed broken buttons + added data-email / data-action
         tr.innerHTML = `
           <td>${s.name || "N/A"}</td>
           <td>${s.id}</td>
@@ -1162,12 +1133,8 @@
           <td>${lastIn}</td>
           <td>${lastOut}</td>
           <td>
-            toggle
-              ${s.active ? "Disable" : "Enable"}
-            </button>
-            remove
-              Remove
-            </button>
+            toggleEnable/Disable</button>
+            removeRemove</button>
           </td>
         `;
         tbody.appendChild(tr);
@@ -1236,7 +1203,7 @@
     });
 
     /***********************
-     * AUTH STATE
+     * AUTH STATE (CRASH-PROOF)
      ***********************/
     onAuthStateChanged(auth, async (user) => {
       try {
@@ -1251,14 +1218,19 @@
           currentRole = await determineRole(user);
           setBadge(currentRole);
 
+          // update UI for role
           showSectionForRole(currentRole);
 
+          // refresh staff list cache for dropdowns (customer booking + staff manual booking)
           await refreshStaffLists();
 
           if (currentRole === "staff") {
             await loadStaffPresence();
             await loadStaffBookings();
           }
+
+          // For admin: DO NOT auto-load bookings; dashboard only
+          // For customer: no extra auto load
 
         } else {
           $("status").style.color = "#27ae60";
@@ -1269,6 +1241,7 @@
           currentRole = "guest";
           showSectionForRole("guest");
 
+          // preload staff dropdowns (optional)
           await refreshStaffLists();
         }
       } catch (err) {
@@ -1280,7 +1253,7 @@
       }
     });
 
-    // Initial load
+    // Initial load for dropdowns
     refreshStaffLists().catch(() => {});
   </script>
 </body>
