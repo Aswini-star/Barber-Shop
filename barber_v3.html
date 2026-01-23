@@ -341,90 +341,83 @@
     </div>
 
     <!-- STAFF DASHBOARD -->
-    
-<!-- STAFF DASHBOARD (REPLACEMENT - CLEAN + WORKING) -->
-<div id="staff-section" style="display:none;" class="section">
-  <h3>Staff Dashboard</h3>
+    <div id="staff-section" style="display:none;" class="section">
+      <h3>Staff Dashboard</h3>
 
-  <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
-    <div>
-      <div class="muted">Your status:</div>
-      <div id="staff-presence" class="pill">Unknown</div>
-    </div>
-
-    <div style="display:flex; gap:10px; flex-wrap:wrap;">
-      <button id="staff-checkin" class="btn-success">Check In</button>
-      <button id="staff-checkout" class="btn-warning">Check Out</button>
-    </div>
-  </div>
-
-  <div class="section">
-    <h3>Your Bookings</h3>
-
-    <div class="row">
-      <div>
-        <label for="staff-booking-date">Bookings Date:</label>
-        <input type="date" id="staff-booking-date" />
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;">
+        <div>
+          <div class="muted">Your status:</div>
+          <div id="staff-presence" class="pill">Unknown</div>
+        </div>
+        <div style="flex:1; min-width:240px;">
+          <button id="staff-checkin" class="btn-success">Check In</button>
+          <button id="staff-checkout" class="btn-warning">Check Out</button>
+        </div>
       </div>
-      <div>
-        <label>&nbsp;</label>
-        <button id="refresh-staff-bookings">Refresh Bookings</button>
+
+      <div class="section">
+        <h3>Your Bookings</h3>
+        <div class="row">
+          <div>
+            <label for="staff-booking-date">Bookings Date:</label>
+            <input type="date" id="staff-booking-date" />
+          </div>
+          <div>
+            <label>&nbsp;</label>
+            <button id="refresh-staff-bookings">Refresh Bookings</button>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table aria-label="Staff Bookings">
+            <thead>
+              <tr>
+                <th>Customer</th>
+                <th>Phone</th>
+                <th>Service</th>
+                <th>Start</th>
+                <th>Duration</th>
+                <th>Status</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="staff-bookings-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ✅ STAFF: Manual Booking (Option 2 - choose ANY staff) -->
+      <div class="section">
+        <h3>Manual Booking (Walk-in)</h3>
+        <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
+
+        <label for="staff-service">Service</label>
+        <select id="staff-service"></select>
+
+        <label for="staff-customer-name">Customer Name</label>
+        <input id="staff-customer-name" type="text" placeholder="Walk-in customer name" />
+
+        <label for="staff-customer-phone">Customer Phone</label>
+        <input id="staff-customer-phone" type="tel" placeholder="Customer phone number" />
+
+        <label for="staff-manual-barber">Assign Staff</label>
+        <select id="staff-manual-barber"></select>
+
+        <div class="row">
+          <div>
+            <label for="staff-manual-date">Date</label>
+            <input id="staff-manual-date" type="date" />
+          </div>
+          <div>
+            <label for="staff-manual-time">Start Time</label>
+            <input id="staff-manual-time" type="time" />
+          </div>
+        </div>
+
+        <button id="staff-create-booking" class="btn-success">Create Booking</button>
+        <p id="staff-manual-status" role="alert" aria-live="polite"></p>
       </div>
     </div>
-
-    <p id="staff-bookings-status" class="muted" style="margin:6px 0 0;"></p>
-
-    <div class="table-scroll">
-      <table aria-label="Staff Bookings">
-        <thead>
-          <tr>
-            <th>Customer</th>
-            <th>Phone</th>
-            <th>Service</th>
-            <th>Start</th>
-            <th>Duration</th>
-            <th>Status</th>
-            <th>Action</th>
-          </tr>
-        </thead>
-        <tbody id="staff-bookings-body"></tbody>
-      </table>
-    </div>
-  </div>
-
-  <!-- OPTIONAL: Manual Booking (Walk-in) -->
-  <div class="section">
-    <h3>Manual Booking (Walk-in)</h3>
-    <div class="muted">Create bookings for direct customers. Choose any staff member.</div>
-
-    <label for="staff-service">Service</label>
-    <select id="staff-service"></select>
-
-    <label for="staff-customer-name">Customer Name</label>
-    <input id="staff-customer-name" type="text" placeholder="Walk-in customer name" />
-
-    <label for="staff-customer-phone">Customer Phone</label>
-    <input id="staff-customer-phone" type="tel" placeholder="Customer phone number" />
-
-    <label for="staff-manual-barber">Assign Staff</label>
-    <select id="staff-manual-barber"></select>
-
-    <div class="row">
-      <div>
-        <label for="staff-manual-date">Date</label>
-        <input id="staff-manual-date" type="date" />
-      </div>
-      <div>
-        <label for="staff-manual-time">Start Time</label>
-        <input id="staff-manual-time" type="time" />
-      </div>
-    </div>
-
-    <button id="staff-create-booking" class="btn-success">Create Booking</button>
-    <p id="staff-manual-status" role="alert" aria-live="polite"></p>
-  </div>
-</div>
-
 
     <!-- ✅ ADMIN DASHBOARD -->
     <div id="admin-section" style="display:none;" class="section">
@@ -471,19 +464,10 @@
             </select>
           </div>
 
-          
-<div class="row">
-  <div>
-    <label>&nbsp;</label>
-    <button id="refresh-admin-bookings">Refresh</button>
-  </div>
-
-  <div>
-    <label>&nbsp;</label>
-    <button id="export-admin-bookings" class="btn-success">⬇ Export CSV</button>
-  </div>
-</div>
-
+          <div>
+            <label>&nbsp;</label>
+            <button id="refresh-admin-bookings">Refresh</button>
+          </div>
         </div>
 
         <div class="table-scroll">
@@ -594,33 +578,18 @@
       return hh * 60 + mm;
     }
 
-    
-// ✅ Always compute date in Asia/Kolkata to avoid timezone problems
-function isoDateInKolkata(dateObj = new Date()) {
-  // en-CA gives YYYY-MM-DD format
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Kolkata",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(dateObj);
-}
+    function todayISO() {
+      const d = new Date();
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
 
-function todayISO() {
-  return isoDateInKolkata(new Date());
-}
-
-function yesterdayISO() {
-  const d = new Date();
-  d.setDate(d.getDate() - 1);
-  return isoDateInKolkata(d);
-}
-
-// ✅ Normalize stored dates (trim + ensure string)
-function normalizeISODate(value) {
-  return String(value || "").trim(); // keeps "YYYY-MM-DD" clean
-}
-
+    function yesterdayISO() {
+      const d = new Date();
+      d.setDate(d.getDate() - 1);
+      const pad = (n) => String(n).padStart(2, "0");
+      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+    }
 
     function setBadge(role) {
       const badge = $("role-badge");
@@ -985,172 +954,146 @@ function showSectionForRole(role) {
     /***********************
      * STAFF: VIEW OWN BOOKINGS
      ***********************/
-    
-
-/***********************
- * STAFF: FULL WORKING MODULE
- ***********************/
-
-
-/***********************
- * STAFF: VIEW OWN BOOKINGS (DOM-based, bulletproof)
- ***********************/
-async function loadStaffBookings() {
-  const u = auth.currentUser;
-  if (!u) return;
-
-  const tbody = $("staff-bookings-body");
-  const dateInput = $("staff-booking-date");
-  if (!tbody) {
-    console.error("staff-bookings-body not found in DOM");
-    return;
-  }
-
-  tbody.innerHTML = "";
-
-  const date = (dateInput?.value || todayISO()).trim();
-
-  try {
-    const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
-    const snap = await getDocs(q1);
-
-    const rows = [];
-    snap.forEach((d) => {
-      const a = d.data();
-      if (String(a.date || "").trim() !== date) return;
-      rows.push({ id: d.id, ...a });
+    async function loadStaffBookings() {
+      const u = auth.currentUser;
+      if (!u) return;
+      $("staff-bookings-body").innerHTML = "";
+      const date = $("staff-booking-date").value || todayISO();
+      // query only by barberEmail then filter by date in JS (stable)
+      const q1 = query(collection(db, "appointments"), where("barberEmail", "==", u.email));
+      const snap = await getDocs(q1);
+      const rows = [];
+      snap.forEach(d => {
+        const a = d.data();
+        if (a.date !== date) return;
+        rows.push({
+          id: d.id,
+          ...a
+        });
+      });
+      rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
+      if (rows.length === 0) {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="7" class="muted">No bookings found for ${date}.</td>`;
+        $("staff-bookings-body").appendChild(tr);
+        return;
+      }
+      rows.forEach(a => {
+        const tr = document.createElement("tr");
+        const canStart = a.status === "booked";
+        const canComplete = a.status === "in_progress";
+        tr.innerHTML = `
+          <td>${a.customerName || "N/A"}</td>
+          <td>${a.phone || "N/A"}</td>
+          <td>${a.serviceName || "N/A"}</td>
+          <td>${a.time || "N/A"}</td>
+          <td>${a.durationMin || "-"} min</td>
+          <td>${pillForStatus(a.status)}</td>
+          <td>
+            startStart</button>
+            completeComplete</button>
+          </td>
+        `;
+        $("staff-bookings-body").appendChild(tr);
+      });
+    }
+    $("refresh-staff-bookings").onclick = loadStaffBookings;
+    $("staff-bookings-body").addEventListener("click", async (e) => {
+      const btn = e.target.closest("button");
+      if (!btn) return;
+      const id = btn.getAttribute("data-id");
+      const action = btn.getAttribute("data-action");
+      if (!id || !action) return;
+      try {
+        const ref = doc(db, "appointments", id);
+        if (action === "start") {
+          await updateDoc(ref, {
+            status: "in_progress",
+            active: true,
+            startedAt: serverTimestamp()
+          });
+        }
+        if (action === "complete") {
+          await updateDoc(ref, {
+            status: "completed",
+            active: false,
+            completedAt: serverTimestamp()
+          });
+        }
+        await loadStaffBookings();
+      } catch (err) {
+        alert("Update failed: " + err.message);
+      }
     });
-
-    rows.sort((a, b) => (a.startMinutes ?? 0) - (b.startMinutes ?? 0));
-
-    if (rows.length === 0) {
-      const tr = document.createElement("tr");
-      const td = document.createElement("td");
-      td.colSpan = 7;
-      td.className = "muted";
-      td.textContent = `No bookings found for ${date}.`;
-      tr.appendChild(td);
-      tbody.appendChild(tr);
-      return;
-    }
-
-    for (const a of rows) {
-      const tr = document.createElement("tr");
-
-      // --- helper to add normal TD text ---
-      const addTd = (text) => {
-        const td = document.createElement("td");
-        td.textContent = text;
-        tr.appendChild(td);
-      };
-
-      addTd(a.customerName || "N/A");
-      addTd(a.phone || "N/A");
-      addTd(a.serviceName || "N/A");
-      addTd(a.time || "N/A");
-      addTd(`${a.durationMin ?? "-"} min`);
-
-      // Status cell (uses your pillForStatus HTML)
-      const statusTd = document.createElement("td");
-      statusTd.innerHTML = pillForStatus(a.status); // ok to use innerHTML for small safe snippet
-      tr.appendChild(statusTd);
-
-      // Action cell with REAL buttons
-      const actionTd = document.createElement("td");
-
-      const canStart = a.status === "booked";
-      const canComplete = a.status === "in_progress";
-
-      const startBtn = document.createElement("button");
-      startBtn.textContent = "Start";
-      startBtn.className = "btn-warning";
-      startBtn.dataset.id = a.id;
-      startBtn.dataset.action = "start";
-      startBtn.disabled = !canStart;
-
-      const completeBtn = document.createElement("button");
-      completeBtn.textContent = "Complete";
-      completeBtn.className = "btn-success";
-      completeBtn.dataset.id = a.id;
-      completeBtn.dataset.action = "complete";
-      completeBtn.disabled = !canComplete;
-
-      actionTd.appendChild(startBtn);
-      actionTd.appendChild(completeBtn);
-
-      tr.appendChild(actionTd);
-      tbody.appendChild(tr);
-    }
-  } catch (err) {
-    console.error("loadStaffBookings failed:", err);
-
-    const tr = document.createElement("tr");
-    const td = document.createElement("td");
-    td.colSpan = 7;
-    td.className = "muted";
-    td.textContent = "Error loading bookings: " + err.message;
-    tr.appendChild(td);
-    tbody.appendChild(tr);
-  }
-}
-
-/***********************
- * STAFF: Handle Start/Complete clicks (event delegation)
- ***********************/
-async function handleStaffBookingAction(e) {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-
-  const id = btn.dataset.id;
-  const action = btn.dataset.action;
-
-  // Debug - shows if click is being captured
-  console.log("Staff action clicked:", { id, action });
-
-  if (!id || !action) return;
-
-  try {
-    const ref = doc(db, "appointments", id);
-
-    if (action === "start") {
-      await updateDoc(ref, {
-        status: "in_progress",
-        active: true,
-        startedAt: serverTimestamp(),
-      });
-    } else if (action === "complete") {
-      await updateDoc(ref, {
-        status: "completed",
-        active: false,
-        completedAt: serverTimestamp(),
-      });
-    }
-
-    await loadStaffBookings();
-  } catch (err) {
-    console.error("Update failed:", err);
-    alert("Update failed: " + err.message);
-  }
-}
-
-/***********************
- * Wire staff bookings events safely
- ***********************/
-function wireStaffBookingsEvents() {
-  const refreshBtn = $("refresh-staff-bookings");
-  const tbody = $("staff-bookings-body");
-
-  if (refreshBtn) refreshBtn.onclick = loadStaffBookings;
-
-  if (tbody) {
-    // Remove old listener if you added multiple times (optional safety)
-    tbody.removeEventListener("click", handleStaffBookingAction);
-    tbody.addEventListener("click", handleStaffBookingAction);
-  } else {
-    console.warn("staff-bookings-body not found while wiring events");
-  }
-}
-
+    /***********************
+     * STAFF: MANUAL BOOKING (Option 2: choose ANY staff)
+     ***********************/
+    $("staff-create-booking").onclick = async () => {
+      const msg = $("staff-manual-status");
+      setMessage(msg, "", "#e67e22");
+      const u = auth.currentUser;
+      if (!u) return setMessage(msg, "Staff must be logged in.", "#e74c3c");
+      const serviceIndex = Number($("staff-service").value);
+      const service = services[serviceIndex];
+      const customerName = $("staff-customer-name").value.trim();
+      const phone = $("staff-customer-phone").value.trim();
+      const barberEmail = $("staff-manual-barber").value;
+      const date = $("staff-manual-date").value;
+      const time = $("staff-manual-time").value;
+      if (!customerName) return setMessage(msg, "Enter customer name.", "#e67e22");
+      if (!phone) return setMessage(msg, "Enter customer phone.", "#e67e22");
+      if (!barberEmail) return setMessage(msg, "Select staff to assign.", "#e67e22");
+      if (!date || !time) return setMessage(msg, "Select date and time.", "#e67e22");
+      const barber = staffCache.find(s => s.email === barberEmail);
+      const barberName = barber?.name || barberEmail;
+      const startMinutes = minutesFromTimeStr(time);
+      const endMinutes = startMinutes + service.duration;
+      try {
+        // check conflicts for selected staff
+        const q1 = query(collection(db, "appointments"), where("barberEmail", "==", barberEmail));
+        const snap = await getDocs(q1);
+        let conflict = false;
+        snap.forEach(d => {
+          const a = d.data();
+          if (a.date !== date) return;
+          if (a.active !== true) return;
+          const aStart = a.startMinutes ?? minutesFromTimeStr(a.time);
+          const aEnd = a.endMinutes ?? (aStart + (a.durationMin || 0));
+          if (overlaps(startMinutes, endMinutes, aStart, aEnd)) conflict = true;
+        });
+        if (conflict) {
+          return setMessage(msg, "Time slot is already booked for that staff. Choose another time/staff.", "#e67e22");
+        }
+        await addDoc(collection(db, "appointments"), {
+          userId: "walkin",
+          email: "Walk-in",
+          customerName,
+          phone,
+          barberEmail,
+          barberName,
+          serviceName: service.name,
+          servicePrice: service.price,
+          durationMin: service.duration,
+          date,
+          time,
+          startMinutes,
+          endMinutes,
+          status: "booked",
+          active: true,
+          createdBy: u.email,
+          createdByRole: "staff",
+          createdAt: serverTimestamp(),
+        });
+        setMessage(msg, "✅ Walk-in booking created successfully.", "#27ae60");
+        $("staff-customer-name").value = "";
+        $("staff-customer-phone").value = "";
+        $("staff-manual-time").value = "";
+        // refresh own bookings if booking was assigned to current staff
+        if (barberEmail === u.email) await loadStaffBookings();
+      } catch (err) {
+        setMessage(msg, "Error: " + err.message, "#e74c3c");
+      }
+    };
     /***********************
      * ADMIN: Bookings (load only on click + filters + details toggle)
      ***********************/
@@ -1237,128 +1180,6 @@ function wireStaffBookingsEvents() {
       await loadStaffAdminTable();
       await refreshStaffLists();
     };
-    
-
-/***********************
- * ADMIN: EXPORT BOOKINGS TO CSV (robust)
- ***********************/
-function escapeCSV(value) {
-  const s = value === null || value === undefined ? "" : String(value);
-  const escaped = s.replace(/"/g, '""');
-  return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
-}
-
-function downloadCSV(filename, csvText) {
-  const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = filename;
-
-  // ✅ required for some browsers
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  URL.revokeObjectURL(url);
-}
-
-async function exportAdminBookingsCSV() {
-  // ✅ If there is any error, you will see it clearly
-  try {
-    const dateMode = $("admin-date-filter").value;
-    const statusMode = $("admin-status-filter").value;
-    const customDate = $("admin-custom-date").value;
-
-    const today = todayISO();
-    const yesterday = yesterdayISO();
-
-    const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
-    const snap = await getDocs(q);
-
-    const filtered = [];
-    snap.forEach((d) => {
-      const a = d.data();
-      const rowDate = String(a.date || "").trim();
-
-      // date filter
-      if (dateMode === "today" && rowDate !== today) return;
-      if (dateMode === "yesterday" && rowDate !== yesterday) return;
-      if (dateMode === "custom" && customDate && rowDate !== String(customDate).trim()) return;
-
-      // status filter
-      if (statusMode !== "all" && a.status !== statusMode) return;
-
-      filtered.push({ id: d.id, ...a });
-    });
-
-    if (filtered.length === 0) {
-      alert("No bookings found for selected filter to export.");
-      return;
-    }
-
-    const headers = [
-      "BookingId",
-      "Date",
-      "StartTime",
-      "StaffName",
-      "StaffEmail",
-      "Service",
-      "DurationMin",
-      "Price",
-      "Status",
-      "CustomerName",
-      "CustomerPhone",
-      "CustomerEmail",
-      "CreatedBy",
-      "CreatedByRole"
-    ];
-
-    const lines = [];
-    lines.push(headers.map(escapeCSV).join(","));
-
-    for (const a of filtered) {
-      lines.push([
-        a.id,
-        a.date || "",
-        a.time || "",
-        a.barberName || "",
-        a.barberEmail || "",
-        a.serviceName || "",
-        a.durationMin ?? "",
-        a.servicePrice ?? "",
-        a.status || "",
-        a.customerName || "",
-        a.phone || "",
-        a.email || "",
-        a.createdBy || "",
-        a.createdByRole || ""
-      ].map(escapeCSV).join(","));
-    }
-
-    const csv = lines.join("\n");
-    const filename = `bookings_${dateMode}_${statusMode}_${todayISO()}.csv`;
-    downloadCSV(filename, csv);
-
-  } catch (err) {
-    console.error("CSV Export Error:", err);
-    alert("Export failed: " + err.message);
-  }
-}
-
-/***********************
- * Attach handler safely AFTER DOM is ready
- ***********************/
-window.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("export-admin-bookings");
-  if (!btn) {
-    console.warn("Export button not found. Check id='export-admin-bookings' in HTML.");
-    return;
-  }
-  btn.addEventListener("click", exportAdminBookingsCSV);
-});
-
     /***********************
      * ADMIN: Staff CRUD (stable)
      ***********************/
@@ -1500,16 +1321,6 @@ window.addEventListener("DOMContentLoaded", () => {
 </body>
 
 </html>
-
-
-
-
-
-
-
-
-
-
 
 
 
