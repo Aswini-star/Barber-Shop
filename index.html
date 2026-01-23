@@ -3,82 +3,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+
+  <!-- ✅ MUST for mobile fit -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
   <title>Royal Cut Barber Shop</title>
 
   <style>
     :root{
       --bg1:#070a12;
       --bg2:#0b1635;
-      --card: rgba(255,255,255,0.08);
-      --border: rgba(255,255,255,0.16);
       --text:#eaf0ff;
-      --muted: rgba(234,240,255,0.72);
+      --muted:rgba(234,240,255,0.75);
+      --border:rgba(255,255,255,0.16);
+      --card:rgba(255,255,255,0.07);
       --shadow: 0 18px 45px rgba(0,0,0,0.45);
       --accent:#f59e0b;
     }
 
+    /* ✅ hard stop for mobile overflow */
     *{ box-sizing:border-box; }
-    html, body { height:100%; }
+    html, body{
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden; /* prevents side scrolling */
+    }
+
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
       color:var(--text);
+
+      /* ✅ background that doesn't cause width overflow */
       background:
-        radial-gradient(900px circle at 20% 15%, rgba(245,158,11,0.22), transparent 45%),
-        radial-gradient(900px circle at 80% 35%, rgba(96,165,250,0.18), transparent 52%),
+        radial-gradient(600px circle at 15% 10%, rgba(245,158,11,0.22), transparent 55%),
+        radial-gradient(600px circle at 85% 25%, rgba(96,165,250,0.18), transparent 60%),
         linear-gradient(180deg, var(--bg1), var(--bg2));
-      padding:14px;
+
+      /* ✅ safe padding on phones */
+      padding: max(12px, env(safe-area-inset-top))
+               max(12px, env(safe-area-inset-right))
+               max(12px, env(safe-area-inset-bottom))
+               max(12px, env(safe-area-inset-left));
+
       display:flex;
+      min-height:100vh;
       align-items:center;
       justify-content:center;
-
-      /* ✅ stops horizontal scroll on mobile */
-      overflow-x:hidden;
     }
 
-    /* ✅ makes sure nothing can force width beyond screen */
-    .shell, header, section, .card, .hero, .chips, .chip, .btn {
-      max-width:100%;
-    }
-
+    /* ✅ main container fits all screens */
     .shell{
       width:100%;
       max-width: 980px;
-      border: 1px solid var(--border);
-      border-radius: 18px;
+      border:1px solid var(--border);
+      border-radius:18px;
       overflow:hidden;
-      box-shadow: var(--shadow);
       background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
     }
 
     header{
-      padding:14px;
+      padding:16px;
       border-bottom:1px solid var(--border);
+
+      /* ✅ stack on mobile */
       display:flex;
-      flex-direction:column;  /* ✅ mobile-first stack */
-      gap:10px;
+      flex-direction:column;
+      gap:12px;
     }
 
-    .top{
+    .brandRow{
       display:flex;
       gap:12px;
       align-items:center;
       min-width:0;
     }
 
-    .mark{
+    .logo{
       width:42px;
       height:42px;
       border-radius:14px;
       display:grid;
       place-items:center;
       flex: 0 0 auto;
-      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
       border:1px solid rgba(255,255,255,0.18);
     }
 
-    .mark span{
+    .logo span{
       font-weight:900;
       letter-spacing:0.7px;
     }
@@ -87,40 +100,43 @@
       min-width:0;
     }
 
+    /* ✅ responsive text that NEVER breaks layout */
     .brand h1{
       margin:0;
-      font-size: clamp(16px, 4.8vw, 22px);  /* ✅ scales on mobile */
+      font-size: clamp(16px, 5vw, 22px);
       line-height:1.15;
       overflow-wrap:anywhere;
+      word-break:break-word;
     }
 
     .brand p{
       margin:4px 0 0;
+      font-size: clamp(12px, 3.5vw, 14px);
       color:var(--muted);
-      font-size: clamp(12px, 3.4vw, 14px);
       line-height:1.35;
       overflow-wrap:anywhere;
+      word-break:break-word;
     }
 
-    .pills{
+    .badges{
       display:flex;
       flex-wrap:wrap;
       gap:8px;
     }
 
-    .pill{
+    .badge{
       display:inline-flex;
       align-items:center;
       gap:8px;
       padding:8px 10px;
+      border-radius:999px;
       border:1px solid var(--border);
-      border-radius: 999px;
       background: rgba(0,0,0,0.18);
       color: var(--muted);
-      font-size: 12px;
+      font-size:12px;
       line-height:1.2;
 
-      /* ✅ allow wrap to avoid overflow */
+      /* ✅ allow wrapping inside badge */
       white-space:normal;
       max-width:100%;
     }
@@ -135,33 +151,34 @@
     }
 
     main{
-      padding:14px;
-      display:grid;
-      gap:12px; /* ✅ single column by default */
+      padding:16px;
+      display:flex;
+      flex-direction:column; /* ✅ mobile first */
+      gap:12px;
     }
 
     .hero{
       border:1px solid var(--border);
       border-radius:16px;
+      background: var(--card);
       padding:14px;
-      background: rgba(255,255,255,0.06);
-      overflow:hidden;
     }
 
     .hero h2{
       margin:0 0 8px;
-      font-size: clamp(20px, 6.2vw, 32px);  /* ✅ fits mobile */
+      font-size: clamp(20px, 6.2vw, 32px);
       line-height:1.12;
     }
 
     .hero p{
-      margin:0 0 12px;
-      color:var(--muted);
-      font-size: 14px;
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
       line-height:1.6;
     }
 
     .chips{
+      margin-top:12px;
       display:flex;
       flex-wrap:wrap;
       gap:8px;
@@ -176,7 +193,7 @@
       border:1px solid rgba(255,255,255,0.14);
       background: rgba(0,0,0,0.16);
       color: var(--muted);
-      font-size: 13px;
+      font-size:13px;
       max-width:100%;
     }
 
@@ -185,39 +202,44 @@
       font-weight:800;
     }
 
-    .card{
+    .cta{
       border:1px solid var(--border);
       border-radius:16px;
+      background: var(--card);
       padding:14px;
-      background: rgba(255,255,255,0.06);
     }
 
-    .card h3{
+    .cta h3{
       margin:0 0 6px;
-      font-size: 15px;
+      font-size:15px;
     }
-
-    .card p{
+    .cta p{
       margin:0;
       color: var(--muted);
-      font-size: 14px;
+      font-size:14px;
       line-height:1.55;
     }
 
+    /* ✅ Mobile button: full width, no overflow */
     .btn{
       margin-top:12px;
-      width:100%;               /* ✅ full-width on mobile */
+      width:100%;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+
       padding:14px 16px;
       border-radius:14px;
       border:1px solid rgba(245,158,11,0.55);
-      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
+
+      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
       color:var(--text);
       font-weight:900;
       letter-spacing:0.2px;
+
       cursor:pointer;
       transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
     }
-
     .btn:hover{
       transform: translateY(-1px);
       filter: brightness(1.08);
@@ -225,29 +247,29 @@
     }
 
     footer{
-      padding:12px 14px;
+      padding:12px 16px;
       border-top:1px solid var(--border);
       color:var(--muted);
-      font-size: 12px;
+      font-size:12px;
+
       display:flex;
-      flex-direction:column;    /* ✅ stack on mobile */
+      flex-direction:column; /* ✅ stack on phones */
       gap:6px;
     }
 
-    /* ✅ Desktop enhancements (only when screen is wide enough) */
+    /* ✅ Desktop enhancement: 2-column layout only when there is space */
     @media (min-width: 900px){
       header{
         flex-direction:row;
-        align-items:flex-start;
         justify-content:space-between;
-      }
-      .pills{
-        justify-content:flex-end;
+        align-items:flex-start;
       }
       main{
-        grid-template-columns: 1.35fr 0.65fr; /* ✅ 2 columns on desktop */
-        align-items:start;
+        flex-direction:row;
+        align-items:stretch;
       }
+      .hero{ flex: 1.35; }
+      .cta{ flex: 0.65; }
       footer{
         flex-direction:row;
         justify-content:space-between;
@@ -259,19 +281,19 @@
 
 <body>
   <div class="shell">
+
     <header>
-      <div class="top">
-        <div class="mark" aria-hidden="true"><span>RC</span></div>
+      <div class="brandRow">
+        <div class="logo" aria-hidden="true"><span>RC</span></div>
         <div class="brand">
-          <!-- ✅ Change name/address here -->
           <h1>Royal Cut Barber Shop</h1>
           <p>12, Anna Salai, T. Nagar, Chennai - 600017</p>
         </div>
       </div>
 
-      <div class="pills">
-        <div class="pill"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
-        <div class="pill">⭐ 4.8 • 2.1k+ Customers</div>
+      <div class="badges">
+        <div class="badge"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
+        <div class="badge">⭐ 4.8 • 2.1k+ Customers</div>
       </div>
     </header>
 
@@ -279,8 +301,7 @@
       <section class="hero">
         <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
         <p>
-          Premium grooming with hygiene-first service. Walk-ins are welcome —
-          or continue to explore services and bookings.
+          Premium grooming with hygiene-first service. Tap continue to open your barber page.
         </p>
 
         <div class="chips">
@@ -291,9 +312,9 @@
         </div>
       </section>
 
-      <aside class="card">
+      <aside class="cta">
         <h3>Continue</h3>
-        <p>Tap the button below to open your barber page.</p>
+        <p>Tap the button to proceed.</p>
         <button class="btn" id="continueBtn">Continue</button>
 
         <p style="margin-top:10px; font-size:12px; color: var(--muted);">
@@ -306,6 +327,7 @@
       <span>© 2026 Royal Cut Barber Shop</span>
       <span>Call: +91 98765 43210</span>
     </footer>
+
   </div>
 
   <script>
