@@ -4,53 +4,406 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Barber Shop</title>
+  <title>Royal Cut Barber Shop</title>
+
   <style>
+    :root{
+      --bg1:#070a12;
+      --bg2:#0b1635;
+      --card: rgba(255,255,255,0.08);
+      --border: rgba(255,255,255,0.16);
+      --text:#eaf0ff;
+      --muted: rgba(234,240,255,0.72);
+      --shadow: 0 22px 60px rgba(0,0,0,0.45);
+      --accent1:#f59e0b; /* amber */
+      --accent2:#22c55e; /* green */
+      --accent3:#60a5fa; /* blue */
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      font-family: Arial, Helvetica, sans-serif;
-      background:#0f172a;
-      color:#e2e8f0;
-      min-height:100vh;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      background:
+        radial-gradient(1200px circle at 15% 10%, rgba(245,158,11,0.26), transparent 45%),
+        radial-gradient(900px circle at 85% 30%, rgba(34,197,94,0.22), transparent 50%),
+        radial-gradient(950px circle at 60% 120%, rgba(96,165,250,0.20), transparent 55%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:20px;
+      padding:24px;
     }
-    .box{
-      width:min(720px,95vw);
-      border:1px solid rgba(255,255,255,0.2);
-      border-radius:16px;
+
+    /* background texture */
+    .noise{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:0.06;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)' opacity='.55'/%3E%3C/svg%3E");
+      mix-blend-mode: overlay;
+    }
+
+    .shell{
+      width:min(1100px, 95vw);
+      border:1px solid var(--border);
+      border-radius:22px;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      backdrop-filter: blur(10px);
+    }
+
+    /* top bar */
+    header{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+      padding:20px 22px;
+      border-bottom:1px solid var(--border);
+    }
+
+    .logo{
+      display:flex;
+      align-items:center;
+      gap:12px;
+      min-width: 260px;
+    }
+
+    .mark{
+      width:44px;
+      height:44px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      background:
+        linear-gradient(135deg, rgba(245,158,11,0.30), rgba(34,197,94,0.22)),
+        rgba(255,255,255,0.06);
+      border:1px solid rgba(255,255,255,0.18);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      position:relative;
+      overflow:hidden;
+    }
+    .mark:before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.22), transparent 45%);
+      transform: rotate(18deg);
+    }
+    .mark span{
+      position:relative;
+      font-weight:900;
+      letter-spacing:0.8px;
+      font-size:16px;
+    }
+
+    .brand h1{
+      font-size:18px;
+      margin:0;
+      letter-spacing:0.4px;
+    }
+    .brand p{
+      margin:2px 0 0;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:9px 12px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      color: var(--muted);
+      font-size:13px;
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background: var(--accent2);
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+    }
+
+    /* layout */
+    .grid{
+      display:grid;
+      grid-template-columns: 1.25fr 0.75fr;
+      gap:18px;
       padding:22px;
-      background:rgba(255,255,255,0.06);
     }
-    h1{ margin:0 0 8px; }
-    p{ margin:0 0 16px; color:#94a3b8; line-height:1.5; }
+
+    .hero{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:22px;
+      background:
+        linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      position:relative;
+      overflow:hidden;
+    }
+    .hero:after{
+      content:"";
+      position:absolute;
+      right:-90px;
+      top:-90px;
+      width:240px;
+      height:240px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(245,158,11,0.30), transparent 60%);
+      filter: blur(2px);
+    }
+    .hero:before{
+      content:"";
+      position:absolute;
+      left:-120px;
+      bottom:-120px;
+      width:280px;
+      height:280px;
+      border-radius:50%;
+      background: radial-gradient(circle, rgba(96,165,250,0.25), transparent 60%);
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size:34px;
+      line-height:1.1;
+      letter-spacing:0.3px;
+      position:relative;
+    }
+
+    .hero p{
+      margin:0 0 16px;
+      color: var(--muted);
+      line-height:1.6;
+      font-size:15px;
+      position:relative;
+    }
+
+    .chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      position:relative;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.18);
+      font-size:13px;
+      color: var(--muted);
+    }
+    .chip b{
+      color: var(--text);
+      font-weight:800;
+    }
+
+    /* right panel */
+    .panel{
+      display:grid;
+      gap:14px;
+    }
+
+    .card{
+      border:1px solid var(--border);
+      border-radius:18px;
+      background: rgba(255,255,255,0.06);
+      padding:18px;
+    }
+
+    .card h3{
+      margin:0 0 6px;
+      font-size:16px;
+      letter-spacing:0.2px;
+    }
+    .card p{
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    .btn-row{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
     button{
-      padding:12px 18px;
-      border-radius:12px;
-      border:1px solid rgba(255,255,255,0.25);
-      background:rgba(0,0,0,0.25);
-      color:#e2e8f0;
-      font-weight:700;
       cursor:pointer;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,0.16);
+      padding:12px 14px;
+      font-weight:900;
+      letter-spacing:0.2px;
+      color: var(--text);
+      background: rgba(0,0,0,0.20);
+      min-width: 170px;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
     }
-    button:hover{ filter:brightness(1.1); }
+    button:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+    }
+
+    .btn-continue{
+      border-color: rgba(245,158,11,0.55);
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
+    }
+    .btn-login{
+      border-color: rgba(34,197,94,0.55);
+      background: linear-gradient(135deg, rgba(34,197,94,0.25), rgba(34,197,94,0.10));
+    }
+
+    .mini{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:14px;
+    }
+    .stat{
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.16);
+    }
+    .stat .k{
+      font-size:12px;
+      color: var(--muted);
+    }
+    .stat .v{
+      margin-top:4px;
+      font-size:16px;
+      font-weight:900;
+      letter-spacing:0.2px;
+    }
+
+    footer{
+      padding:16px 22px;
+      border-top:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      color: var(--muted);
+      font-size:13px;
+    }
+
+    /* responsive */
+    @media (max-width: 860px){
+      .grid{ grid-template-columns: 1fr; }
+      .hero h2{ font-size:30px; }
+      .logo{ min-width:auto; }
+    }
   </style>
 </head>
+
 <body>
-  <div class="box">
-    <h1>Royal Cut Barber Shop</h1>
-    <p>12, Anna Salai, T. Nagar, Chennai - 600017</p>
+  <div class="noise" aria-hidden="true"></div>
 
-    <button id="continueBtn">Continue</button>
+  <main class="shell">
+    <header>
+      <div class="logo">
+        <div class="mark" aria-hidden="true"><span>RC</span></div>
+        <div class="brand">
+          <h1>Royal Cut Barber Shop</h1>
+          <p>12, Anna Salai, T. Nagar, Chennai - 600017</p>
+        </div>
+      </div>
 
-    <script>
-      // ✅ This must match your actual file name EXACTLY
-      document.getElementById("continueBtn").addEventListener("click", function () {
-        window.location.assign("./barber_v3.html");
-      });
-    </script>
-  </div>
+      <div class="top-actions">
+        <div class="pill"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
+        <div class="pill">⭐ 4.8 • 2.1k+ Customers</div>
+      </div>
+    </header>
+
+    <section class="grid">
+      <!-- LEFT: HERO -->
+      <div class="hero">
+        <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
+        <p>
+          Step in for a premium grooming experience. Quick walk‑ins and easy booking — crafted with care,
+          hygiene, and style.
+        </p>
+
+        <div class="chips">
+          <div class="chip">💈 <b>Haircut</b> & Styling</div>
+          <div class="chip">🧔 <b>Beard</b> Trim & Shape</div>
+          <div class="chip">🧼 <b>Facial</b> & Cleanup</div>
+          <div class="chip">👦 <b>Kids</b> Haircut</div>
+        </div>
+      </div>
+
+      <!-- RIGHT: CTA PANEL -->
+      <aside class="panel">
+        <div class="card">
+          <h3>Continue to Services</h3>
+          <p>Click continue to open your barber page. Login is optional for bookings.</p>
+
+          <div class="btn-row">
+            <button class="btn-continue" id="continueBtn">Continue</button>
+            <button class="btn-login" id="loginBtn">Login</button>
+          </div>
+
+          <div class="mini">
+            <div class="stat">
+              <div class="k">Average Time</div>
+              <div class="v">20–30 mins</div>
+            </div>
+            <div class="stat">
+              <div class="k">Hygiene</div>
+              <div class="v">Sanitized Tools</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Location</h3>
+          <p>Near T. Nagar bus stop • Parking available • Walk‑ins welcome</p>
+        </div>
+      </aside>
+    </section>
+
+    <footer>
+      <span>© 2026 Royal Cut Barber Shop • All rights reserved</span>
+      <span>Call: +91 98765 43210</span>
+    </footer>
+  </main>
+
+  <script>
+    // ✅ Works on GitHub Pages when index.html and barber_v3.html are in same folder
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      window.location.assign("./barber_v3.html");
+    });
+
+    // For now, login opens the same page. Change to ./login.html when you create it.
+    document.getElementById("loginBtn").addEventListener("click", () => {
+      window.location.assign("./barber_v3.html");
+    });
+  </script>
 </body>
 </html>
