@@ -34,10 +34,10 @@
       display:flex;
       align-items:center;
       justify-content:center;
-      padding:24px;
+      padding:16px; /* ✅ smaller padding for mobile */
     }
 
-    /* background texture */
+    /* subtle noise */
     .noise{
       position:fixed;
       inset:0;
@@ -48,36 +48,38 @@
     }
 
     .shell{
-      width:min(1100px, 95vw);
+      width:min(1100px, 100%);
       border:1px solid var(--border);
-      border-radius:22px;
+      border-radius:20px;
       overflow:hidden;
       box-shadow: var(--shadow);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
       backdrop-filter: blur(10px);
     }
 
-    /* top bar */
+    /* HEADER */
     header{
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:14px;
-      padding:20px 22px;
+      gap:12px;
+      padding:16px 16px;
       border-bottom:1px solid var(--border);
+      flex-wrap:wrap; /* ✅ allow wrap on small screens */
     }
 
     .logo{
       display:flex;
       align-items:center;
       gap:12px;
-      min-width: 260px;
+      min-width: 0; /* ✅ prevents overflow */
+      flex: 1 1 auto;
     }
 
     .mark{
-      width:44px;
-      height:44px;
+      width:42px;
+      height:42px;
+      flex: 0 0 auto;
       border-radius:14px;
       display:grid;
       place-items:center;
@@ -103,36 +105,43 @@
       font-size:16px;
     }
 
+    .brand{
+      min-width:0; /* ✅ allows wrapping */
+    }
     .brand h1{
-      font-size:18px;
+      font-size:16px; /* ✅ smaller on mobile */
       margin:0;
-      letter-spacing:0.4px;
+      letter-spacing:0.3px;
+      line-height:1.2;
+      overflow-wrap:anywhere;
     }
     .brand p{
-      margin:2px 0 0;
-      font-size:13px;
+      margin:3px 0 0;
+      font-size:12px;
       color:var(--muted);
+      line-height:1.4;
+      overflow-wrap:anywhere;
     }
 
     .top-actions{
       display:flex;
-      align-items:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
-      justify-content:flex-end;
+      justify-content:flex-start;
+      width:100%; /* ✅ stack under logo on mobile */
     }
 
     .pill{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding:9px 12px;
+      padding:8px 10px;
       border-radius:999px;
       border:1px solid var(--border);
       background: rgba(0,0,0,0.18);
       color: var(--muted);
-      font-size:13px;
-      white-space:nowrap;
+      font-size:12px;
+      white-space:normal; /* ✅ allow wrap */
     }
     .dot{
       width:8px;
@@ -140,22 +149,22 @@
       border-radius:50%;
       background: var(--accent2);
       box-shadow: 0 0 0 4px rgba(34,197,94,0.18);
+      flex: 0 0 auto;
     }
 
-    /* layout */
+    /* MAIN GRID */
     .grid{
       display:grid;
       grid-template-columns: 1.25fr 0.75fr;
-      gap:18px;
-      padding:22px;
+      gap:16px;
+      padding:16px;
     }
 
     .hero{
       border:1px solid var(--border);
       border-radius:18px;
-      padding:22px;
-      background:
-        linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
+      padding:18px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.07), rgba(255,255,255,0.03));
       position:relative;
       overflow:hidden;
     }
@@ -168,7 +177,6 @@
       height:240px;
       border-radius:50%;
       background: radial-gradient(circle, rgba(245,158,11,0.30), transparent 60%);
-      filter: blur(2px);
     }
     .hero:before{
       content:"";
@@ -183,17 +191,15 @@
 
     .hero h2{
       margin:0 0 8px;
-      font-size:34px;
-      line-height:1.1;
-      letter-spacing:0.3px;
+      font-size: clamp(22px, 6vw, 34px); /* ✅ scales perfectly */
+      line-height:1.12;
       position:relative;
     }
-
     .hero p{
-      margin:0 0 16px;
+      margin:0 0 14px;
       color: var(--muted);
       line-height:1.6;
-      font-size:15px;
+      font-size:14px;
       position:relative;
     }
 
@@ -213,13 +219,14 @@
       background: rgba(0,0,0,0.18);
       font-size:13px;
       color: var(--muted);
+      max-width: 100%;
     }
     .chip b{
       color: var(--text);
       font-weight:800;
     }
 
-    /* right panel */
+    /* RIGHT PANEL */
     .panel{
       display:grid;
       gap:14px;
@@ -229,13 +236,11 @@
       border:1px solid var(--border);
       border-radius:18px;
       background: rgba(255,255,255,0.06);
-      padding:18px;
+      padding:16px;
     }
-
     .card h3{
       margin:0 0 6px;
-      font-size:16px;
-      letter-spacing:0.2px;
+      font-size:15px;
     }
     .card p{
       margin:0;
@@ -246,9 +251,9 @@
 
     .btn-row{
       display:flex;
-      gap:12px;
+      gap:10px;
       flex-wrap:wrap;
-      margin-top:14px;
+      margin-top:12px;
     }
 
     button{
@@ -257,11 +262,11 @@
       border:1px solid rgba(255,255,255,0.16);
       padding:12px 14px;
       font-weight:900;
-      letter-spacing:0.2px;
       color: var(--text);
       background: rgba(0,0,0,0.20);
-      min-width: 170px;
       transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+      flex: 1 1 170px;
+      min-width: 0;                 /* ✅ no overflow */
     }
     button:hover{
       transform: translateY(-1px);
@@ -281,11 +286,11 @@
     .mini{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:12px;
-      margin-top:14px;
+      gap:10px;
+      margin-top:12px;
     }
     .stat{
-      padding:14px;
+      padding:12px;
       border-radius:16px;
       border:1px solid rgba(255,255,255,0.14);
       background: rgba(0,0,0,0.16);
@@ -296,28 +301,37 @@
     }
     .stat .v{
       margin-top:4px;
-      font-size:16px;
+      font-size:15px;
       font-weight:900;
-      letter-spacing:0.2px;
     }
 
     footer{
-      padding:16px 22px;
+      padding:14px 16px;
       border-top:1px solid var(--border);
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
       color: var(--muted);
-      font-size:13px;
+      font-size:12px;
     }
 
-    /* responsive */
+    /* ✅ MOBILE BREAKPOINT (Main fix) */
     @media (max-width: 860px){
       .grid{ grid-template-columns: 1fr; }
-      .hero h2{ font-size:30px; }
-      .logo{ min-width:auto; }
+    }
+
+    /* ✅ EXTRA SMALL PHONES */
+    @media (max-width: 420px){
+      body{ padding:12px; }
+      header{ padding:14px; }
+      .grid{ padding:14px; gap:14px; }
+      .hero{ padding:16px; }
+      .card{ padding:14px; }
+      .mini{ grid-template-columns: 1fr; } /* ✅ stack stats */
+      .top-actions{ gap:6px; }
+      button{ width:100%; flex-basis: 100%; } /* ✅ full width buttons */
     }
   </style>
 </head>
@@ -342,12 +356,11 @@
     </header>
 
     <section class="grid">
-      <!-- LEFT: HERO -->
       <div class="hero">
         <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
         <p>
-          Step in for a premium grooming experience. Quick walk‑ins and easy booking — crafted with care,
-          hygiene, and style.
+          Step in for a premium grooming experience. Quick walk-ins and easy booking —
+          crafted with care, hygiene, and style.
         </p>
 
         <div class="chips">
@@ -358,7 +371,6 @@
         </div>
       </div>
 
-      <!-- RIGHT: CTA PANEL -->
       <aside class="panel">
         <div class="card">
           <h3>Continue to Services</h3>
@@ -383,26 +395,24 @@
 
         <div class="card">
           <h3>Location</h3>
-          <p>Near T. Nagar bus stop • Parking available • Walk‑ins welcome</p>
+          <p>Near T. Nagar bus stop • Parking available • Walk-ins welcome</p>
         </div>
       </aside>
     </section>
 
     <footer>
-      <span>© 2026 Royal Cut Barber Shop • All rights reserved</span>
+      <span>© 2026 Royal Cut Barber Shop</span>
       <span>Call: +91 98765 43210</span>
     </footer>
   </main>
 
   <script>
-    // ✅ Works on GitHub Pages when index.html and barber_v3.html are in same folder
     document.getElementById("continueBtn").addEventListener("click", () => {
       window.location.assign("./barber_v3.html");
     });
 
-    // For now, login opens the same page. Change to ./login.html when you create it.
     document.getElementById("loginBtn").addEventListener("click", () => {
-      window.location.assign("./barber_v3.html");
+      window.location.assign("./barber_v3.html"); // change later to ./login.html
     });
   </script>
 </body>
