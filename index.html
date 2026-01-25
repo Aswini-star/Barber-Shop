@@ -43,19 +43,47 @@ auth.onAuthStateChanged(user => {
 </script>
 
 
+<script>
 function login() {
- auth.signInWithEmailAndPassword(email.value, password.value)
- .then(res => {
-   return db.collection("users").doc(res.user.uid).get();
- })
- .then(doc => {
-   const role = doc.data().role;
-   if(role==="admin") location.href="admin.html";
-   if(role==="staff") location.href="staff.html";
-   if(role==="customer") location.href="customer.html";
- })
- .catch(e => msg.innerText = e.message);
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .then(res => {
+      return db.collection("users").doc(res.user.uid).get();
+    })
+    .then(doc => {
+
+      // 🔒 SAFETY CHECKS
+      if (!doc.exists) {
+        msg.innerText = "User role not assigned. Contact admin.";
+        auth.signOut();
+        return;
+      }
+
+      const data = doc.data();
+
+      if (!data || !data.role) {
+        msg.innerText = "Role missing in user record.";
+        auth.signOut();
+        return;
+      }
+
+      // 🚦 ROLE REDIRECT
+      if (data.role === "admin") {
+        location.href = "admin.html";
+      } else if (data.role === "staff") {
+        location.href = "staff.html";
+      } else if (data.role === "customer") {
+        location.href = "customer.html";
+      } else {
+        msg.innerText = "Invalid role value.";
+        auth.signOut();
+      }
+    })
+    .catch(e => {
+      msg.innerText = e.message;
+    });
 }
+</script>
+
 </script>
 
 </body>
