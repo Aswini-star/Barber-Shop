@@ -1,46 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Admin</title>
+</head>
+
+<body>
+
 <h2>Admin</h2>
 
 <input id="name" placeholder="Name">
 <input id="principal" placeholder="Principal">
 <input id="rate" placeholder="Monthly Interest %">
-<button onclick="add()">Add</button>
+<button onclick="addCustomer()">Add</button>
 
 <div id="list"></div>
 
+<!-- Firebase compat SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-      authDomain: "barber-shop-4c26f.firebaseapp.com",
-      projectId: "barber-shop-4c26f",
-      storageBucket: "barber-shop-4c26f.firebasestorage.app",
-      messagingSenderId: "213114385226",
-      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
-
+  authDomain: "barber-shop-4c26f.firebaseapp.com",
+  projectId: "barber-shop-4c26f",
+  storageBucket: "barber-shop-4c26f.firebasestorage.app",
+  messagingSenderId: "213114385226",
+  appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
 });
 
-const db=firebase.firestore();
+const db = firebase.firestore();
 
-function add(){
- db.collection("customers").add({
-  name:name.value,
-  principal:+principal.value,
-  rate:+rate.value,
-  interest:0,
-  lastUpdated: firebase.firestore.Timestamp.now()
- }).then(load);
-}
+/* ===== ADD CUSTOMER ===== */
+function addCustomer() {
 
-function load(){
- list.innerHTML="";
- db.collection("customers").get().then(snap=>{
-  snap.forEach(d=>{
-   const c=d.data();
-   list.innerHTML+=`${c.name} ₹${c.principal} Interest ₹${c.interest}<br>`;
+  const nameEl = document.getElementById("name");
+  const principalEl = document.getElementById("principal");
+  const rateEl = document.getElementById("rate");
+
+  if (!nameEl.value || !principalEl.value || !rateEl.value) {
+    alert("Please fill all fields");
+    return;
+  }
+
+  db.collection("customers").add({
+    name: nameEl.value,
+    principal: Number(principalEl.value),
+    rate: Number(rateEl.value),
+    interest: 0,
+    lastUpdated: firebase.firestore.Timestamp.now()
+  })
+  .then(() => {
+    nameEl.value = "";
+    principalEl.value = "";
+    rateEl.value = "";
+    loadCustomers();
+  })
+  .catch(err => {
+    console.error("Error adding customer:", err);
+    alert("Failed to add customer");
   });
- });
 }
-load();
+
+/* ===== LOAD CUSTOMERS ===== */
+function loadCustomers() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  db.collection("customers").get()
+    .then(snap => {
+      snap.forEach(d => {
+        const c = d.data();
+        list.innerHTML += `
+          <div>
+            <b>${c.name}</b> —
+            ₹${c.principal} —
+            Interest ₹${c.interest}
+          </div>
+        `;
+      });
+    })
+    .catch(err => console.error(err));
+}
+
+loadCustomers();
 </script>
+
+</body>
+</html>
