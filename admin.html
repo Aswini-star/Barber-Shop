@@ -11,32 +11,53 @@ body {
   background: #f2f4f7;
   padding: 10px;
 }
-h2 { text-align:center; }
+h2 { text-align: center; }
 
 .card {
-  background:#fff;
-  padding:15px;
-  margin-bottom:15px;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,.1);
+  background: #fff;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 input, select, button {
-  width:100%;
-  padding:10px;
-  margin-top:8px;
-  font-size:16px;
+  width: 100%;
+  padding: 10px;
+  margin-top: 8px;
+  font-size: 16px;
 }
 
-button { background:#007bff;color:#fff;border:none;border-radius:6px; }
-button.danger { background:#dc3545; }
+button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
 
-table { width:100%; border-collapse:collapse; min-width:720px; }
-th, td { padding:8px; border-bottom:1px solid #ddd; font-size:14px; }
-th { background:#f1f1f1; }
+button.danger { background: #dc3545; }
 
-.num-input { width:90px; }
-.total { font-weight:bold; text-align:right; margin-top:10px; }
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 700px;
+}
+
+th, td {
+  padding: 8px;
+  border-bottom: 1px solid #ddd;
+  font-size: 14px;
+}
+
+th { background: #f1f1f1; }
+
+.num-input { width: 90px; }
+
+.total {
+  font-weight: bold;
+  text-align: right;
+  margin-top: 10px;
+}
 </style>
 </head>
 
@@ -44,16 +65,17 @@ th { background:#f1f1f1; }
 
 <h2>Monthly Customer Ledger</h2>
 
-<!-- MONTH -->
+<!-- MONTH SELECT -->
 <div class="card">
   <h3>Select Month</h3>
-  <select id="monthSelect" onchange="loadCustomers()">
-    <option value="">Select</option>
+  <select id="month">
+    <option value="">Select month</option>
     <option value="2025-01">Jan 2025</option>
     <option value="2025-02">Feb 2025</option>
     <option value="2025-03">Mar 2025</option>
     <option value="2025-04">Apr 2025</option>
   </select>
+  <button onclick="loadData()">Load</button>
 </div>
 
 <!-- ADD CUSTOMER -->
@@ -61,28 +83,27 @@ th { background:#f1f1f1; }
   <h3>Add Customer</h3>
   <input id="name" placeholder="Customer Name">
   <input id="principal" type="number" max="100000" placeholder="Opening Principal">
-  <input id="rate" type="number" placeholder="Monthly Interest % (Fixed)">
-  <button onclick="addCustomer()">Add</button>
+  <input id="rate" type="number" placeholder="Monthly Interest %">
+  <button onclick="addCustomer()">Add Customer</button>
 </div>
 
 <!-- TABLE -->
 <div class="card">
-<h3>Records</h3>
-<div style="overflow-x:auto">
-<table>
-<thead>
-<tr>
-  <th>Name</th>
-  <th>Principal</th>
-  <th>Collected</th>
-  <th>Interest</th>
-  <th>Action</th>
-</tr>
-</thead>
-<tbody id="list"></tbody>
-</table>
-</div>
-<div class="total" id="totals"></div>
+  <h3>Customers</h3>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Principal</th>
+          <th>Collected</th>
+          <th>Interest</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+  <div class="total" id="totals"></div>
 </div>
 
 <!-- Firebase -->
@@ -95,46 +116,55 @@ firebase.initializeApp({
   authDomain: "barber-shop-4c26f.firebaseapp.com",
   projectId: "barber-shop-4c26f"
 });
+
 const db = firebase.firestore();
 
 /* ADD CUSTOMER */
 async function addCustomer() {
-  const name = nameInput.value.trim();
-  const principal = +principalInput.value;
-  const rate = +rateInput.value;
-  const month = monthSelect.value;
+  const name = document.getElementById("name").value.trim();
+  const principal = +document.getElementById("principal").value;
+  const rate = +document.getElementById("rate").value;
+  const month = document.getElementById("month").value;
 
   if (!name || !principal || !rate || !month) {
-    alert("Fill all fields & select month");
+    alert("Fill all fields and select month");
     return;
   }
 
   const ref = await db.collection("customers").add({ name, rate });
 
-  await ref.collection("records").doc(month).set({
+  await ref.collection("ledger").doc(month).set({
     principal,
     collected: 0,
     interest: principal * rate / 100,
     created: firebase.firestore.Timestamp.now()
   });
 
-  nameInput.value = principalInput.value = rateInput.value = "";
-  loadCustomers();
+  document.getElementById("name").value = "";
+  document.getElementById("principal").value = "";
+  document.getElementById("rate").value = "";
+
+  loadData();
 }
 
 /* LOAD MONTH DATA */
-async function loadCustomers() {
-  const month = monthSelect.value;
+async function loadData() {
+  const month = document.getElementById("month").value;
   if (!month) return;
 
-  const tbody = list;
+  const tbody = document.getElementById("list");
+  const totals = document.getElementById("totals");
+
   tbody.innerHTML = "";
+  totals.innerHTML = "";
+
   let totalP = 0, totalI = 0;
 
   const snap = await db.collection("customers").get();
+
   for (const doc of snap.docs) {
-    const c = doc.data();
-    const rec = await doc.ref.collection("records").doc(month).get();
+    const cust = doc.data();
+    const rec = await doc.ref.collection("ledger").doc(month).get();
     if (!rec.exists) continue;
 
     const r = rec.data();
@@ -143,7 +173,7 @@ async function loadCustomers() {
 
     tbody.innerHTML += `
       <tr>
-        <td>${c.name}</td>
+        <td>${cust.name}</td>
         <td>₹${r.principal}</td>
         <td>
           <input class="num-input" type="number"
@@ -151,27 +181,19 @@ async function loadCustomers() {
             onchange="updateCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
-        <td>
-          <button class="danger" onclick="remove('${doc.id}')">Delete</button>
-        </td>
-      </tr>`;
+      </tr>
+    `;
   }
 
   totals.innerHTML =
-    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
+    `Total Principal: ₹${totalP} <br> Total Interest: ₹${totalI}`;
 }
 
-/* SAVE COLLECTION */
-function updateCollected(cid, month, val) {
+/* UPDATE COLLECTION (NO DEDUCTION YET) */
+function updateCollected(cid, month, value) {
   db.collection("customers").doc(cid)
-    .collection("records").doc(month)
-    .update({ collected:+val });
-}
-
-/* DELETE CUSTOMER */
-function remove(id) {
-  if(confirm("Delete customer?"))
-    db.collection("customers").doc(id).delete().then(loadCustomers);
+    .collection("ledger").doc(month)
+    .update({ collected: +value });
 }
 </script>
 
