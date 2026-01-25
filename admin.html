@@ -62,6 +62,11 @@ th { background: #f1f1f1; }
   text-align: right;
   margin-top: 10px;
 }
+
+/* HIDE LOAD BUTTON */
+button[onclick="loadMonth()"] {
+  display: none;
+}
 </style>
 </head>
 
@@ -69,11 +74,19 @@ th { background: #f1f1f1; }
 
 <h2>Monthly Customer Ledger</h2>
 
-<!-- MONTH -->
+<!-- ADD CUSTOMER -->
+<div class="card">
+  <h3>Add Customer (Opening Month Only)</h3>
+  <input id="name" placeholder="Customer Name">
+  <input id="principal" type="number" max="100000" placeholder="Opening Principal">
+  <input id="rate" type="number" placeholder="Monthly Interest %">
+  <button onclick="addCustomer()">Add Customer</button>
+</div>
+
+<!-- MONTH (MOVED BELOW ADD CUSTOMER) -->
 <div class="card">
   <h3>Select Month</h3>
 
-  <!-- ✅ AUTO LOAD ON SELECT -->
   <select id="monthSelect" onchange="loadMonth()">
     <option value="">Select Month</option>
     <option value="2025-01">Jan 2025</option>
@@ -83,17 +96,8 @@ th { background: #f1f1f1; }
     <option value="2025-05">May 2025</option>
   </select>
 
-  
+  <button onclick="loadMonth()">Load Month</button>
   <button onclick="closeMonth()">Close Month</button>
-</div>
-
-<!-- ADD CUSTOMER -->
-<div class="card">
-  <h3>Add Customer (Opening Month Only)</h3>
-  <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" max="100000" placeholder="Opening Principal">
-  <input id="rate" type="number" placeholder="Monthly Interest %">
-  <button onclick="addCustomer()">Add Customer</button>
 </div>
 
 <!-- TABLE -->
@@ -130,7 +134,7 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-/* ADD CUSTOMER (ONLY FIRST MONTH) */
+/* ADD CUSTOMER */
 async function addCustomer() {
   const name = document.getElementById("name").value.trim();
   const principal = +document.getElementById("principal").value;
@@ -159,7 +163,7 @@ async function addCustomer() {
   loadMonth();
 }
 
-/* LOAD SELECTED MONTH */
+/* LOAD MONTH */
 async function loadMonth() {
   const month = document.getElementById("monthSelect").value;
   if (!month) return;
@@ -243,7 +247,7 @@ async function closeMonth() {
   loadMonth();
 }
 
-/* NEXT MONTH HELPER */
+/* NEXT MONTH */
 function getNextMonth(m) {
   const [y, mo] = m.split("-").map(Number);
   const d = new Date(y, mo);
@@ -253,5 +257,3 @@ function getNextMonth(m) {
 
 </body>
 </html>
-
-
