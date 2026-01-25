@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Admin</title>
+  <title>Admin – Customers</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
@@ -10,14 +10,23 @@
       font-family: Arial, sans-serif;
       background: #f2f4f7;
       margin: 0;
-      padding: 15px;
+      padding: 10px;
     }
 
     h2 {
       text-align: center;
+      margin-bottom: 10px;
     }
 
-    input, button {
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+
+    input, select, button {
       width: 100%;
       padding: 10px;
       margin-top: 8px;
@@ -27,32 +36,31 @@
 
     button {
       background: #007bff;
-      color: white;
+      color: #fff;
       border: none;
       border-radius: 6px;
-      cursor: pointer;
     }
 
-    button:hover {
-      opacity: 0.9;
+    button:active {
+      opacity: 0.8;
     }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 15px;
-      background: white;
+    .customer {
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
     }
 
-    th, td {
-      border: 1px solid #ccc;
-      padding: 8px;
+    .customer:last-child {
+      border-bottom: none;
+    }
+
+    .name {
+      font-weight: bold;
+    }
+
+    .small {
       font-size: 14px;
-      text-align: left;
-    }
-
-    th {
-      background: #f0f0f0;
+      color: #555;
     }
   </style>
 </head>
@@ -62,24 +70,43 @@
 <h2>Admin</h2>
 
 <!-- ADD CUSTOMER -->
-<input id="name" placeholder="Name">
-<input id="principal" type="number" placeholder="Principal">
-<input id="rate" type="number" placeholder="Monthly Interest %">
-<button onclick="addCustomer()">Add</button>
+<div class="card">
+  <h3>Add Customer</h3>
 
-<!-- CUSTOMER TABLE -->
-<table>
-  <thead>
-    <tr>
-      <th>Name</th>
-      <th>Principal (₹)</th>
-      <th>Interest (₹)</th>
-    </tr>
-  </thead>
-  <tbody id="list"></tbody>
-</table>
+  <input id="name" placeholder="Customer Name">
+  <input id="principal" type="number" placeholder="Principal Amount">
+  <input id="rate" type="number" placeholder="Monthly Interest %">
+  <button onclick="addCustomer()">Add Customer</button>
+</div>
 
-<!-- Firebase SDK -->
+<!-- FILTER -->
+<div class="card">
+  <h3>Filter by Month</h3>
+
+  <select id="monthFilter" onchange="loadCustomers()">
+    <option value="">All Months</option>
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
+  </select>
+</div>
+
+<!-- CUSTOMER LIST -->
+<div class="card">
+  <h3>Customers</h3>
+  <div id="list"></div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
@@ -102,7 +129,7 @@ function addCustomer() {
   const rate = Number(document.getElementById("rate").value);
 
   if (!name || !principal || !rate) {
-    alert("Please fill all fields");
+    alert("Fill all fields");
     return;
   }
 
@@ -117,32 +144,38 @@ function addCustomer() {
     document.getElementById("principal").value = "";
     document.getElementById("rate").value = "";
     loadCustomers();
-  }).catch(err => {
-    console.error(err);
-    alert("Error adding customer");
   });
 }
 
-/* LOAD CUSTOMERS */
+/* LOAD CUSTOMERS (MONTH FILTER) */
 function loadCustomers() {
   const list = document.getElementById("list");
+  const month = document.getElementById("monthFilter").value;
+
   list.innerHTML = "";
 
-  db.collection("customers").get()
-    .then(snap => {
-      snap.forEach(d => {
-        const c = d.data();
+  db.collection("customers").get().then(snap => {
+    snap.forEach(d => {
+      const c = d.data();
 
-        list.innerHTML += `
-          <tr>
-            <td>${c.name}</td>
-            <td>${c.principal}</td>
-            <td>${c.interest}</td>
-          </tr>
-        `;
-      });
-    })
-    .catch(err => console.error(err));
+      if (month !== "") {
+        const m = c.lastUpdated.toDate().getMonth();
+        if (String(m) !== month) return;
+      }
+
+      list.innerHTML += `
+        <div class="customer">
+          <div class="name">${c.name}</div>
+          <div class="small">Principal: ₹${c.principal}</div>
+          <div class="small">Interest: ₹${c.interest}</div>
+        </div>
+      `;
+    });
+  });
 }
 
-loadC
+loadCustomers();
+</script>
+
+</body>
+</html>
