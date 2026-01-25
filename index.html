@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Login</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Login</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
@@ -12,78 +12,63 @@
 <button onclick="login()">Login</button>
 <p id="msg"></p>
 
-<!-- Firebase config -->
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+<!-- Firebase SDKs -->
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
+/* 🔥 Firebase Init */
 firebase.initializeApp({
- apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-      authDomain: "barber-shop-4c26f.firebaseapp.com",
-      projectId: "barber-shop-4c26f",
-      storageBucket: "barber-shop-4c26f.firebasestorage.app",
-      messagingSenderId: "213114385226",
-      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+  apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+  authDomain: "barber-shop-4c26f.firebaseapp.com",
+  projectId: "barber-shop-4c26f",
+  storageBucket: "barber-shop-4c26f.firebasestorage.app",
+  messagingSenderId: "213114385226",
+  appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
 });
 
 const auth = firebase.auth();
 const db = firebase.firestore();
 
- <script>
-/* TEMPORARY – RUN ONCE */
+/* ⚠️ TEMPORARY – RUN ONCE, THEN DELETE */
 auth.onAuthStateChanged(user => {
   if (user) {
     db.collection("users").doc(user.uid).set({
       role: "admin"
     });
-    alert("Admin role assigned. Remove this code now!");
+    alert("Admin role assigned. REMOVE THIS CODE NOW!");
   }
 });
-</script>
 
-
-<script>
+/* ✅ LOGIN FUNCTION */
 function login() {
-  auth.signInWithEmailAndPassword(email.value, password.value)
-    .then(res => {
-      return db.collection("users").doc(res.user.uid).get();
-    })
-    .then(doc => {
+  msg.innerText = "Logging in...";
 
-      // 🔒 SAFETY CHECKS
-      if (!doc.exists) {
-        msg.innerText = "User role not assigned. Contact admin.";
-        auth.signOut();
-        return;
-      }
+  auth.signInWithEmailAndPassword(
+    document.getElementById("email").value,
+    document.getElementById("password").value
+  )
+  .then(res => db.collection("users").doc(res.user.uid).get())
+  .then(doc => {
 
-      const data = doc.data();
+    if (!doc.exists) {
+      msg.innerText = "User role not assigned.";
+      auth.signOut();
+      return;
+    }
 
-      if (!data || !data.role) {
-        msg.innerText = "Role missing in user record.";
-        auth.signOut();
-        return;
-      }
+    const role = doc.data().role;
 
-      // 🚦 ROLE REDIRECT
-      if (data.role === "admin") {
-        location.href = "admin.html";
-      } else if (data.role === "staff") {
-        location.href = "staff.html";
-      } else if (data.role === "customer") {
-        location.href = "customer.html";
-      } else {
-        msg.innerText = "Invalid role value.";
-        auth.signOut();
-      }
-    })
-    .catch(e => {
-      msg.innerText = e.message;
-    });
+    if (role === "admin") location.href = "admin.html";
+    else if (role === "staff") location.href = "staff.html";
+    else if (role === "customer") location.href = "customer.html";
+    else msg.innerText = "Invalid role";
+  })
+  .catch(e => {
+    msg.innerText = e.message;
+  });
 }
-</script>
-
 </script>
 
 </body>
