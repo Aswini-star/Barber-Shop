@@ -56,7 +56,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 650px;
+      min-width: 550px;
     }
 
     th, td {
@@ -129,7 +129,6 @@
         <tr>
           <th>Name</th>
           <th>Principal</th>
-          <th>Rate %</th>
           <th>Interest</th>
           <th>Actions</th>
         </tr>
@@ -184,7 +183,7 @@ function addCustomer() {
   db.collection("customers").add({
     name,
     principal,
-    rate,               // 🔒 fixed rate
+    rate, // stored but hidden
     interest: principal * rate / 100,
     lastUpdated: firebase.firestore.Timestamp.now()
   }).then(loadCustomers);
@@ -213,7 +212,6 @@ function loadCustomers() {
 
       totalPrincipal += c.principal;
       totalInterest += c.interest;
-
       cachedData.push({ id: doc.id, ...c });
 
       tbody.innerHTML += `
@@ -226,7 +224,6 @@ function loadCustomers() {
               value="${c.principal}"
               onchange="updatePrincipal('${doc.id}', this.value, ${c.rate})">
           </td>
-          <td>${c.rate}%</td>
           <td>₹${c.interest.toFixed(2)}</td>
           <td>
             <button class="small danger"
