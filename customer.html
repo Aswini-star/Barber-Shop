@@ -1,0 +1,33 @@
+<h2>My Loan</h2>
+<div id="info"></div>
+<button onclick="pay()">Pay via UPI</button>
+
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+ apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+});
+
+const auth=firebase.auth();
+const db=firebase.firestore();
+
+auth.onAuthStateChanged(u=>{
+ db.collection("customers").doc(u.uid).get().then(doc=>{
+  const c=doc.data();
+  info.innerHTML=`Principal ₹${c.principal}<br>Interest ₹${c.interest}`;
+  window.upi=c.upi;
+ });
+});
+
+function pay(){
+ location.href=`upi://pay?pa=${upi}&pn=LoanPayment`;
+}
+</script>
