@@ -57,11 +57,6 @@ tfoot td {
 .num-input {
   width: 90px;
 }
-
-/* hide load button */
-button[onclick="loadMonth()"] {
-  display: none;
-}
 </style>
 </head>
 
@@ -90,7 +85,6 @@ button[onclick="loadMonth()"] {
     <option value="2025-05">May 2025</option>
   </select>
 
-  <button onclick="loadMonth()">Load Month</button>
   <button onclick="closeMonth()">Close Month</button>
 </div>
 
@@ -195,8 +189,8 @@ async function loadMonth() {
           <input type="number"
             class="num-input"
             value="${r.collected}"
-            ${r.closed ? "disabled" : ""}
-            onchange="saveCollected('${doc.id}','${month}',this.value)">
+            ${r.closed ? "readonly" : ""}
+            oninput="saveCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
       </tr>
