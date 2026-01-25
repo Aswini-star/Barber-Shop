@@ -1,0 +1,45 @@
+<h2>Staff</h2>
+
+<input id="cid" placeholder="Customer ID">
+<input id="amt" placeholder="Amount">
+<select id="type">
+ <option value="principal">Principal</option>
+ <option value="interest">Interest</option>
+</select>
+<button onclick="update()">Update</button>
+
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+ apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+
+});
+const db=firebase.firestore();
+
+function update(){
+ const ref=db.collection("customers").doc(cid.value);
+ ref.get().then(doc=>{
+  const c=doc.data();
+  const months=Math.floor(
+   (Date.now()-c.lastUpdated.toMillis())/(1000*60*60*24*30)
+  );
+  let interest=c.interest+(months*c.principal*c.rate/100);
+
+  if(type.value==="principal") c.principal-=+amt.value;
+  else interest-=+amt.value;
+
+  ref.update({
+   principal:c.principal,
+   interest:interest,
+   lastUpdated: firebase.firestore.Timestamp.now()
+  });
+ });
+}
+</script>
