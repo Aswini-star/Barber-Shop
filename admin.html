@@ -149,13 +149,16 @@ async function addCustomer() {
     return;
   }
 
-  const custRef = await db.collection("customers").add({ name, rate });
+  const custRef = await db.collection("customers").add({
+    name,
+    rate
+  });
 
   await custRef.collection("ledger").doc(month).set({
-    principal,
+    principal: principal,
     collected: 0,
     interest: principal * rate / 100,
-    closed: false,
+    closed: false,  // BOOLEAN
     created: firebase.firestore.Timestamp.now()
   });
 
@@ -195,7 +198,7 @@ async function loadMonth() {
           <input type="number"
             class="num-input"
             value="${r.collected}"
-            ${r.closed ? "disabled" : ""}
+            ${r.closed === true ? "disabled" : ""}
             onchange="saveCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
@@ -211,7 +214,9 @@ async function loadMonth() {
 function saveCollected(cid, month, val) {
   db.collection("customers").doc(cid)
     .collection("ledger").doc(month)
-    .update({ collected: +val });
+    .update({
+      collected: Number(val)
+    });
 }
 
 /* CLOSE MONTH */
@@ -227,7 +232,7 @@ async function closeMonth() {
     const ledger = doc.ref.collection("ledger");
 
     const cur = await ledger.doc(month).get();
-    if (!cur.exists || cur.data().closed) continue;
+    if (!cur.exists || cur.data().closed === true) continue;
 
     const r = cur.data();
     const newPrincipal = Math.max(r.principal - r.collected, 0);
