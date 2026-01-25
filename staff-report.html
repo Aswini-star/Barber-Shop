@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Staff Report</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 750px;
+      margin: auto;
+      background: #fff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+
+    .row {
+      margin: 6px 0;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    ul {
+      padding-left: 18px;
+    }
+
+    .buttons {
+      margin-top: 15px;
+      text-align: center;
+    }
+
+    button {
+      padding: 8px 14px;
+      margin: 5px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      background: #f8f8f8;
+    }
+
+    button:hover {
+      background: #eaeaea;
+    }
+
+    .back {
+      margin-bottom: 15px;
+      display: inline-block;
+      cursor: pointer;
+      color: #007bff;
+      text-decoration: underline;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #ddd;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <div class="back" onclick="goBack()">⬅ Back to Admin</div>
+
+  <h2>Staff Report</h2>
+
+  <div class="row"><span class="label">Email:</span> <span id="email"></span></div>
+  <div class="row"><span class="label">Total Days Worked:</span> <span id="days"></span></div>
+  <div class="row"><span class="label">Total Services:</span> <span id="services"></span></div>
+  <div class="row"><span class="label">Total Earnings:</span> ₹<span id="earnings"></span></div>
+  <div class="row"><span class="label">Last Working Date:</span> <span id="lastDate"></span></div>
+
+  <div class="section">
+    <h3>📅 Month-wise Work</h3>
+    <ul id="months"></ul>
+  </div>
+
+  <div class="section buttons">
+    <button onclick="downloadExcel()">📊 Download Excel</button>
+    <button onclick="downloadPDF()">📄 Download PDF</button>
+  </div>
+
+</div>
+
+<!-- Firebase -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import {
+  getFirestore,
+  collection,
+  query,
+  where,
+  getDocs
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+/* 🔥 REPLACE WITH YOUR FIREBASE CONFIG */
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT.appspot.com",
+  messagingSenderId: "YOUR_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* ===== READ EMAIL FROM URL ===== */
+const params = new URLSearchParams(window.location.search);
+const staffEmail = params.get("email");
+
+if (!staffEmail) {
+  alert("No staff selected");
+  window.location.assign("./barber_v3.html");
+}
+
+document.getElementById("email").textContent = staffEmail;
+
+let reportRows = [];
+
+loadReport();
+
+async function loadReport() {
+
+  const q = query(
+    collection(db, "bookings"),
+    where("staff", "==", staffEmail),
+    where("status", "==", "completed")
+  );
+
+  const snap = await getDocs(q);
+
+  const workedDays = new Set();
+  const monthMap = {};
+  let earnings = 0;
+  let lastDate = null;
+
+  reportRows = [];
+
+  snap.forEach(doc => {
+    const d = doc.data();
+    if (!d.date) return;
+
+    workedDays.add(d.date);
+
+    const dt = new Date(d.date);
+    const month = dt.toLocaleString("default", { month: "long" });
+    monthMap[month] = (monthMap[month] || 0) + 1;
+
+    earnings += Number(d.price || 0);
+
+    if (!lastDate || new Date(d.date) > new Date(lastDate)) {
+      lastDate = d.date;
+    }
+
+    reportRows.push({
+      Date: d.date,
+      Service: d.service || "",
+      Price: d.price || 0
+    });
+  });
+
+  document.getElementById("days").textContent = workedDays.size;
+  document.getElementById("services").textContent = snap.size;
+  document.getElementById("earnings").textContent = earnings;
+  document.getElementById("lastDate").textContent = lastDate || "N/A";
+
+  const ul = document.getElementById("months");
+  ul.innerHTML = "";
+
+  for (const m in monthMap) {
+    const li = document.createElement("li");
+    li.textContent = `${m} : ${monthMap[m]} days`;
+    ul.appendChild(li);
+  }
+}
+
+/* 📊 DOWNLOAD EXCEL */
+window.downloadExcel = function () {
+  let csv = "Date,Service,Price\n";
+  reportRows.forEach(r => {
+    csv += `${r.Date},${r.Service},${r.Price}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "staff_report.csv";
+  a.click();
+};
+
+/* 📄 DOWNLOAD PDF */
+window.downloadPDF = function () {
+  let text = "STAFF REPORT\n\n";
+  text += "Staff: " + staffEmail + "\n\n";
+
+  reportRows.forEach(r => {
+    text += `${r.Date} | ${r.Service} | ₹${r.Price}\n`;
+  });
+
+  const blob = new Blob([text], { type: "application/pdf" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "staff_report.pdf";
+  a.click();
+};
+
+</script>
+
+<script>
+function goBack(){
+  window.location.assign("./barber_v3.html");
+}
+</script>
+
+</body>
+</html>
