@@ -133,7 +133,10 @@
     </table>
   </div>
 
-  <div class="total" id="totalInterest">Total Interest: ₹0</div>
+  <div class="total" id="totals">
+    Total Principal: ₹0<br>
+    Total Interest: ₹0
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -159,7 +162,10 @@ function addCustomer() {
   const principal = +principalInput.value;
   const rate = +rateInput.value;
 
-  if (!name || !principal || !rate) return alert("Fill all fields");
+  if (!name || !principal || !rate) {
+    alert("Fill all fields");
+    return;
+  }
 
   db.collection("customers").add({
     name,
@@ -169,7 +175,9 @@ function addCustomer() {
     lastUpdated: firebase.firestore.Timestamp.now()
   }).then(loadCustomers);
 
-  nameInput.value = principalInput.value = rateInput.value = "";
+  nameInput.value = "";
+  principalInput.value = "";
+  rateInput.value = "";
 }
 
 const nameInput = document.getElementById("name");
@@ -180,7 +188,9 @@ const rateInput = document.getElementById("rate");
 function loadCustomers() {
   const tbody = document.getElementById("list");
   const month = document.getElementById("monthFilter").value;
-  let total = 0;
+  let totalInterest = 0;
+  let totalPrincipal = 0;
+
   tbody.innerHTML = "";
   cachedData = [];
 
@@ -188,9 +198,12 @@ function loadCustomers() {
     snap.forEach(doc => {
       const c = doc.data();
       const date = c.lastUpdated.toDate();
+
       if (month !== "" && date.getMonth().toString() !== month) return;
 
-      total += c.interest;
+      totalInterest += c.interest;
+      totalPrincipal += c.principal;
+
       cachedData.push({ id: doc.id, ...c });
 
       tbody.innerHTML += `
@@ -198,27 +211,30 @@ function loadCustomers() {
           <td>${c.name}</td>
           <td>
             <input type="number" value="${c.principal}"
-              onchange="update('${doc.id}', this.value, ${c.rate})">
+              onchange="updateCustomer('${doc.id}', this.value, ${c.rate})">
           </td>
           <td>
             <input type="number" value="${c.rate}"
-              onchange="update('${doc.id}', ${c.principal}, this.value)">
+              onchange="updateCustomer('${doc.id}', ${c.principal}, this.value)">
           </td>
           <td>₹${c.interest.toFixed(2)}</td>
           <td>
-            <button class="small danger" onclick="remove('${doc.id}')">Delete</button>
+            <button class="small danger" onclick="deleteCustomer('${doc.id}')">
+              Delete
+            </button>
           </td>
         </tr>
       `;
     });
 
-    document.getElementById("totalInterest").innerText =
-      "Total Interest: ₹" + total.toFixed(2);
+    document.getElementById("totals").innerHTML =
+      `Total Principal: ₹${totalPrincipal.toFixed(2)}<br>
+       Total Interest: ₹${totalInterest.toFixed(2)}`;
   });
 }
 
 /* UPDATE CUSTOMER */
-function update(id, principal, rate) {
+function updateCustomer(id, principal, rate) {
   principal = +principal;
   rate = +rate;
   const interest = principal * rate / 100;
@@ -231,8 +247,8 @@ function update(id, principal, rate) {
   }).then(loadCustomers);
 }
 
-/* DELETE */
-function remove(id) {
+/* DELETE CUSTOMER */
+function deleteCustomer(id) {
   if (!confirm("Delete customer?")) return;
   db.collection("customers").doc(id).delete().then(loadCustomers);
 }
