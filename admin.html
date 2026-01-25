@@ -48,7 +48,6 @@ th, td {
 }
 
 th { background: #f1f1f1; }
-
 .num-input { width: 90px; }
 
 .total {
@@ -65,16 +64,16 @@ th { background: #f1f1f1; }
 
 <!-- ADD CUSTOMER -->
 <div class="card">
-  <h3>Add Customer</h3>
+  <h3>Add Customer (Current Month)</h3>
   <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" max="100000" placeholder="Opening Principal">
+  <input id="principal" type="number" placeholder="Opening Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
 
-<!-- MONTH SELECT (MOVED BELOW ADD CUSTOMER) -->
+<!-- MONTH SELECT -->
 <div class="card">
-  <h3>Select Month</h3>
+  <h3>Select Month to View</h3>
   <select id="month"></select>
   <button onclick="loadData()">Load</button>
 </div>
@@ -111,35 +110,41 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-/* AUTO GENERATE ALL MONTHS & YEARS */
+/* CURRENT MONTH (AUTO) */
+function currentMonth() {
+  const d = new Date();
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+
+/* GENERATE ALL MONTHS */
 function generateMonths() {
   const sel = document.getElementById("month");
-  sel.innerHTML = `<option value="">Select month</option>`;
+  sel.innerHTML = "";
 
-  for (let year = 2024; year <= 2035; year++) {
+  for (let y = 2023; y <= 2035; y++) {
     for (let m = 0; m < 12; m++) {
-      const value = `${year}-${String(m + 1).padStart(2, "0")}`;
-      const label = new Date(year, m).toLocaleString("default", {
-        month: "short",
-        year: "numeric"
-      });
-      sel.innerHTML += `<option value="${value}">${label}</option>`;
+      const v = `${y}-${String(m+1).padStart(2,"0")}`;
+      const t = new Date(y, m).toLocaleString("default",{month:"short",year:"numeric"});
+      sel.innerHTML += `<option value="${v}">${t}</option>`;
     }
   }
+
+  sel.value = currentMonth();
 }
 generateMonths();
 
-/* ADD CUSTOMER */
+/* ADD CUSTOMER → CURRENT MONTH */
 async function addCustomer() {
   const name = document.getElementById("name").value.trim();
   const principal = +document.getElementById("principal").value;
   const rate = +document.getElementById("rate").value;
-  const month = document.getElementById("month").value;
 
-  if (!name || !principal || !rate || !month) {
-    alert("Fill all fields and select month");
+  if (!name || !principal || !rate) {
+    alert("Fill all fields");
     return;
   }
+
+  const month = currentMonth();
 
   const ref = await db.collection("customers").add({ name, rate });
 
@@ -154,17 +159,17 @@ async function addCustomer() {
   document.getElementById("principal").value = "";
   document.getElementById("rate").value = "";
 
+  document.getElementById("month").value = month;
   loadData();
 }
 
-/* LOAD MONTH DATA */
+/* LOAD DATA */
 async function loadData() {
   const month = document.getElementById("month").value;
   if (!month) return;
 
   const tbody = document.getElementById("list");
   const totals = document.getElementById("totals");
-
   tbody.innerHTML = "";
   totals.innerHTML = "";
 
@@ -191,19 +196,16 @@ async function loadData() {
             onchange="updateCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
-      </tr>
-    `;
+      </tr>`;
   }
 
-  totals.innerHTML =
-    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
+  totals.innerHTML = `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
 }
 
-/* UPDATE COLLECTION */
-function updateCollected(cid, month, value) {
+function updateCollected(cid, month, val) {
   db.collection("customers").doc(cid)
     .collection("ledger").doc(month)
-    .update({ collected: +value });
+    .update({ collected: +val });
 }
 </script>
 
