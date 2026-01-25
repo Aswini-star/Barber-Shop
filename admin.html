@@ -96,15 +96,17 @@ function prevMonth(m){
 
 function calcInterest(cid){
   const p = Number(document.getElementById("p_"+cid).value || 0);
-  document.getElementById("i_"+cid).value = (p * RATE / 100).toFixed(2);
+  document.getElementById("i_"+cid).value =
+    (p * RATE / 100).toFixed(2);
 }
 
 async function loadData(){
   const m = month.value;
   if(!m) return;
 
-  rows.innerHTML="";
-  let tp=0, ti=0;
+  rows.innerHTML = "";
+  let totalPrincipal = 0;
+  let totalInterest = 0;
 
   const customers = await db.collection("customers").get();
 
@@ -116,7 +118,7 @@ async function loadData(){
       .where("month","==",m)
       .get();
 
-    let principal=0, collected=0, interest=0, docId="";
+    let principal = 0, collected = 0, interest = 0, docId = "";
 
     if(!curSnap.empty){
       const d = curSnap.docs[0];
@@ -138,11 +140,11 @@ async function loadData(){
       }
     }
 
-    // ✅ HIDE ROW IF PRINCIPAL IS 0
+    // ❌ Skip if closed
     if(principal <= 0) continue;
 
-    tp += Number(principal);
-    ti += Number(interest);
+    totalPrincipal += Number(principal);
+    totalInterest += Number(interest);
 
     rows.innerHTML += `
     <tr>
@@ -165,8 +167,10 @@ async function loadData(){
     </tr>`;
   }
 
-  tp.textContent = tp.toFixed(2);
-  ti.textContent = ti.toFixed(2);
+  document.getElementById("tp").textContent =
+    totalPrincipal.toFixed(2);
+  document.getElementById("ti").textContent =
+    totalInterest.toFixed(2);
 }
 
 async function save(cid,docId){
