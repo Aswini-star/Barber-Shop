@@ -1,113 +1,98 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Admin – Customers</title>
+  <title>My Loan Details</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background: #f2f4f7;
       margin: 0;
-      padding: 10px;
+      padding: 16px;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
+      margin-bottom: 16px;
     }
 
-    .card {
-      background: #fff;
-      padding: 15px;
+    .table-container {
+      overflow-x: auto;
+      background: white;
       border-radius: 10px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      margin-bottom: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     }
 
-    input, select, button {
+    table {
       width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      font-size: 16px;
-      box-sizing: border-box;
+      border-collapse: collapse;
+      min-width: 320px;
     }
 
-    button {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
+    th, td {
+      padding: 12px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+      font-size: 15px;
     }
 
-    button:active {
-      opacity: 0.8;
+    th {
+      background: #1976d2;
+      color: white;
     }
 
-    .customer {
-      border-bottom: 1px solid #eee;
-      padding: 8px 0;
-    }
-
-    .customer:last-child {
+    tr:last-child td {
       border-bottom: none;
     }
 
-    .name {
-      font-weight: bold;
-    }
-
-    .small {
-      font-size: 14px;
-      color: #555;
+    .pay-btn {
+      margin-top: 20px;
+      width: 100%;
+      padding: 14px;
+      background: #2e7d32;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 8px;
     }
   </style>
 </head>
 
 <body>
 
-<h2>Admin</h2>
+<h2>My Loan Details</h2>
 
-<!-- ADD CUSTOMER -->
-<div class="card">
-  <h3>Add Customer</h3>
-
-  <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" placeholder="Principal Amount">
-  <input id="rate" type="number" placeholder="Monthly Interest %">
-  <button onclick="addCustomer()">Add Customer</button>
+<div class="table-container">
+  <table>
+    <tr>
+      <th>Field</th>
+      <th>Value</th>
+    </tr>
+    <tr>
+      <td>Customer Name</td>
+      <td id="cname">-</td>
+    </tr>
+    <tr>
+      <td>Principal Amount</td>
+      <td id="principal">-</td>
+    </tr>
+    <tr>
+      <td>Outstanding Interest</td>
+      <td id="interest">-</td>
+    </tr>
+    <tr>
+      <td>Monthly Interest %</td>
+      <td id="rate">-</td>
+    </tr>
+  </table>
 </div>
 
-<!-- FILTER -->
-<div class="card">
-  <h3>Filter by Month</h3>
+<button class="pay-btn" onclick="pay()">Pay via UPI</button>
 
-  <select id="monthFilter" onchange="loadCustomers()">
-    <option value="">All Months</option>
-    <option value="0">January</option>
-    <option value="1">February</option>
-    <option value="2">March</option>
-    <option value="3">April</option>
-    <option value="4">May</option>
-    <option value="5">June</option>
-    <option value="6">July</option>
-    <option value="7">August</option>
-    <option value="8">September</option>
-    <option value="9">October</option>
-    <option value="10">November</option>
-    <option value="11">December</option>
-  </select>
-</div>
-
-<!-- CUSTOMER LIST -->
-<div class="card">
-  <h3>Customers</h3>
-  <div id="list"></div>
-</div>
-
-<!-- Firebase -->
+<!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -117,64 +102,44 @@ firebase.initializeApp({
   projectId: "barber-shop-4c26f",
   storageBucket: "barber-shop-4c26f.firebasestorage.app",
   messagingSenderId: "213114385226",
-  appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
+  appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
 });
 
+const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ADD CUSTOMER */
-function addCustomer() {
-  const name = document.getElementById("name").value;
-  const principal = Number(document.getElementById("principal").value);
-  const rate = Number(document.getElementById("rate").value);
+let upiId = "";
 
-  if (!name || !principal || !rate) {
-    alert("Fill all fields");
-    return;
-  }
+/* 🔐 LOAD CUSTOMER DATA */
+auth.onAuthStateChanged(user => {
+  if (!user) return;
 
-  db.collection("customers").add({
-    name,
-    principal,
-    rate,
-    interest: 0,
-    lastUpdated: firebase.firestore.Timestamp.now()
-  }).then(() => {
-    document.getElementById("name").value = "";
-    document.getElementById("principal").value = "";
-    document.getElementById("rate").value = "";
-    loadCustomers();
-  });
-}
-
-/* LOAD CUSTOMERS (MONTH FILTER) */
-function loadCustomers() {
-  const list = document.getElementById("list");
-  const month = document.getElementById("monthFilter").value;
-
-  list.innerHTML = "";
-
-  db.collection("customers").get().then(snap => {
-    snap.forEach(d => {
-      const c = d.data();
-
-      if (month !== "") {
-        const m = c.lastUpdated.toDate().getMonth();
-        if (String(m) !== month) return;
+  db.collection("customers").doc(user.uid).get()
+    .then(doc => {
+      if (!doc.exists) {
+        alert("Customer record not found");
+        return;
       }
 
-      list.innerHTML += `
-        <div class="customer">
-          <div class="name">${c.name}</div>
-          <div class="small">Principal: ₹${c.principal}</div>
-          <div class="small">Interest: ₹${c.interest}</div>
-        </div>
-      `;
-    });
-  });
-}
+      const c = doc.data();
 
-loadCustomers();
+      document.getElementById("cname").innerText = c.name || "-";
+      document.getElementById("principal").innerText = "₹ " + c.principal;
+      document.getElementById("interest").innerText = "₹ " + c.interest;
+      document.getElementById("rate").innerText = c.rate + " %";
+
+      upiId = c.upi;
+    });
+});
+
+/* 💸 UPI PAYMENT */
+function pay() {
+  if (!upiId) {
+    alert("UPI ID not available");
+    return;
+  }
+  location.href = `upi://pay?pa=${upiId}&pn=LoanPayment`;
+}
 </script>
 
 </body>
