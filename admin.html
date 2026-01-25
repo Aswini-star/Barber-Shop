@@ -2,81 +2,39 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Admin – Customers</title>
+<title>Customer Ledger</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background:#f2f4f7;
-  margin:0;
-  padding:10px;
-}
-h2 { text-align:center; }
-
-.card {
-  background:#fff;
-  padding:15px;
-  border-radius:10px;
-  box-shadow:0 2px 8px rgba(0,0,0,0.1);
-  margin-bottom:15px;
-}
-
-input, select, button {
-  width:100%;
-  padding:8px;
-  margin-top:8px;
-  font-size:15px;
-}
-
-input[type=number] { max-width:100%; }
-
-button {
-  background:#007bff;
-  color:#fff;
-  border:none;
-  border-radius:6px;
-}
-
-table {
-  width:100%;
-  border-collapse:collapse;
-  margin-top:10px;
-  font-size:14px;
-}
-th, td {
-  border:1px solid #ddd;
-  padding:6px;
-  text-align:center;
-}
-th { background:#f0f0f0; }
-
-.total {
-  font-weight:bold;
-  background:#e8f4ff;
-}
+body{font-family:Arial;background:#f2f4f7;padding:10px}
+.card{background:#fff;padding:15px;border-radius:10px;margin-bottom:15px}
+input,button,select{width:100%;padding:8px;margin-top:8px}
+button{background:#007bff;color:#fff;border:none;border-radius:6px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border:1px solid #ddd;padding:6px;text-align:center}
+th{background:#eee}
+.total{font-weight:bold;background:#e8f4ff}
 </style>
 </head>
 
 <body>
 
-<h2>Admin – Customer Ledger</h2>
+<h2>Customer Ledger</h2>
 
 <div class="card">
 <h3>Add Customer</h3>
-<input id="name" placeholder="Customer Name">
-<input id="phone" placeholder="Phone Number">
-<input id="principal" type="number" max="100000" placeholder="Principal (max 1,00,000)">
-<button onclick="addCustomer()">Add Customer</button>
+<input id="cname" placeholder="Name">
+<input id="phone" placeholder="Phone">
+<button onclick="addCustomer()">Add</button>
 </div>
 
 <div class="card">
 <h3>Select Month</h3>
-<input type="month" id="monthPicker" onchange="loadData()">
+<input type="month" id="month" onchange="loadData()">
 </div>
 
 <div class="card">
-<h3>Customers</h3>
+<h3>Ledger</h3>
 <table>
 <thead>
 <tr>
@@ -85,15 +43,17 @@ th { background:#f0f0f0; }
 <th>Principal</th>
 <th>Collected</th>
 <th>Interest</th>
+<th>Save</th>
 </tr>
 </thead>
-<tbody id="tbody"></tbody>
+<tbody id="rows"></tbody>
 <tfoot>
 <tr class="total">
 <td colspan="2">TOTAL</td>
-<td id="tPrincipal">0</td>
+<td id="tp">0</td>
 <td>-</td>
-<td id="tInterest">0</td>
+<td id="ti">0</td>
+<td></td>
 </tr>
 </tfoot>
 </table>
@@ -110,125 +70,84 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
-const FIXED_RATE = 3; // monthly %
+const RATE = 3;
 
-document.getElementById("monthPicker").value =
+document.getElementById("month").value =
   new Date().toISOString().slice(0,7);
 
-function addCustomer() {
-  const name = name.value.trim();
-  const phone = phone.value.trim();
-  const principal = Number(principal.value);
-
-  if(!name || !phone || !principal){
-    alert("Fill all fields");
-    return;
-  }
-
+function addCustomer(){
+  if(!cname.value || !phone.value) return alert("Fill all");
   db.collection("customers").add({
-    name, phone,
-    created: firebase.firestore.Timestamp.now()
-  }).then(() => {
-    name.value=""; phone.value=""; principal.value="";
-    loadData();
-  });
+    name:cname.value,
+    phone:phone.value
+  }).then(()=>{cname.value="";phone.value="";loadData();});
 }
 
-async function loadData() {
-  const month = monthPicker.value;
-  if(!month) return;
+async function loadData(){
+  const m = month.value;
+  if(!m) return;
 
-  const start = new Date(month+"-01");
-  const end = new Date(start);
-  end.setMonth(end.getMonth()+1);
-
-  const body = document.getElementById("tbody");
-  body.innerHTML="";
-  let tP=0, tI=0;
+  rows.innerHTML="";
+  let tp=0, ti=0;
 
   const customers = await db.collection("customers").get();
 
   for(const c of customers.docs){
     const cust = c.data();
-    const ledgerRef = db.collection("ledger");
 
-    let prev = await ledgerRef
-      .where("cid","==",c.id)
-      .where("month","<",month)
-      .orderBy("month","desc")
-      .limit(1)
+    const snap = await db.collection("monthly_ledger")
+      .where("customerId","==",c.id)
+      .where("month","==",m)
       .get();
 
-    let principalAmt = prev.empty ? 0 :
-      prev.docs[0].data().principal -
-      prev.docs[0].data().collected;
+    let data = snap.empty ? null : snap.docs[0];
 
-    if(prev.empty){
-      principalAmt = await askInitialPrincipal(c.id);
+    let principal="", collected="", interest="";
+
+    if(data){
+      const d = data.data();
+      principal=d.principal;
+      collected=d.collected;
+      interest=d.interest;
+      tp+=principal;
+      ti+=interest;
     }
 
-    let cur = await ledgerRef
-      .where("cid","==",c.id)
-      .where("month","==",month)
-      .get();
-
-    let collected=0, interest=0;
-
-    if(cur.empty){
-      interest = Math.round(principalAmt * FIXED_RATE / 100);
-      await ledgerRef.add({
-        cid:c.id,
-        month,
-        principal:principalAmt,
-        collected:0,
-        interest
-      });
-    } else {
-      collected = cur.docs[0].data().collected;
-      interest = cur.docs[0].data().interest;
-    }
-
-    tP += principalAmt;
-    tI += interest;
-
-    body.innerHTML += `
+    rows.innerHTML+=`
     <tr>
       <td>${cust.name}</td>
       <td>${cust.phone}</td>
-      <td>${principalAmt}</td>
-      <td>
-        <input type="number" value="${collected}"
-        onchange="updateCollected('${cur.empty?'':cur.docs[0].id}',this.value)">
-      </td>
-      <td>${interest}</td>
+      <td><input id="p_${c.id}" value="${principal}"></td>
+      <td><input id="c_${c.id}" value="${collected}"></td>
+      <td><input id="i_${c.id}" value="${interest}"></td>
+      <td><button onclick="save('${c.id}','${data?data.id:""}')">Save</button></td>
     </tr>`;
   }
 
-  tPrincipal.innerText = tP;
-  tInterest.innerText = tI;
+  tpElem.textContent=tp;
+  tiElem.textContent=ti;
 }
 
-async function askInitialPrincipal(cid){
-  const p = prompt("Enter initial principal:");
-  if(!p) return 0;
-  await db.collection("ledger").add({
-    cid,
-    month:monthPicker.value,
-    principal:Number(p),
-    collected:0,
-    interest:Math.round(p*FIXED_RATE/100)
-  });
-  return Number(p);
-}
+async function save(cid,docId){
+  const p=Number(document.getElementById("p_"+cid).value||0);
+  const c=Number(document.getElementById("c_"+cid).value||0);
+  const i=Number(document.getElementById("i_"+cid).value||0);
 
-function updateCollected(id,val){
-  if(!id) return;
-  db.collection("ledger").doc(id).update({
-    collected:Number(val)
-  });
-}
+  const obj={
+    customerId:cid,
+    month:month.value,
+    principal:p,
+    collected:c,
+    interest:i
+  };
 
-loadData();
+  if(docId)
+    await db.collection("monthly_ledger").doc(docId).set(obj);
+  else
+    await db.collection("monthly_ledger").add(obj);
+
+  loadData();
+}
 </script>
 
 </body>
