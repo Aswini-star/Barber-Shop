@@ -1,122 +1,9 @@
-<!DOCTYPE html>
-<html>
-<head>
-<meta charset="UTF-8">
-<title>Admin – Monthly Ledger</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
-
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f2f4f7;
-  padding: 10px;
-}
-h2 { text-align: center; }
-
-.card {
-  background: #fff;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  font-size: 16px;
-}
-
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-}
-
-button.danger { background: #dc3545; }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 700px;
-}
-
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
-}
-
-th { background: #f1f1f1; }
-
-.num-input { width: 90px; }
-
-.total {
-  font-weight: bold;
-  text-align: right;
-  margin-top: 10px;
-}
-</style>
-</head>
-
-<body>
-
-<h2>Monthly Customer Ledger</h2>
-
-<!-- MONTH SELECT -->
-<div class="card">
-  <h3>Select Month</h3>
-  <select id="month">
-    <option value="">Select month</option>
-    <option value="2025-01">Jan 2025</option>
-    <option value="2025-02">Feb 2025</option>
-    <option value="2025-03">Mar 2025</option>
-    <option value="2025-04">Apr 2025</option>
-  </select>
-  <button onclick="loadData()">Load</button>
-</div>
-
-<!-- ADD CUSTOMER -->
-<div class="card">
-  <h3>Add Customer</h3>
-  <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" max="100000" placeholder="Opening Principal">
-  <input id="rate" type="number" placeholder="Monthly Interest %">
-  <button onclick="addCustomer()">Add Customer</button>
-</div>
-
-<!-- TABLE -->
-<div class="card">
-  <h3>Customers</h3>
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Principal</th>
-          <th>Collected</th>
-          <th>Interest</th>
-        </tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
-  </div>
-  <div class="total" id="totals"></div>
-</div>
-
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
-
 <script>
 firebase.initializeApp({
   apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
   authDomain: "barber-shop-4c26f.firebaseapp.com",
   projectId: "barber-shop-4c26f"
 });
-
 const db = firebase.firestore();
 
 /* ADD CUSTOMER */
@@ -127,7 +14,7 @@ async function addCustomer() {
   const month = document.getElementById("month").value;
 
   if (!name || !principal || !rate || !month) {
-    alert("Fill all fields and select month");
+    alert("Fill all fields & select month");
     return;
   }
 
@@ -154,20 +41,40 @@ async function loadData() {
 
   const tbody = document.getElementById("list");
   const totals = document.getElementById("totals");
-
   tbody.innerHTML = "";
   totals.innerHTML = "";
 
   let totalP = 0, totalI = 0;
 
-  const snap = await db.collection("customers").get();
+  const customers = await db.collection("customers").get();
 
-  for (const doc of snap.docs) {
+  for (const doc of customers.docs) {
     const cust = doc.data();
-    const rec = await doc.ref.collection("ledger").doc(month).get();
-    if (!rec.exists) continue;
+    const ledgerRef = doc.ref.collection("ledger");
+    let record = await ledgerRef.doc(month).get();
 
-    const r = rec.data();
+    // 🔑 AUTO CREATE MONTH IF NOT EXISTS
+    if (!record.exists) {
+      const prevMonth = getPreviousMonth(month);
+      const prevRec = await ledgerRef.doc(prevMonth).get();
+
+      if (!prevRec.exists) continue; // first month not created yet
+
+      const p = prevRec.data();
+      const newPrincipal = Math.max(p.principal - (p.collected || 0), 0);
+      const newInterest = newPrincipal * cust.rate / 100;
+
+      await ledgerRef.doc(month).set({
+        principal: newPrincipal,
+        collected: 0,
+        interest: newInterest,
+        created: firebase.firestore.Timestamp.now()
+      });
+
+      record = await ledgerRef.doc(month).get();
+    }
+
+    const r = record.data();
     totalP += r.principal;
     totalI += r.interest;
 
@@ -186,16 +93,21 @@ async function loadData() {
   }
 
   totals.innerHTML =
-    `Total Principal: ₹${totalP} <br> Total Interest: ₹${totalI}`;
+    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
 }
 
-/* UPDATE COLLECTION (NO DEDUCTION YET) */
+/* UPDATE COLLECTION ONLY */
 function updateCollected(cid, month, value) {
   db.collection("customers").doc(cid)
     .collection("ledger").doc(month)
     .update({ collected: +value });
 }
-</script>
 
-</body>
-</html>
+/* GET PREVIOUS MONTH */
+function getPreviousMonth(month) {
+  const [y, m] = month.split("-").map(Number);
+  const d = new Date(y, m - 1);
+  d.setMonth(d.getMonth() - 1);
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+}
+</script>
