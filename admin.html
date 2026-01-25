@@ -15,7 +15,6 @@
 
     h2 {
       text-align: center;
-      margin-bottom: 10px;
     }
 
     .card {
@@ -31,7 +30,6 @@
       padding: 10px;
       margin-top: 8px;
       font-size: 16px;
-      box-sizing: border-box;
     }
 
     button {
@@ -42,11 +40,16 @@
       cursor: pointer;
     }
 
-    button:active {
-      opacity: 0.8;
+    button.danger {
+      background: #dc3545;
     }
 
-    /* TABLE */
+    button.small {
+      padding: 6px;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
     .table-wrap {
       overflow-x: auto;
     }
@@ -54,23 +57,25 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 500px;
+      min-width: 700px;
     }
 
     th, td {
-      padding: 10px;
+      padding: 8px;
       border-bottom: 1px solid #ddd;
-      text-align: left;
       font-size: 14px;
+      text-align: left;
     }
 
     th {
       background: #f1f1f1;
-      font-weight: bold;
     }
 
-    tr:last-child td {
-      border-bottom: none;
+    .total {
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 10px;
+      text-align: right;
     }
   </style>
 </head>
@@ -82,17 +87,15 @@
 <!-- ADD CUSTOMER -->
 <div class="card">
   <h3>Add Customer</h3>
-
   <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" placeholder="Principal Amount">
+  <input id="principal" type="number" placeholder="Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
 
-<!-- FILTER -->
+<!-- FILTER + EXPORT -->
 <div class="card">
-  <h3>Filter by Month</h3>
-
+  <h3>Filter</h3>
   <select id="monthFilter" onchange="loadCustomers()">
     <option value="">All Months</option>
     <option value="0">January</option>
@@ -108,6 +111,7 @@
     <option value="10">November</option>
     <option value="11">December</option>
   </select>
+  <button onclick="exportCSV()">Export to Excel</button>
 </div>
 
 <!-- CUSTOMER TABLE -->
@@ -119,15 +123,17 @@
       <thead>
         <tr>
           <th>Name</th>
-          <th>Principal (₹)</th>
-          <th>Interest (₹)</th>
-          <th>Rate (%)</th>
-          <th>Updated</th>
+          <th>Principal</th>
+          <th>Rate %</th>
+          <th>Interest</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody id="list"></tbody>
     </table>
   </div>
+
+  <div class="total" id="totalInterest">Total Interest: ₹0</div>
 </div>
 
 <!-- Firebase -->
@@ -145,57 +151,104 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
+let cachedData = [];
 
 /* ADD CUSTOMER */
 function addCustomer() {
-  const name = document.getElementById("name").value.trim();
-  const principal = Number(document.getElementById("principal").value);
-  const rate = Number(document.getElementById("rate").value);
+  const name = nameInput.value.trim();
+  const principal = +principalInput.value;
+  const rate = +rateInput.value;
 
-  if (!name || !principal || !rate) {
-    alert("Fill all fields");
-    return;
-  }
+  if (!name || !principal || !rate) return alert("Fill all fields");
 
   db.collection("customers").add({
     name,
     principal,
     rate,
-    interest: 0,
+    interest: (principal * rate / 100),
     lastUpdated: firebase.firestore.Timestamp.now()
-  }).then(() => {
-    document.getElementById("name").value = "";
-    document.getElementById("principal").value = "";
-    document.getElementById("rate").value = "";
-    loadCustomers();
-  });
+  }).then(loadCustomers);
+
+  nameInput.value = principalInput.value = rateInput.value = "";
 }
+
+const nameInput = document.getElementById("name");
+const principalInput = document.getElementById("principal");
+const rateInput = document.getElementById("rate");
 
 /* LOAD CUSTOMERS */
 function loadCustomers() {
   const tbody = document.getElementById("list");
   const month = document.getElementById("monthFilter").value;
-
+  let total = 0;
   tbody.innerHTML = "";
+  cachedData = [];
 
   db.collection("customers").get().then(snap => {
     snap.forEach(doc => {
       const c = doc.data();
       const date = c.lastUpdated.toDate();
-
       if (month !== "" && date.getMonth().toString() !== month) return;
+
+      total += c.interest;
+      cachedData.push({ id: doc.id, ...c });
 
       tbody.innerHTML += `
         <tr>
           <td>${c.name}</td>
-          <td>₹${c.principal}</td>
-          <td>₹${c.interest}</td>
-          <td>${c.rate}%</td>
-          <td>${date.toLocaleDateString()}</td>
+          <td>
+            <input type="number" value="${c.principal}"
+              onchange="update('${doc.id}', this.value, ${c.rate})">
+          </td>
+          <td>
+            <input type="number" value="${c.rate}"
+              onchange="update('${doc.id}', ${c.principal}, this.value)">
+          </td>
+          <td>₹${c.interest.toFixed(2)}</td>
+          <td>
+            <button class="small danger" onclick="remove('${doc.id}')">Delete</button>
+          </td>
         </tr>
       `;
     });
+
+    document.getElementById("totalInterest").innerText =
+      "Total Interest: ₹" + total.toFixed(2);
   });
+}
+
+/* UPDATE CUSTOMER */
+function update(id, principal, rate) {
+  principal = +principal;
+  rate = +rate;
+  const interest = principal * rate / 100;
+
+  db.collection("customers").doc(id).update({
+    principal,
+    rate,
+    interest,
+    lastUpdated: firebase.firestore.Timestamp.now()
+  }).then(loadCustomers);
+}
+
+/* DELETE */
+function remove(id) {
+  if (!confirm("Delete customer?")) return;
+  db.collection("customers").doc(id).delete().then(loadCustomers);
+}
+
+/* EXPORT TO EXCEL */
+function exportCSV() {
+  let csv = "Name,Principal,Rate,Interest\n";
+  cachedData.forEach(c => {
+    csv += `${c.name},${c.principal},${c.rate},${c.interest}\n`;
+  });
+
+  const blob = new Blob([csv], { type: "text/csv" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "customers.csv";
+  a.click();
 }
 
 loadCustomers();
