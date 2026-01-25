@@ -817,7 +817,18 @@ function showSectionForRole(role) {
       }));
       staffCache.sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
     }
-
+tr.innerHTML = `
+  <td>${s.name || "N/A"}</td>
+  <td>${s.id}</td>
+  <td>${s.active ? `<span class="pill green">YES</span>` : `<span class="pill red">NO</span>`}</td>
+  <td>${s.checkedIn ? `<span class="pill green">IN</span>` : `<span class="pill orange">OUT</span>`}</td>
+  <td>${lastIn}</td>
+  <td>${lastOut}</td>
+  <td>
+    <button data-email="${s.id}" data-action="toggle">Enable/Disable</button>
+    <button data-email="${s.id}" data-action="remove" class="btn-danger">Remove</button>
+  </td>
+`;
     function populateStaffDropdowns() {
       // Customer booking staff dropdown
       const customerSel = $("barber");
@@ -1594,6 +1605,7 @@ async function profit_exportCSV() {
 </body>
 
 </html>
+
 
 
 
