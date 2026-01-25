@@ -47,7 +47,6 @@
     button.small {
       padding: 6px;
       font-size: 14px;
-      margin-top: 4px;
     }
 
     .table-wrap {
@@ -57,7 +56,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 700px;
+      min-width: 650px;
     }
 
     th, td {
@@ -78,7 +77,6 @@
       text-align: right;
     }
 
-    /* 🔹 SMALL NUMBER INPUTS */
     .num-input {
       width: 90px;
       padding: 4px;
@@ -96,7 +94,7 @@
   <h3>Add Customer</h3>
   <input id="name" placeholder="Customer Name">
   <input id="principal" type="number" max="100000" placeholder="Principal (Max 100000)">
-  <input id="rate" type="number" placeholder="Monthly Interest %">
+  <input id="rate" type="number" placeholder="Monthly Interest % (Fixed)">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
 
@@ -186,7 +184,7 @@ function addCustomer() {
   db.collection("customers").add({
     name,
     principal,
-    rate,
+    rate,               // 🔒 fixed rate
     interest: principal * rate / 100,
     lastUpdated: firebase.firestore.Timestamp.now()
   }).then(loadCustomers);
@@ -200,8 +198,8 @@ function addCustomer() {
 function loadCustomers() {
   const tbody = document.getElementById("list");
   const month = document.getElementById("monthFilter").value;
-  let totalInterest = 0;
   let totalPrincipal = 0;
+  let totalInterest = 0;
 
   tbody.innerHTML = "";
   cachedData = [];
@@ -213,8 +211,8 @@ function loadCustomers() {
 
       if (month !== "" && date.getMonth().toString() !== month) return;
 
-      totalInterest += c.interest;
       totalPrincipal += c.principal;
+      totalInterest += c.interest;
 
       cachedData.push({ id: doc.id, ...c });
 
@@ -226,14 +224,9 @@ function loadCustomers() {
               class="num-input"
               max="100000"
               value="${c.principal}"
-              onchange="updateCustomer('${doc.id}', this.value, ${c.rate})">
+              onchange="updatePrincipal('${doc.id}', this.value, ${c.rate})">
           </td>
-          <td>
-            <input type="number"
-              class="num-input"
-              value="${c.rate}"
-              onchange="updateCustomer('${doc.id}', ${c.principal}, this.value)">
-          </td>
+          <td>${c.rate}%</td>
           <td>₹${c.interest.toFixed(2)}</td>
           <td>
             <button class="small danger"
@@ -249,10 +242,9 @@ function loadCustomers() {
   });
 }
 
-/* UPDATE CUSTOMER */
-function updateCustomer(id, principal, rate) {
+/* UPDATE ONLY PRINCIPAL */
+function updatePrincipal(id, principal, rate) {
   principal = +principal;
-  rate = +rate;
 
   if (principal > 100000) {
     alert("Principal cannot exceed ₹1,00,000");
@@ -263,7 +255,6 @@ function updateCustomer(id, principal, rate) {
 
   db.collection("customers").doc(id).update({
     principal,
-    rate,
     interest,
     lastUpdated: firebase.firestore.Timestamp.now()
   }).then(loadCustomers);
