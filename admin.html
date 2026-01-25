@@ -39,28 +39,38 @@
       color: #fff;
       border: none;
       border-radius: 6px;
+      cursor: pointer;
     }
 
     button:active {
       opacity: 0.8;
     }
 
-    .customer {
-      border-bottom: 1px solid #eee;
-      padding: 8px 0;
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
     }
 
-    .customer:last-child {
-      border-bottom: none;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
     }
 
-    .name {
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f1f1;
       font-weight: bold;
     }
 
-    .small {
-      font-size: 14px;
-      color: #555;
+    tr:last-child td {
+      border-bottom: none;
     }
   </style>
 </head>
@@ -100,10 +110,24 @@
   </select>
 </div>
 
-<!-- CUSTOMER LIST -->
+<!-- CUSTOMER TABLE -->
 <div class="card">
   <h3>Customers</h3>
-  <div id="list"></div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Principal (₹)</th>
+          <th>Interest (₹)</th>
+          <th>Rate (%)</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -124,7 +148,7 @@ const db = firebase.firestore();
 
 /* ADD CUSTOMER */
 function addCustomer() {
-  const name = document.getElementById("name").value;
+  const name = document.getElementById("name").value.trim();
   const principal = Number(document.getElementById("principal").value);
   const rate = Number(document.getElementById("rate").value);
 
@@ -147,28 +171,28 @@ function addCustomer() {
   });
 }
 
-/* LOAD CUSTOMERS (MONTH FILTER) */
+/* LOAD CUSTOMERS */
 function loadCustomers() {
-  const list = document.getElementById("list");
+  const tbody = document.getElementById("list");
   const month = document.getElementById("monthFilter").value;
 
-  list.innerHTML = "";
+  tbody.innerHTML = "";
 
   db.collection("customers").get().then(snap => {
-    snap.forEach(d => {
-      const c = d.data();
+    snap.forEach(doc => {
+      const c = doc.data();
+      const date = c.lastUpdated.toDate();
 
-      if (month !== "") {
-        const m = c.lastUpdated.toDate().getMonth();
-        if (String(m) !== month) return;
-      }
+      if (month !== "" && date.getMonth().toString() !== month) return;
 
-      list.innerHTML += `
-        <div class="customer">
-          <div class="name">${c.name}</div>
-          <div class="small">Principal: ₹${c.principal}</div>
-          <div class="small">Interest: ₹${c.interest}</div>
-        </div>
+      tbody.innerHTML += `
+        <tr>
+          <td>${c.name}</td>
+          <td>₹${c.principal}</td>
+          <td>₹${c.interest}</td>
+          <td>${c.rate}%</td>
+          <td>${date.toLocaleDateString()}</td>
+        </tr>
       `;
     });
   });
