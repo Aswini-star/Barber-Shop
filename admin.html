@@ -35,14 +35,12 @@ button {
   border-radius: 6px;
 }
 
-button.danger {
-  background: #dc3545;
-}
+button.danger { background: #dc3545; }
 
 table {
   width: 100%;
   border-collapse: collapse;
-  min-width: 720px;
+  min-width: 700px;
 }
 
 th, td {
@@ -53,9 +51,7 @@ th, td {
 
 th { background: #f1f1f1; }
 
-.num-input {
-  width: 90px;
-}
+.num-input { width: 90px; }
 
 .total {
   font-weight: bold;
@@ -69,25 +65,22 @@ th { background: #f1f1f1; }
 
 <h2>Monthly Customer Ledger</h2>
 
-<!-- MONTH -->
+<!-- MONTH SELECT -->
 <div class="card">
   <h3>Select Month</h3>
-  <select id="monthSelect">
-    <option value="">Select Month</option>
+  <select id="month">
+    <option value="">Select month</option>
     <option value="2025-01">Jan 2025</option>
     <option value="2025-02">Feb 2025</option>
     <option value="2025-03">Mar 2025</option>
     <option value="2025-04">Apr 2025</option>
-    <option value="2025-05">May 2025</option>
   </select>
-
-  <button onclick="loadMonth()">Load Month</button>
-  <button onclick="closeMonth()">Close Month</button>
+  <button onclick="loadData()">Load</button>
 </div>
 
 <!-- ADD CUSTOMER -->
 <div class="card">
-  <h3>Add Customer (Opening Month Only)</h3>
+  <h3>Add Customer</h3>
   <input id="name" placeholder="Customer Name">
   <input id="principal" type="number" max="100000" placeholder="Opening Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
@@ -96,23 +89,21 @@ th { background: #f1f1f1; }
 
 <!-- TABLE -->
 <div class="card">
-<h3>Customers</h3>
-
-<div style="overflow-x:auto">
-<table>
-<thead>
-<tr>
-  <th>Name</th>
-  <th>Principal</th>
-  <th>Collected</th>
-  <th>Interest</th>
-</tr>
-</thead>
-<tbody id="list"></tbody>
-</table>
-</div>
-
-<div class="total" id="totals"></div>
+  <h3>Customers</h3>
+  <div style="overflow-x:auto">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Principal</th>
+          <th>Collected</th>
+          <th>Interest</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
+  <div class="total" id="totals"></div>
 </div>
 
 <!-- Firebase -->
@@ -128,25 +119,24 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-/* ADD CUSTOMER (ONLY FIRST MONTH) */
+/* ADD CUSTOMER */
 async function addCustomer() {
   const name = document.getElementById("name").value.trim();
   const principal = +document.getElementById("principal").value;
   const rate = +document.getElementById("rate").value;
-  const month = document.getElementById("monthSelect").value;
+  const month = document.getElementById("month").value;
 
   if (!name || !principal || !rate || !month) {
-    alert("Fill all fields & select month");
+    alert("Fill all fields and select month");
     return;
   }
 
-  const custRef = await db.collection("customers").add({ name, rate });
+  const ref = await db.collection("customers").add({ name, rate });
 
-  await custRef.collection("ledger").doc(month).set({
+  await ref.collection("ledger").doc(month).set({
     principal,
     collected: 0,
     interest: principal * rate / 100,
-    closed: false,
     created: firebase.firestore.Timestamp.now()
   });
 
@@ -154,12 +144,12 @@ async function addCustomer() {
   document.getElementById("principal").value = "";
   document.getElementById("rate").value = "";
 
-  loadMonth();
+  loadData();
 }
 
-/* LOAD SELECTED MONTH (READ ONLY IF CLOSED) */
-async function loadMonth() {
-  const month = document.getElementById("monthSelect").value;
+/* LOAD MONTH DATA */
+async function loadData() {
+  const month = document.getElementById("month").value;
   if (!month) return;
 
   const tbody = document.getElementById("list");
@@ -170,9 +160,9 @@ async function loadMonth() {
 
   let totalP = 0, totalI = 0;
 
-  const customers = await db.collection("customers").get();
+  const snap = await db.collection("customers").get();
 
-  for (const doc of customers.docs) {
+  for (const doc of snap.docs) {
     const cust = doc.data();
     const rec = await doc.ref.collection("ledger").doc(month).get();
     if (!rec.exists) continue;
@@ -186,11 +176,9 @@ async function loadMonth() {
         <td>${cust.name}</td>
         <td>₹${r.principal}</td>
         <td>
-          <input type="number"
-            class="num-input"
+          <input class="num-input" type="number"
             value="${r.collected}"
-            ${r.closed ? "disabled" : ""}
-            onchange="saveCollected('${doc.id}','${month}',this.value)">
+            onchange="updateCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
       </tr>
@@ -198,54 +186,14 @@ async function loadMonth() {
   }
 
   totals.innerHTML =
-    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
+    `Total Principal: ₹${totalP} <br> Total Interest: ₹${totalI}`;
 }
 
-/* SAVE COLLECTION */
-function saveCollected(cid, month, val) {
+/* UPDATE COLLECTION (NO DEDUCTION YET) */
+function updateCollected(cid, month, value) {
   db.collection("customers").doc(cid)
     .collection("ledger").doc(month)
-    .update({ collected: +val });
-}
-
-/* CLOSE MONTH (CRITICAL LOGIC) */
-async function closeMonth() {
-  const month = document.getElementById("monthSelect").value;
-  if (!month) return;
-
-  const next = getNextMonth(month);
-  const customers = await db.collection("customers").get();
-
-  for (const doc of customers.docs) {
-    const cust = doc.data();
-    const ledger = doc.ref.collection("ledger");
-
-    const cur = await ledger.doc(month).get();
-    if (!cur.exists || cur.data().closed) continue;
-
-    const r = cur.data();
-    const newPrincipal = Math.max(r.principal - r.collected, 0);
-
-    await ledger.doc(month).update({ closed: true });
-
-    await ledger.doc(next).set({
-      principal: newPrincipal,
-      collected: 0,
-      interest: newPrincipal * cust.rate / 100,
-      closed: false,
-      created: firebase.firestore.Timestamp.now()
-    });
-  }
-
-  document.getElementById("monthSelect").value = next;
-  loadMonth();
-}
-
-/* NEXT MONTH HELPER */
-function getNextMonth(m) {
-  const [y, mo] = m.split("-").map(Number);
-  const d = new Date(y, mo);
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+    .update({ collected: +value });
 }
 </script>
 
