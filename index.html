@@ -30,6 +30,19 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+ <script>
+/* TEMPORARY – RUN ONCE */
+auth.onAuthStateChanged(user => {
+  if (user) {
+    db.collection("users").doc(user.uid).set({
+      role: "admin"
+    });
+    alert("Admin role assigned. Remove this code now!");
+  }
+});
+</script>
+
+
 function login() {
  auth.signInWithEmailAndPassword(email.value, password.value)
  .then(res => {
