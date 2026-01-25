@@ -196,7 +196,7 @@ async function loadMonth() {
             class="num-input"
             value="${r.collected}"
             ${r.closed ? "disabled" : ""}
-            onchange="saveCollected('${doc.id}','${month}',this.value)">
+            oninput="saveCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
       </tr>
