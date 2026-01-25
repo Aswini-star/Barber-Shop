@@ -28,6 +28,13 @@ input, select, button {
   font-size: 16px;
 }
 
+button {
+  background: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -49,7 +56,6 @@ tfoot td {
 
 .num-input {
   width: 90px;
-  padding: 6px;
 }
 
 /* hide load button */
@@ -83,6 +89,8 @@ button[onclick="loadMonth()"] {
     <option value="2025-04">Apr 2025</option>
     <option value="2025-05">May 2025</option>
   </select>
+
+  <button onclick="loadMonth()">Load Month</button>
   <button onclick="closeMonth()">Close Month</button>
 </div>
 
@@ -111,6 +119,7 @@ button[onclick="loadMonth()"] {
   <td id="totalInterest">₹0</td>
 </tr>
 </tfoot>
+
 </table>
 </div>
 </div>
@@ -128,35 +137,43 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
+/* ADD CUSTOMER */
 async function addCustomer() {
-  const name = nameInput.value.trim();
-  const principal = +principalInput.value;
-  const rate = +rateInput.value;
-  const month = monthSelect.value;
+  const name = document.getElementById("name").value.trim();
+  const principal = +document.getElementById("principal").value;
+  const rate = +document.getElementById("rate").value;
+  const month = document.getElementById("monthSelect").value;
 
   if (!name || !principal || !rate || !month) {
     alert("Fill all fields & select month");
     return;
   }
 
-  const ref = await db.collection("customers").add({ name, rate });
+  const custRef = await db.collection("customers").add({ name, rate });
 
-  await ref.collection("ledger").doc(month).set({
+  await custRef.collection("ledger").doc(month).set({
     principal,
     collected: 0,
     interest: principal * rate / 100,
-    closed: false
+    closed: false,
+    created: firebase.firestore.Timestamp.now()
   });
 
-  nameInput.value = principalInput.value = rateInput.value = "";
+  document.getElementById("name").value = "";
+  document.getElementById("principal").value = "";
+  document.getElementById("rate").value = "";
+
   loadMonth();
 }
 
+/* LOAD MONTH */
 async function loadMonth() {
-  const month = monthSelect.value;
+  const month = document.getElementById("monthSelect").value;
   if (!month) return;
 
-  list.innerHTML = "";
+  const tbody = document.getElementById("list");
+  tbody.innerHTML = "";
+
   let totalP = 0, totalI = 0;
 
   const customers = await db.collection("customers").get();
@@ -170,7 +187,7 @@ async function loadMonth() {
     totalP += r.principal;
     totalI += r.interest;
 
-    list.innerHTML += `
+    tbody.innerHTML += `
       <tr>
         <td>${cust.name}</td>
         <td>₹${r.principal}</td>
@@ -179,52 +196,58 @@ async function loadMonth() {
             class="num-input"
             value="${r.collected}"
             ${r.closed ? "disabled" : ""}
-            onblur="saveCollected('${doc.id}','${month}',this.value)">
+            onchange="saveCollected('${doc.id}','${month}',this.value)">
         </td>
         <td>₹${r.interest}</td>
-      </tr>`;
+      </tr>
+    `;
   }
 
-  totalPrincipal.innerText = "₹" + totalP;
-  totalInterest.innerText = "₹" + totalI;
+  document.getElementById("totalPrincipal").innerText = "₹" + totalP;
+  document.getElementById("totalInterest").innerText = "₹" + totalI;
 }
 
+/* SAVE COLLECTION */
 function saveCollected(cid, month, val) {
-  db.collection("customers")
-    .doc(cid)
-    .collection("ledger")
-    .doc(month)
+  db.collection("customers").doc(cid)
+    .collection("ledger").doc(month)
     .update({ collected: +val });
 }
 
+/* CLOSE MONTH */
 async function closeMonth() {
-  const month = monthSelect.value;
+  const month = document.getElementById("monthSelect").value;
   if (!month) return;
 
   const next = getNextMonth(month);
   const customers = await db.collection("customers").get();
 
   for (const doc of customers.docs) {
+    const cust = doc.data();
     const ledger = doc.ref.collection("ledger");
+
     const cur = await ledger.doc(month).get();
     if (!cur.exists || cur.data().closed) continue;
 
     const r = cur.data();
-    const bal = Math.max(r.principal - r.collected, 0);
+    const newPrincipal = Math.max(r.principal - r.collected, 0);
 
     await ledger.doc(month).update({ closed: true });
+
     await ledger.doc(next).set({
-      principal: bal,
+      principal: newPrincipal,
       collected: 0,
-      interest: bal * doc.data().rate / 100,
-      closed: false
+      interest: newPrincipal * cust.rate / 100,
+      closed: false,
+      created: firebase.firestore.Timestamp.now()
     });
   }
 
-  monthSelect.value = next;
+  document.getElementById("monthSelect").value = next;
   loadMonth();
 }
 
+/* NEXT MONTH */
 function getNextMonth(m) {
   const [y, mo] = m.split("-").map(Number);
   const d = new Date(y, mo);
