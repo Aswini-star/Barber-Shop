@@ -35,10 +35,6 @@ button {
   border-radius: 6px;
 }
 
-button.danger {
-  background: #dc3545;
-}
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -53,17 +49,16 @@ th, td {
 
 th { background: #f1f1f1; }
 
+tfoot td {
+  font-weight: bold;
+  background: #fafafa;
+}
+
 .num-input {
   width: 90px;
 }
 
-.total {
-  font-weight: bold;
-  text-align: right;
-  margin-top: 10px;
-}
-
-/* HIDE LOAD BUTTON */
+/* hide load button */
 button[onclick="loadMonth()"] {
   display: none;
 }
@@ -83,10 +78,9 @@ button[onclick="loadMonth()"] {
   <button onclick="addCustomer()">Add Customer</button>
 </div>
 
-<!-- MONTH (MOVED BELOW ADD CUSTOMER) -->
+<!-- MONTH -->
 <div class="card">
   <h3>Select Month</h3>
-
   <select id="monthSelect" onchange="loadMonth()">
     <option value="">Select Month</option>
     <option value="2025-01">Jan 2025</option>
@@ -114,11 +108,20 @@ button[onclick="loadMonth()"] {
   <th>Interest</th>
 </tr>
 </thead>
+
 <tbody id="list"></tbody>
+
+<tfoot>
+<tr>
+  <td>Total</td>
+  <td id="totalPrincipal">₹0</td>
+  <td></td>
+  <td id="totalInterest">₹0</td>
+</tr>
+</tfoot>
+
 </table>
 </div>
-
-<div class="total" id="totals"></div>
 </div>
 
 <!-- Firebase -->
@@ -169,10 +172,7 @@ async function loadMonth() {
   if (!month) return;
 
   const tbody = document.getElementById("list");
-  const totals = document.getElementById("totals");
-
   tbody.innerHTML = "";
-  totals.innerHTML = "";
 
   let totalP = 0, totalI = 0;
 
@@ -203,8 +203,8 @@ async function loadMonth() {
     `;
   }
 
-  totals.innerHTML =
-    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
+  document.getElementById("totalPrincipal").innerText = "₹" + totalP;
+  document.getElementById("totalInterest").innerText = "₹" + totalI;
 }
 
 /* SAVE COLLECTION */
