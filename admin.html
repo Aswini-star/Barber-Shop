@@ -1,98 +1,86 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>My Loan Details</title>
+  <meta charset="UTF-8">
+  <title>Admin</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <style>
     body {
-      margin: 0;
-      padding: 16px;
       font-family: Arial, sans-serif;
-      background: #f4f6f8;
+      background: #f2f4f7;
+      margin: 0;
+      padding: 15px;
     }
 
     h2 {
       text-align: center;
-      margin-bottom: 16px;
     }
 
-    .table-container {
-      overflow-x: auto;
-      background: white;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      min-width: 320px;
+      margin-top: 15px;
+      background: white;
     }
 
     th, td {
-      padding: 12px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      font-size: 14px;
       text-align: left;
-      border-bottom: 1px solid #ddd;
-      font-size: 15px;
     }
 
     th {
-      background: #1976d2;
-      color: white;
-    }
-
-    tr:last-child td {
-      border-bottom: none;
-    }
-
-    .pay-btn {
-      margin-top: 20px;
-      width: 100%;
-      padding: 14px;
-      background: #2e7d32;
-      color: white;
-      border: none;
-      font-size: 16px;
-      border-radius: 8px;
+      background: #f0f0f0;
     }
   </style>
 </head>
 
 <body>
 
-<h2>My Loan Details</h2>
+<h2>Admin</h2>
 
-<div class="table-container">
-  <table>
-    <tr>
-      <th>Field</th>
-      <th>Value</th>
-    </tr>
-    <tr>
-      <td>Customer Name</td>
-      <td id="cname">-</td>
-    </tr>
-    <tr>
-      <td>Principal Amount</td>
-      <td id="principal">-</td>
-    </tr>
-    <tr>
-      <td>Outstanding Interest</td>
-      <td id="interest">-</td>
-    </tr>
-    <tr>
-      <td>Monthly Interest %</td>
-      <td id="rate">-</td>
-    </tr>
-  </table>
-</div>
+<!-- ADD CUSTOMER -->
+<input id="name" placeholder="Name">
+<input id="principal" type="number" placeholder="Principal">
+<input id="rate" type="number" placeholder="Monthly Interest %">
+<button onclick="addCustomer()">Add</button>
 
-<button class="pay-btn" onclick="pay()">Pay via UPI</button>
+<!-- CUSTOMER TABLE -->
+<table>
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Principal (₹)</th>
+      <th>Interest (₹)</th>
+    </tr>
+  </thead>
+  <tbody id="list"></tbody>
+</table>
 
-<!-- Firebase SDKs -->
+<!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -102,45 +90,59 @@ firebase.initializeApp({
   projectId: "barber-shop-4c26f",
   storageBucket: "barber-shop-4c26f.firebasestorage.app",
   messagingSenderId: "213114385226",
-  appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+  appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
 });
 
-const auth = firebase.auth();
 const db = firebase.firestore();
 
-let upiId = "";
+/* ADD CUSTOMER */
+function addCustomer() {
+  const name = document.getElementById("name").value;
+  const principal = Number(document.getElementById("principal").value);
+  const rate = Number(document.getElementById("rate").value);
 
-/* 🔐 LOAD CUSTOMER DATA */
-auth.onAuthStateChanged(user => {
-  if (!user) return;
-
-  db.collection("customers").doc(user.uid).get()
-    .then(doc => {
-      if (!doc.exists) {
-        alert("Customer record not found");
-        return;
-      }
-
-      const c = doc.data();
-
-      document.getElementById("cname").innerText = c.name || "-";
-      document.getElementById("principal").innerText = "₹ " + c.principal;
-      document.getElementById("interest").innerText = "₹ " + c.interest;
-      document.getElementById("rate").innerText = c.rate + " %";
-
-      upiId = c.upi;
-    });
-});
-
-/* 💸 UPI PAYMENT */
-function pay() {
-  if (!upiId) {
-    alert("UPI ID not available");
+  if (!name || !principal || !rate) {
+    alert("Please fill all fields");
     return;
   }
-  location.href = `upi://pay?pa=${upiId}&pn=LoanPayment`;
-}
-</script>
 
-</body>
-</html>
+  db.collection("customers").add({
+    name,
+    principal,
+    rate,
+    interest: 0,
+    lastUpdated: firebase.firestore.Timestamp.now()
+  }).then(() => {
+    document.getElementById("name").value = "";
+    document.getElementById("principal").value = "";
+    document.getElementById("rate").value = "";
+    loadCustomers();
+  }).catch(err => {
+    console.error(err);
+    alert("Error adding customer");
+  });
+}
+
+/* LOAD CUSTOMERS */
+function loadCustomers() {
+  const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  db.collection("customers").get()
+    .then(snap => {
+      snap.forEach(d => {
+        const c = d.data();
+
+        list.innerHTML += `
+          <tr>
+            <td>${c.name}</td>
+            <td>${c.principal}</td>
+            <td>${c.interest}</td>
+          </tr>
+        `;
+      });
+    })
+    .catch(err => console.error(err));
+}
+
+loadC
