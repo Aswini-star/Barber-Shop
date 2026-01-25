@@ -3,14 +3,68 @@
 <head>
   <title>Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #1976d2, #64b5f6);
+      font-family: Arial, sans-serif;
+    }
+    .login-box {
+      background: white;
+      padding: 24px;
+      width: 100%;
+      max-width: 360px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 12px;
+      font-size: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      font-size: 16px;
+      border-radius: 6px;
+    }
+    button:active {
+      transform: scale(0.98);
+    }
+    #msg {
+      margin-top: 10px;
+      text-align: center;
+      color: red;
+      font-size: 14px;
+    }
+  </style>
 </head>
+
 <body>
 
-<h2>Login</h2>
-<input id="email" placeholder="Email"><br>
-<input id="password" type="password" placeholder="Password"><br>
-<button onclick="login()">Login</button>
-<p id="msg"></p>
+<div class="login-box">
+  <h2>Login</h2>
+  <input id="email" placeholder="Email">
+  <input id="password" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
+  <p id="msg"></p>
+</div>
 
 <!-- Firebase SDKs -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
@@ -18,7 +72,6 @@
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
-/* 🔥 Firebase Init */
 firebase.initializeApp({
   apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
   authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -31,43 +84,22 @@ firebase.initializeApp({
 const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* ⚠️ TEMPORARY – RUN ONCE, THEN DELETE */
+/* ⚠️ TEMPORARY – REMOVE AFTER FIRST LOGIN */
 auth.onAuthStateChanged(user => {
   if (user) {
-    db.collection("users").doc(user.uid).set({
-      role: "admin"
-    });
-    alert("Admin role assigned. REMOVE THIS CODE NOW!");
+    db.collection("users").doc(user.uid).set({ role: "admin" });
   }
 });
 
-/* ✅ LOGIN FUNCTION */
 function login() {
   msg.innerText = "Logging in...";
-
-  auth.signInWithEmailAndPassword(
-    document.getElementById("email").value,
-    document.getElementById("password").value
-  )
-  .then(res => db.collection("users").doc(res.user.uid).get())
-  .then(doc => {
-
-    if (!doc.exists) {
-      msg.innerText = "User role not assigned.";
-      auth.signOut();
-      return;
-    }
-
-    const role = doc.data().role;
-
-    if (role === "admin") location.href = "admin.html";
-    else if (role === "staff") location.href = "staff.html";
-    else if (role === "customer") location.href = "customer.html";
-    else msg.innerText = "Invalid role";
-  })
-  .catch(e => {
-    msg.innerText = e.message;
-  });
+  auth.signInWithEmailAndPassword(email.value, password.value)
+    .then(res => db.collection("users").doc(res.user.uid).get())
+    .then(doc => {
+      const role = doc.data().role;
+      location.href = role + ".html";
+    })
+    .catch(e => msg.innerText = e.message);
 }
 </script>
 
