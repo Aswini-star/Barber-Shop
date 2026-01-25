@@ -35,8 +35,6 @@ button {
   border-radius: 6px;
 }
 
-button.danger { background: #dc3545; }
-
 table {
   width: 100%;
   border-collapse: collapse;
@@ -65,19 +63,6 @@ th { background: #f1f1f1; }
 
 <h2>Monthly Customer Ledger</h2>
 
-<!-- MONTH SELECT -->
-<div class="card">
-  <h3>Select Month</h3>
-  <select id="month">
-    <option value="">Select month</option>
-    <option value="2025-01">Jan 2025</option>
-    <option value="2025-02">Feb 2025</option>
-    <option value="2025-03">Mar 2025</option>
-    <option value="2025-04">Apr 2025</option>
-  </select>
-  <button onclick="loadData()">Load</button>
-</div>
-
 <!-- ADD CUSTOMER -->
 <div class="card">
   <h3>Add Customer</h3>
@@ -85,6 +70,13 @@ th { background: #f1f1f1; }
   <input id="principal" type="number" max="100000" placeholder="Opening Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
+</div>
+
+<!-- MONTH SELECT (MOVED BELOW ADD CUSTOMER) -->
+<div class="card">
+  <h3>Select Month</h3>
+  <select id="month"></select>
+  <button onclick="loadData()">Load</button>
 </div>
 
 <!-- TABLE -->
@@ -118,6 +110,24 @@ firebase.initializeApp({
 });
 
 const db = firebase.firestore();
+
+/* AUTO GENERATE ALL MONTHS & YEARS */
+function generateMonths() {
+  const sel = document.getElementById("month");
+  sel.innerHTML = `<option value="">Select month</option>`;
+
+  for (let year = 2024; year <= 2035; year++) {
+    for (let m = 0; m < 12; m++) {
+      const value = `${year}-${String(m + 1).padStart(2, "0")}`;
+      const label = new Date(year, m).toLocaleString("default", {
+        month: "short",
+        year: "numeric"
+      });
+      sel.innerHTML += `<option value="${value}">${label}</option>`;
+    }
+  }
+}
+generateMonths();
 
 /* ADD CUSTOMER */
 async function addCustomer() {
@@ -186,10 +196,10 @@ async function loadData() {
   }
 
   totals.innerHTML =
-    `Total Principal: ₹${totalP} <br> Total Interest: ₹${totalI}`;
+    `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
 }
 
-/* UPDATE COLLECTION (NO DEDUCTION YET) */
+/* UPDATE COLLECTION */
 function updateCollected(cid, month, value) {
   db.collection("customers").doc(cid)
     .collection("ledger").doc(month)
