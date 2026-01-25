@@ -6,55 +6,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f2f4f7;
-  padding: 10px;
-}
-h2 { text-align: center; }
-
-.card {
-  background: #fff;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  font-size: 16px;
-}
-
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-}
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 700px;
-}
-
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
-}
-
-th { background: #f1f1f1; }
-.num-input { width: 90px; }
-
-.total {
-  font-weight: bold;
-  text-align: right;
-  margin-top: 10px;
-}
+body { font-family: Arial; background:#f2f4f7; padding:10px }
+.card { background:#fff; padding:15px; margin-bottom:15px; border-radius:10px }
+input,select,button { width:100%; padding:10px; margin-top:8px }
+button { background:#007bff; color:#fff; border:none; border-radius:6px }
+table { width:100%; border-collapse:collapse }
+th,td { padding:8px; border-bottom:1px solid #ddd }
 </style>
 </head>
 
@@ -62,43 +19,32 @@ th { background: #f1f1f1; }
 
 <h2>Monthly Customer Ledger</h2>
 
-<!-- ADD CUSTOMER -->
 <div class="card">
-  <h3>Add Customer (Current Month)</h3>
+  <h3>Add Customer</h3>
   <input id="name" placeholder="Customer Name">
   <input id="principal" type="number" placeholder="Opening Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
-  <button onclick="addCustomer()">Add Customer</button>
+  <button onclick="addCustomer()">Add</button>
 </div>
 
-<!-- MONTH SELECT -->
 <div class="card">
-  <h3>Select Month to View</h3>
+  <h3>Select Month</h3>
   <select id="month"></select>
   <button onclick="loadData()">Load</button>
 </div>
 
-<!-- TABLE -->
 <div class="card">
-  <h3>Customers</h3>
-  <div style="overflow-x:auto">
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Principal</th>
-          <th>Collected</th>
-          <th>Interest</th>
-        </tr>
-      </thead>
-      <tbody id="list"></tbody>
-    </table>
-  </div>
-  <div class="total" id="totals"></div>
+  <table>
+    <thead>
+      <tr><th>Name</th><th>Principal</th><th>Collected</th><th>Interest</th></tr>
+    </thead>
+    <tbody id="list"></tbody>
+  </table>
 </div>
 
 <!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
 <script>
@@ -108,105 +54,68 @@ firebase.initializeApp({
   projectId: "barber-shop-4c26f"
 });
 
+const auth = firebase.auth();
 const db = firebase.firestore();
 
-/* CURRENT MONTH (AUTO) */
-function currentMonth() {
-  const d = new Date();
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
+/* 🔑 AUTH FIX (THIS WAS MISSING) */
+auth.signInAnonymously()
+  .then(()=>console.log("Auth OK"))
+  .catch(e=>alert(e.message));
+
+function currentMonth(){
+  const d=new Date();
+  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
 }
 
-/* GENERATE ALL MONTHS */
-function generateMonths() {
-  const sel = document.getElementById("month");
-  sel.innerHTML = "";
-
-  for (let y = 2023; y <= 2035; y++) {
-    for (let m = 0; m < 12; m++) {
-      const v = `${y}-${String(m+1).padStart(2,"0")}`;
-      const t = new Date(y, m).toLocaleString("default",{month:"short",year:"numeric"});
-      sel.innerHTML += `<option value="${v}">${t}</option>`;
-    }
+/* MONTH LIST */
+const sel=document.getElementById("month");
+for(let y=2024;y<=2035;y++){
+  for(let m=0;m<12;m++){
+    const v=`${y}-${String(m+1).padStart(2,"0")}`;
+    sel.innerHTML+=`<option value="${v}">${v}</option>`;
   }
-
-  sel.value = currentMonth();
 }
-generateMonths();
+sel.value=currentMonth();
 
-/* ADD CUSTOMER → CURRENT MONTH */
-async function addCustomer() {
-  const name = document.getElementById("name").value.trim();
-  const principal = +document.getElementById("principal").value;
-  const rate = +document.getElementById("rate").value;
+/* ADD CUSTOMER */
+async function addCustomer(){
+  const name=nameEl.value.trim();
+  const principal=+principalEl.value;
+  const rate=+rateEl.value;
 
-  if (!name || !principal || !rate) {
-    alert("Fill all fields");
-    return;
-  }
+  if(!name||!principal||!rate){ alert("Fill all"); return; }
 
-  const month = currentMonth();
-
-  const ref = await db.collection("customers").add({ name, rate });
-
-  await ref.collection("ledger").doc(month).set({
-    principal,
-    collected: 0,
-    interest: principal * rate / 100,
-    created: firebase.firestore.Timestamp.now()
+  const ref=await db.collection("customers").add({name,rate});
+  await ref.collection("ledger").doc(currentMonth()).set({
+    principal, collected:0, interest:principal*rate/100
   });
 
-  document.getElementById("name").value = "";
-  document.getElementById("principal").value = "";
-  document.getElementById("rate").value = "";
-
-  document.getElementById("month").value = month;
   loadData();
 }
 
-/* LOAD DATA */
-async function loadData() {
-  const month = document.getElementById("month").value;
-  if (!month) return;
+async function loadData(){
+  const m=sel.value;
+  list.innerHTML="";
+  const snap=await db.collection("customers").get();
 
-  const tbody = document.getElementById("list");
-  const totals = document.getElementById("totals");
-  tbody.innerHTML = "";
-  totals.innerHTML = "";
-
-  let totalP = 0, totalI = 0;
-
-  const snap = await db.collection("customers").get();
-
-  for (const doc of snap.docs) {
-    const cust = doc.data();
-    const rec = await doc.ref.collection("ledger").doc(month).get();
-    if (!rec.exists) continue;
-
-    const r = rec.data();
-    totalP += r.principal;
-    totalI += r.interest;
-
-    tbody.innerHTML += `
+  for(const d of snap.docs){
+    const l=await d.ref.collection("ledger").doc(m).get();
+    if(!l.exists) continue;
+    const r=l.data();
+    list.innerHTML+=`
       <tr>
-        <td>${cust.name}</td>
-        <td>₹${r.principal}</td>
-        <td>
-          <input class="num-input" type="number"
-            value="${r.collected}"
-            onchange="updateCollected('${doc.id}','${month}',this.value)">
-        </td>
-        <td>₹${r.interest}</td>
+        <td>${d.data().name}</td>
+        <td>${r.principal}</td>
+        <td><input value="${r.collected}"
+          onchange="d.ref.collection('ledger').doc('${m}')
+          .update({collected:+this.value})"></td>
+        <td>${r.interest}</td>
       </tr>`;
   }
-
-  totals.innerHTML = `Total Principal: ₹${totalP}<br>Total Interest: ₹${totalI}`;
 }
 
-function updateCollected(cid, month, val) {
-  db.collection("customers").doc(cid)
-    .collection("ledger").doc(month)
-    .update({ collected: +val });
-}
+/* shortcuts */
+const nameEl=name, principalEl=principal, rateEl=rate, list=list;
 </script>
 
 </body>
