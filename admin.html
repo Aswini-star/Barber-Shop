@@ -1,0 +1,46 @@
+<h2>Admin</h2>
+
+<input id="name" placeholder="Name">
+<input id="principal" placeholder="Principal">
+<input id="rate" placeholder="Monthly Interest %">
+<button onclick="add()">Add</button>
+
+<div id="list"></div>
+
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+
+});
+
+const db=firebase.firestore();
+
+function add(){
+ db.collection("customers").add({
+  name:name.value,
+  principal:+principal.value,
+  rate:+rate.value,
+  interest:0,
+  lastUpdated: firebase.firestore.Timestamp.now()
+ }).then(load);
+}
+
+function load(){
+ list.innerHTML="";
+ db.collection("customers").get().then(snap=>{
+  snap.forEach(d=>{
+   const c=d.data();
+   list.innerHTML+=`${c.name} ₹${c.principal} Interest ₹${c.interest}<br>`;
+  });
+ });
+}
+load();
+</script>
