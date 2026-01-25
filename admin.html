@@ -2,21 +2,111 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Admin</title>
+  <title>Admin – Customers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      margin: 0;
+      padding: 10px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
+
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
+
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+    }
+
+    button:active {
+      opacity: 0.8;
+    }
+
+    .customer {
+      border-bottom: 1px solid #eee;
+      padding: 8px 0;
+    }
+
+    .customer:last-child {
+      border-bottom: none;
+    }
+
+    .name {
+      font-weight: bold;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
 </head>
 
 <body>
 
 <h2>Admin</h2>
 
-<input id="name" placeholder="Name">
-<input id="principal" placeholder="Principal">
-<input id="rate" placeholder="Monthly Interest %">
-<button onclick="addCustomer()">Add</button>
+<!-- ADD CUSTOMER -->
+<div class="card">
+  <h3>Add Customer</h3>
 
-<div id="list"></div>
+  <input id="name" placeholder="Customer Name">
+  <input id="principal" type="number" placeholder="Principal Amount">
+  <input id="rate" type="number" placeholder="Monthly Interest %">
+  <button onclick="addCustomer()">Add Customer</button>
+</div>
 
-<!-- Firebase compat SDK -->
+<!-- FILTER -->
+<div class="card">
+  <h3>Filter by Month</h3>
+
+  <select id="monthFilter" onchange="loadCustomers()">
+    <option value="">All Months</option>
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
+  </select>
+</div>
+
+<!-- CUSTOMER LIST -->
+<div class="card">
+  <h3>Customers</h3>
+  <div id="list"></div>
+</div>
+
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
@@ -32,56 +122,56 @@ firebase.initializeApp({
 
 const db = firebase.firestore();
 
-/* ===== ADD CUSTOMER ===== */
+/* ADD CUSTOMER */
 function addCustomer() {
+  const name = document.getElementById("name").value;
+  const principal = Number(document.getElementById("principal").value);
+  const rate = Number(document.getElementById("rate").value);
 
-  const nameEl = document.getElementById("name");
-  const principalEl = document.getElementById("principal");
-  const rateEl = document.getElementById("rate");
-
-  if (!nameEl.value || !principalEl.value || !rateEl.value) {
-    alert("Please fill all fields");
+  if (!name || !principal || !rate) {
+    alert("Fill all fields");
     return;
   }
 
   db.collection("customers").add({
-    name: nameEl.value,
-    principal: Number(principalEl.value),
-    rate: Number(rateEl.value),
+    name,
+    principal,
+    rate,
     interest: 0,
     lastUpdated: firebase.firestore.Timestamp.now()
-  })
-  .then(() => {
-    nameEl.value = "";
-    principalEl.value = "";
-    rateEl.value = "";
+  }).then(() => {
+    document.getElementById("name").value = "";
+    document.getElementById("principal").value = "";
+    document.getElementById("rate").value = "";
     loadCustomers();
-  })
-  .catch(err => {
-    console.error("Error adding customer:", err);
-    alert("Failed to add customer");
   });
 }
 
-/* ===== LOAD CUSTOMERS ===== */
+/* LOAD CUSTOMERS (MONTH FILTER) */
 function loadCustomers() {
   const list = document.getElementById("list");
+  const month = document.getElementById("monthFilter").value;
+
   list.innerHTML = "";
 
-  db.collection("customers").get()
-    .then(snap => {
-      snap.forEach(d => {
-        const c = d.data();
-        list.innerHTML += `
-          <div>
-            <b>${c.name}</b> —
-            ₹${c.principal} —
-            Interest ₹${c.interest}
-          </div>
-        `;
-      });
-    })
-    .catch(err => console.error(err));
+  db.collection("customers").get().then(snap => {
+    snap.forEach(d => {
+      const c = d.data();
+
+      if (month !== "") {
+        const m = c.lastUpdated.toDate().getMonth();
+        if (String(m) !== month) return;
+      }
+
+      list.innerHTML += `
+        <div class="customer">
+          <div class="name">${c.name}</div>
+          <div class="small">Principal: ₹${c.principal}</div>
+          <div class="small">Interest: ₹${c.interest}</div>
+        </div>
+      `;
+    });
+  });
 }
 
 loadCustomers();
