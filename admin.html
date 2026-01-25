@@ -49,11 +49,6 @@ th, td {
 
 th { background: #f1f1f1; }
 
-tfoot td {
-  font-weight: bold;
-  background: #fafafa;
-}
-
 .num-input {
   width: 90px;
 }
@@ -68,7 +63,7 @@ tfoot td {
 <div class="card">
   <h3>Add Customer (Opening Month Only)</h3>
   <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" max="100000" placeholder="Opening Principal">
+  <input id="principal" type="number" placeholder="Opening Principal">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
@@ -84,14 +79,12 @@ tfoot td {
     <option value="2025-04">Apr 2025</option>
     <option value="2025-05">May 2025</option>
   </select>
-
   <button onclick="closeMonth()">Close Month</button>
 </div>
 
 <!-- TABLE -->
 <div class="card">
 <h3>Customers</h3>
-
 <div style="overflow-x:auto">
 <table>
 <thead>
@@ -102,18 +95,7 @@ tfoot td {
   <th>Interest</th>
 </tr>
 </thead>
-
 <tbody id="list"></tbody>
-
-<tfoot>
-<tr>
-  <td>Total</td>
-  <td id="totalPrincipal">₹0</td>
-  <td></td>
-  <td id="totalInterest">₹0</td>
-</tr>
-</tfoot>
-
 </table>
 </div>
 </div>
@@ -133,10 +115,10 @@ const db = firebase.firestore();
 
 /* ADD CUSTOMER */
 async function addCustomer() {
-  const name = document.getElementById("name").value.trim();
-  const principal = +document.getElementById("principal").value;
-  const rate = +document.getElementById("rate").value;
-  const month = document.getElementById("monthSelect").value;
+  const name = nameEl.value.trim();
+  const principal = +principalEl.value;
+  const rate = +rateEl.value;
+  const month = monthSelect.value;
 
   if (!name || !principal || !rate || !month) {
     alert("Fill all fields & select month");
@@ -149,68 +131,56 @@ async function addCustomer() {
     principal,
     collected: 0,
     interest: principal * rate / 100,
-    closed: false,
     created: firebase.firestore.Timestamp.now()
   });
 
-  document.getElementById("name").value = "";
-  document.getElementById("principal").value = "";
-  document.getElementById("rate").value = "";
-
+  nameEl.value = principalEl.value = rateEl.value = "";
   loadMonth();
 }
 
 /* LOAD MONTH */
 async function loadMonth() {
-  const month = document.getElementById("monthSelect").value;
+  const month = monthSelect.value;
   if (!month) return;
 
-  const tbody = document.getElementById("list");
-  tbody.innerHTML = "";
-
-  let totalP = 0, totalI = 0;
+  list.innerHTML = "";
 
   const customers = await db.collection("customers").get();
 
   for (const doc of customers.docs) {
     const cust = doc.data();
-    const rec = await doc.ref.collection("ledger").doc(month).get();
-    if (!rec.exists) continue;
+    const snap = await doc.ref.collection("ledger").doc(month).get();
+    if (!snap.exists) continue;
 
-    const r = rec.data();
-    totalP += r.principal;
-    totalI += r.interest;
+    const r = snap.data();
 
-    tbody.innerHTML += `
+    list.innerHTML += `
       <tr>
         <td>${cust.name}</td>
         <td>₹${r.principal}</td>
         <td>
           <input type="number"
-            class="num-input"
-            value="${r.collected}"
-            ${r.closed ? "readonly" : ""}
-            oninput="saveCollected('${doc.id}','${month}',this.value)">
+                 class="num-input"
+                 value="${r.collected}"
+                 oninput="saveCollected('${doc.id}','${month}', this.value)">
         </td>
         <td>₹${r.interest}</td>
-      </tr>
-    `;
+      </tr>`;
   }
-
-  document.getElementById("totalPrincipal").innerText = "₹" + totalP;
-  document.getElementById("totalInterest").innerText = "₹" + totalI;
 }
 
-/* SAVE COLLECTION */
-function saveCollected(cid, month, val) {
-  db.collection("customers").doc(cid)
-    .collection("ledger").doc(month)
-    .update({ collected: +val });
+/* SAVE COLLECTION — SIMPLE & WORKING */
+function saveCollected(cid, month, value) {
+  db.collection("customers")
+    .doc(cid)
+    .collection("ledger")
+    .doc(month)
+    .update({ collected: Number(value) });
 }
 
 /* CLOSE MONTH */
 async function closeMonth() {
-  const month = document.getElementById("monthSelect").value;
+  const month = monthSelect.value;
   if (!month) return;
 
   const next = getNextMonth(month);
@@ -219,25 +189,21 @@ async function closeMonth() {
   for (const doc of customers.docs) {
     const cust = doc.data();
     const ledger = doc.ref.collection("ledger");
-
     const cur = await ledger.doc(month).get();
-    if (!cur.exists || cur.data().closed) continue;
+    if (!cur.exists) continue;
 
     const r = cur.data();
     const newPrincipal = Math.max(r.principal - r.collected, 0);
-
-    await ledger.doc(month).update({ closed: true });
 
     await ledger.doc(next).set({
       principal: newPrincipal,
       collected: 0,
       interest: newPrincipal * cust.rate / 100,
-      closed: false,
       created: firebase.firestore.Timestamp.now()
     });
   }
 
-  document.getElementById("monthSelect").value = next;
+  monthSelect.value = next;
   loadMonth();
 }
 
@@ -247,6 +213,13 @@ function getNextMonth(m) {
   const d = new Date(y, mo);
   return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
 }
+
+/* ELEMENT SHORTCUTS */
+const nameEl = document.getElementById("name");
+const principalEl = document.getElementById("principal");
+const rateEl = document.getElementById("rate");
+const monthSelect = document.getElementById("monthSelect");
+const list = document.getElementById("list");
 </script>
 
 </body>
