@@ -72,7 +72,9 @@ th { background: #f1f1f1; }
 <!-- MONTH -->
 <div class="card">
   <h3>Select Month</h3>
-  <select id="monthSelect">
+
+  <!-- ✅ AUTO LOAD ON SELECT -->
+  <select id="monthSelect" onchange="loadMonth()">
     <option value="">Select Month</option>
     <option value="2025-01">Jan 2025</option>
     <option value="2025-02">Feb 2025</option>
@@ -157,7 +159,7 @@ async function addCustomer() {
   loadMonth();
 }
 
-/* LOAD SELECTED MONTH (READ ONLY IF CLOSED) */
+/* LOAD SELECTED MONTH */
 async function loadMonth() {
   const month = document.getElementById("monthSelect").value;
   if (!month) return;
@@ -208,7 +210,7 @@ function saveCollected(cid, month, val) {
     .update({ collected: +val });
 }
 
-/* CLOSE MONTH (CRITICAL LOGIC) */
+/* CLOSE MONTH */
 async function closeMonth() {
   const month = document.getElementById("monthSelect").value;
   if (!month) return;
