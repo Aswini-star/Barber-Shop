@@ -1,103 +1,133 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>Admin – Monthly Ledger</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8">
+  <title>Admin – Customers</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<style>
-body {
-  font-family: Arial, sans-serif;
-  background: #f2f4f7;
-  padding: 10px;
-}
-h2 { text-align: center; }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f2f4f7;
+      margin: 0;
+      padding: 10px;
+    }
 
-.card {
-  background: #fff;
-  padding: 15px;
-  margin-bottom: 15px;
-  border-radius: 10px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
 
-input, select, button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 8px;
-  font-size: 16px;
-}
+    .card {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      margin-bottom: 15px;
+    }
 
-button {
-  background: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-}
+    input, select, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      font-size: 16px;
+      box-sizing: border-box;
+    }
 
-table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 720px;
-}
+    button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
 
-th, td {
-  padding: 8px;
-  border-bottom: 1px solid #ddd;
-  font-size: 14px;
-}
+    button:active {
+      opacity: 0.8;
+    }
 
-th { background: #f1f1f1; }
+    /* TABLE */
+    .table-wrap {
+      overflow-x: auto;
+    }
 
-.num-input {
-  width: 90px;
-}
-</style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 500px;
+    }
+
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+      font-size: 14px;
+    }
+
+    th {
+      background: #f1f1f1;
+      font-weight: bold;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+  </style>
 </head>
 
 <body>
 
-<h2>Monthly Customer Ledger</h2>
+<h2>Admin</h2>
 
 <!-- ADD CUSTOMER -->
 <div class="card">
-  <h3>Add Customer (Opening Month Only)</h3>
+  <h3>Add Customer</h3>
+
   <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" placeholder="Opening Principal">
+  <input id="principal" type="number" placeholder="Principal Amount">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
 
-<!-- MONTH -->
+<!-- FILTER -->
 <div class="card">
-  <h3>Select Month</h3>
-  <select id="monthSelect" onchange="loadMonth()">
-    <option value="">Select Month</option>
-    <option value="2025-01">Jan 2025</option>
-    <option value="2025-02">Feb 2025</option>
-    <option value="2025-03">Mar 2025</option>
-    <option value="2025-04">Apr 2025</option>
-    <option value="2025-05">May 2025</option>
+  <h3>Filter by Month</h3>
+
+  <select id="monthFilter" onchange="loadCustomers()">
+    <option value="">All Months</option>
+    <option value="0">January</option>
+    <option value="1">February</option>
+    <option value="2">March</option>
+    <option value="3">April</option>
+    <option value="4">May</option>
+    <option value="5">June</option>
+    <option value="6">July</option>
+    <option value="7">August</option>
+    <option value="8">September</option>
+    <option value="9">October</option>
+    <option value="10">November</option>
+    <option value="11">December</option>
   </select>
-  <button onclick="closeMonth()">Close Month</button>
 </div>
 
-<!-- TABLE -->
+<!-- CUSTOMER TABLE -->
 <div class="card">
-<h3>Customers</h3>
-<div style="overflow-x:auto">
-<table>
-<thead>
-<tr>
-  <th>Name</th>
-  <th>Principal</th>
-  <th>Collected</th>
-  <th>Interest</th>
-</tr>
-</thead>
-<tbody id="list"></tbody>
-</table>
-</div>
+  <h3>Customers</h3>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Principal (₹)</th>
+          <th>Interest (₹)</th>
+          <th>Rate (%)</th>
+          <th>Updated</th>
+        </tr>
+      </thead>
+      <tbody id="list"></tbody>
+    </table>
+  </div>
 </div>
 
 <!-- Firebase -->
@@ -108,118 +138,67 @@ th { background: #f1f1f1; }
 firebase.initializeApp({
   apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
   authDomain: "barber-shop-4c26f.firebaseapp.com",
-  projectId: "barber-shop-4c26f"
+  projectId: "barber-shop-4c26f",
+  storageBucket: "barber-shop-4c26f.firebasestorage.app",
+  messagingSenderId: "213114385226",
+  appId: "1:213114385226:web:dcdf67972a683f2055c7b3"
 });
 
 const db = firebase.firestore();
 
 /* ADD CUSTOMER */
-async function addCustomer() {
-  const name = nameEl.value.trim();
-  const principal = +principalEl.value;
-  const rate = +rateEl.value;
-  const month = monthSelect.value;
+function addCustomer() {
+  const name = document.getElementById("name").value.trim();
+  const principal = Number(document.getElementById("principal").value);
+  const rate = Number(document.getElementById("rate").value);
 
-  if (!name || !principal || !rate || !month) {
-    alert("Fill all fields & select month");
+  if (!name || !principal || !rate) {
+    alert("Fill all fields");
     return;
   }
 
-  const custRef = await db.collection("customers").add({ name, rate });
-
-  await custRef.collection("ledger").doc(month).set({
+  db.collection("customers").add({
+    name,
     principal,
-    collected: 0,
-    interest: principal * rate / 100,
-    created: firebase.firestore.Timestamp.now()
+    rate,
+    interest: 0,
+    lastUpdated: firebase.firestore.Timestamp.now()
+  }).then(() => {
+    document.getElementById("name").value = "";
+    document.getElementById("principal").value = "";
+    document.getElementById("rate").value = "";
+    loadCustomers();
   });
-
-  nameEl.value = principalEl.value = rateEl.value = "";
-  loadMonth();
 }
 
-/* LOAD MONTH */
-async function loadMonth() {
-  const month = monthSelect.value;
-  if (!month) return;
+/* LOAD CUSTOMERS */
+function loadCustomers() {
+  const tbody = document.getElementById("list");
+  const month = document.getElementById("monthFilter").value;
 
-  list.innerHTML = "";
+  tbody.innerHTML = "";
 
-  const customers = await db.collection("customers").get();
+  db.collection("customers").get().then(snap => {
+    snap.forEach(doc => {
+      const c = doc.data();
+      const date = c.lastUpdated.toDate();
 
-  for (const doc of customers.docs) {
-    const cust = doc.data();
-    const snap = await doc.ref.collection("ledger").doc(month).get();
-    if (!snap.exists) continue;
+      if (month !== "" && date.getMonth().toString() !== month) return;
 
-    const r = snap.data();
-
-    list.innerHTML += `
-      <tr>
-        <td>${cust.name}</td>
-        <td>₹${r.principal}</td>
-        <td>
-          <input type="number"
-                 class="num-input"
-                 value="${r.collected}"
-                 oninput="saveCollected('${doc.id}','${month}', this.value)">
-        </td>
-        <td>₹${r.interest}</td>
-      </tr>`;
-  }
-}
-
-/* SAVE COLLECTION — SIMPLE & WORKING */
-function saveCollected(cid, month, value) {
-  db.collection("customers")
-    .doc(cid)
-    .collection("ledger")
-    .doc(month)
-    .update({ collected: Number(value) });
-}
-
-/* CLOSE MONTH */
-async function closeMonth() {
-  const month = monthSelect.value;
-  if (!month) return;
-
-  const next = getNextMonth(month);
-  const customers = await db.collection("customers").get();
-
-  for (const doc of customers.docs) {
-    const cust = doc.data();
-    const ledger = doc.ref.collection("ledger");
-    const cur = await ledger.doc(month).get();
-    if (!cur.exists) continue;
-
-    const r = cur.data();
-    const newPrincipal = Math.max(r.principal - r.collected, 0);
-
-    await ledger.doc(next).set({
-      principal: newPrincipal,
-      collected: 0,
-      interest: newPrincipal * cust.rate / 100,
-      created: firebase.firestore.Timestamp.now()
+      tbody.innerHTML += `
+        <tr>
+          <td>${c.name}</td>
+          <td>₹${c.principal}</td>
+          <td>₹${c.interest}</td>
+          <td>${c.rate}%</td>
+          <td>${date.toLocaleDateString()}</td>
+        </tr>
+      `;
     });
-  }
-
-  monthSelect.value = next;
-  loadMonth();
+  });
 }
 
-/* NEXT MONTH */
-function getNextMonth(m) {
-  const [y, mo] = m.split("-").map(Number);
-  const d = new Date(y, mo);
-  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0");
-}
-
-/* ELEMENT SHORTCUTS */
-const nameEl = document.getElementById("name");
-const principalEl = document.getElementById("principal");
-const rateEl = document.getElementById("rate");
-const monthSelect = document.getElementById("monthSelect");
-const list = document.getElementById("list");
+loadCustomers();
 </script>
 
 </body>
