@@ -1,89 +1,48 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <title>Lending App – Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      background: white;
-      padding: 20px;
-      width: 100%;
-      max-width: 320px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin-top: 10px;
-      font-size: 16px;
-    }
-    button {
-      background: #1976d2;
-      color: white;
-      border: none;
-      border-radius: 5px;
-    }
-  </style>
+<title>Login</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body>
 
-<div class="box">
-  <h2>Login</h2>
+<h2>Login</h2>
+<input id="email" placeholder="Email"><br>
+<input id="password" type="password" placeholder="Password"><br>
+<button onclick="login()">Login</button>
+<p id="msg"></p>
 
-  <input id="email" type="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
+<!-- Firebase config -->
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
 
-  <p id="msg"></p>
-</div>
+<script>
+firebase.initializeApp({
+ apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+});
 
-<script type="module">
-import { auth, db } from "./firebase.js";
-import { signInWithEmailAndPassword } from
-  "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-import { doc, getDoc } from
-  "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
+const auth = firebase.auth();
+const db = firebase.firestore();
 
-window.login = async () => {
-  msg.innerText = "Logging in...";
-
-  try {
-    const res = await signInWithEmailAndPassword(
-      auth,
-      email.value,
-      password.value
-    );
-
-    const uid = res.user.uid;
-    const snap = await getDoc(doc(db, "users", uid));
-
-    if (!snap.exists()) {
-      msg.innerText = "User role not found";
-      return;
-    }
-
-    const role = snap.data().role;
-
-    if (role === "admin") location.href = "admin.html";
-    else if (role === "staff") location.href = "staff.html";
-    else if (role === "customer") location.href = "customer.html";
-    else msg.innerText = "Invalid role";
-
-  } catch (e) {
-    msg.innerText = e.message;
-  }
-};
+function login() {
+ auth.signInWithEmailAndPassword(email.value, password.value)
+ .then(res => {
+   return db.collection("users").doc(res.user.uid).get();
+ })
+ .then(doc => {
+   const role = doc.data().role;
+   if(role==="admin") location.href="admin.html";
+   if(role==="staff") location.href="staff.html";
+   if(role==="customer") location.href="customer.html";
+ })
+ .catch(e => msg.innerText = e.message);
+}
 </script>
 
 </body>
