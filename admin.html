@@ -77,6 +77,13 @@
       margin-top: 10px;
       text-align: right;
     }
+
+    /* 🔹 SMALL NUMBER INPUTS */
+    .num-input {
+      width: 90px;
+      padding: 4px;
+      font-size: 14px;
+    }
   </style>
 </head>
 
@@ -88,7 +95,7 @@
 <div class="card">
   <h3>Add Customer</h3>
   <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" placeholder="Principal">
+  <input id="principal" type="number" max="100000" placeholder="Principal (Max 100000)">
   <input id="rate" type="number" placeholder="Monthly Interest %">
   <button onclick="addCustomer()">Add Customer</button>
 </div>
@@ -156,6 +163,10 @@ firebase.initializeApp({
 const db = firebase.firestore();
 let cachedData = [];
 
+const nameInput = document.getElementById("name");
+const principalInput = document.getElementById("principal");
+const rateInput = document.getElementById("rate");
+
 /* ADD CUSTOMER */
 function addCustomer() {
   const name = nameInput.value.trim();
@@ -167,11 +178,16 @@ function addCustomer() {
     return;
   }
 
+  if (principal > 100000) {
+    alert("Principal cannot exceed ₹1,00,000");
+    return;
+  }
+
   db.collection("customers").add({
     name,
     principal,
     rate,
-    interest: (principal * rate / 100),
+    interest: principal * rate / 100,
     lastUpdated: firebase.firestore.Timestamp.now()
   }).then(loadCustomers);
 
@@ -179,10 +195,6 @@ function addCustomer() {
   principalInput.value = "";
   rateInput.value = "";
 }
-
-const nameInput = document.getElementById("name");
-const principalInput = document.getElementById("principal");
-const rateInput = document.getElementById("rate");
 
 /* LOAD CUSTOMERS */
 function loadCustomers() {
@@ -210,18 +222,22 @@ function loadCustomers() {
         <tr>
           <td>${c.name}</td>
           <td>
-            <input type="number" value="${c.principal}"
+            <input type="number"
+              class="num-input"
+              max="100000"
+              value="${c.principal}"
               onchange="updateCustomer('${doc.id}', this.value, ${c.rate})">
           </td>
           <td>
-            <input type="number" value="${c.rate}"
+            <input type="number"
+              class="num-input"
+              value="${c.rate}"
               onchange="updateCustomer('${doc.id}', ${c.principal}, this.value)">
           </td>
           <td>₹${c.interest.toFixed(2)}</td>
           <td>
-            <button class="small danger" onclick="deleteCustomer('${doc.id}')">
-              Delete
-            </button>
+            <button class="small danger"
+              onclick="deleteCustomer('${doc.id}')">Delete</button>
           </td>
         </tr>
       `;
@@ -237,6 +253,12 @@ function loadCustomers() {
 function updateCustomer(id, principal, rate) {
   principal = +principal;
   rate = +rate;
+
+  if (principal > 100000) {
+    alert("Principal cannot exceed ₹1,00,000");
+    return;
+  }
+
   const interest = principal * rate / 100;
 
   db.collection("customers").doc(id).update({
