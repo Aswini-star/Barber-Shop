@@ -14,6 +14,7 @@ table{width:100%;border-collapse:collapse;margin-top:10px}
 th,td{border:1px solid #ddd;padding:6px;text-align:center}
 th{background:#eee}
 .total{font-weight:bold;background:#e8f4ff}
+.small{font-size:13px;color:#555}
 </style>
 </head>
 
@@ -21,20 +22,24 @@ th{background:#eee}
 
 <h2>Customer Ledger</h2>
 
+<!-- ADD CUSTOMER -->
 <div class="card">
 <h3>Add Customer</h3>
-<input id="cname" placeholder="Name">
-<input id="phone" placeholder="Phone">
-<button onclick="addCustomer()">Add</button>
+<input id="cname" placeholder="Customer Name">
+<input id="phone" placeholder="Phone Number">
+<button onclick="addCustomer()">Add Customer</button>
 </div>
 
+<!-- MONTH SELECT -->
 <div class="card">
 <h3>Select Month</h3>
 <input type="month" id="month" onchange="loadData()">
+<div class="small">Interest rate fixed at 3%</div>
 </div>
 
+<!-- LEDGER -->
 <div class="card">
-<h3>Ledger</h3>
+<h3>Monthly Ledger</h3>
 <table>
 <thead>
 <tr>
@@ -42,7 +47,7 @@ th{background:#eee}
 <th>Phone</th>
 <th>Principal</th>
 <th>Collected</th>
-<th>Interest</th>
+<th>Interest (3%)</th>
 <th>Save</th>
 </tr>
 </thead>
@@ -59,6 +64,7 @@ th{background:#eee}
 </table>
 </div>
 
+<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
 
@@ -75,14 +81,29 @@ const RATE = 3;
 document.getElementById("month").value =
   new Date().toISOString().slice(0,7);
 
+/* ADD CUSTOMER */
 function addCustomer(){
-  if(!cname.value || !phone.value) return alert("Fill all");
+  if(!cname.value || !phone.value)
+    return alert("Fill all fields");
+
   db.collection("customers").add({
     name:cname.value,
     phone:phone.value
-  }).then(()=>{cname.value="";phone.value="";loadData();});
+  }).then(()=>{
+    cname.value="";
+    phone.value="";
+    loadData();
+  });
 }
 
+/* AUTO INTEREST CALC */
+function calcInterest(cid){
+  const p = Number(document.getElementById("p_"+cid).value || 0);
+  const interest = (p * RATE) / 100;
+  document.getElementById("i_"+cid).value = interest.toFixed(2);
+}
+
+/* LOAD MONTH DATA */
 async function loadData(){
   const m = month.value;
   if(!m) return;
@@ -100,45 +121,55 @@ async function loadData(){
       .where("month","==",m)
       .get();
 
-    let data = snap.empty ? null : snap.docs[0];
+    let principal="", collected="", interest="", docId="";
 
-    let principal="", collected="", interest="";
-
-    if(data){
-      const d = data.data();
-      principal=d.principal;
-      collected=d.collected;
-      interest=d.interest;
-      tp+=principal;
-      ti+=interest;
+    if(!snap.empty){
+      const d = snap.docs[0];
+      docId = d.id;
+      principal = d.data().principal;
+      collected = d.data().collected;
+      interest = d.data().interest;
+      tp += principal;
+      ti += interest;
     }
 
-    rows.innerHTML+=`
+    rows.innerHTML += `
     <tr>
       <td>${cust.name}</td>
       <td>${cust.phone}</td>
-      <td><input id="p_${c.id}" value="${principal}"></td>
-      <td><input id="c_${c.id}" value="${collected}"></td>
-      <td><input id="i_${c.id}" value="${interest}"></td>
-      <td><button onclick="save('${c.id}','${data?data.id:""}')">Save</button></td>
+      <td>
+        <input id="p_${c.id}" type="number" max="100000"
+          value="${principal}"
+          oninput="calcInterest('${c.id}')">
+      </td>
+      <td>
+        <input id="c_${c.id}" type="number" value="${collected}">
+      </td>
+      <td>
+        <input id="i_${c.id}" type="number" value="${interest}" readonly>
+      </td>
+      <td>
+        <button onclick="save('${c.id}','${docId}')">Save</button>
+      </td>
     </tr>`;
   }
 
-  tpElem.textContent=tp;
-  tiElem.textContent=ti;
+  document.getElementById("tp").textContent = tp.toFixed(2);
+  document.getElementById("ti").textContent = ti.toFixed(2);
 }
 
+/* SAVE MONTH ENTRY */
 async function save(cid,docId){
-  const p=Number(document.getElementById("p_"+cid).value||0);
-  const c=Number(document.getElementById("c_"+cid).value||0);
-  const i=Number(document.getElementById("i_"+cid).value||0);
+  const p = Number(document.getElementById("p_"+cid).value||0);
+  const c = Number(document.getElementById("c_"+cid).value||0);
+  const i = Number(document.getElementById("i_"+cid).value||0);
 
-  const obj={
-    customerId:cid,
-    month:month.value,
-    principal:p,
-    collected:c,
-    interest:i
+  const obj = {
+    customerId: cid,
+    month: month.value,
+    principal: p,
+    collected: c,
+    interest: i
   };
 
   if(docId)
@@ -148,6 +179,8 @@ async function save(cid,docId){
 
   loadData();
 }
+
+loadData();
 </script>
 
 </body>
