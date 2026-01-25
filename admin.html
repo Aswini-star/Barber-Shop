@@ -111,7 +111,6 @@ async function loadData(){
   for(const c of customers.docs){
     const cust = c.data();
 
-    // check current month
     const curSnap = await db.collection("monthly_ledger")
       .where("customerId","==",c.id)
       .where("month","==",m)
@@ -126,7 +125,6 @@ async function loadData(){
       collected = d.data().collected;
       interest = d.data().interest;
     } else {
-      // load previous month
       const pm = prevMonth(m);
       const prevSnap = await db.collection("monthly_ledger")
         .where("customerId","==",c.id)
@@ -139,6 +137,9 @@ async function loadData(){
         interest = (principal * RATE / 100).toFixed(2);
       }
     }
+
+    // ✅ HIDE ROW IF PRINCIPAL IS 0
+    if(principal <= 0) continue;
 
     tp += Number(principal);
     ti += Number(interest);
@@ -164,8 +165,8 @@ async function loadData(){
     </tr>`;
   }
 
-  tpElem.textContent = tp.toFixed(2);
-  tiElem.textContent = ti.toFixed(2);
+  tp.textContent = tp.toFixed(2);
+  ti.textContent = ti.toFixed(2);
 }
 
 async function save(cid,docId){
