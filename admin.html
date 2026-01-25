@@ -74,18 +74,25 @@ firebase.initializeApp({
 const db = firebase.firestore();
 const RATE = 3;
 
-month.value = new Date().toISOString().slice(0,7);
+document.getElementById("month").value =
+  new Date().toISOString().slice(0,7);
 
+/* ADD CUSTOMER */
 function addCustomer(){
-  if(!cname.value || !phone.value) return alert("Fill all");
-  db.collection("customers").add({
-    name:cname.value,
-    phone:phone.value
-  }).then(()=>{
-    cname.value="";
-    phone.value="";
-    loadData();
-  });
+  const name = document.getElementById("cname").value.trim();
+  const phone = document.getElementById("phone").value.trim();
+
+  if(!name || !phone){
+    alert("Fill all fields");
+    return;
+  }
+
+  db.collection("customers").add({ name, phone })
+    .then(()=>{
+      document.getElementById("cname").value="";
+      document.getElementById("phone").value="";
+      loadData();
+    });
 }
 
 function prevMonth(m){
@@ -101,10 +108,9 @@ function calcInterest(cid){
 }
 
 async function loadData(){
-  const m = month.value;
-  if(!m) return;
-
+  const m = document.getElementById("month").value;
   rows.innerHTML = "";
+
   let totalPrincipal = 0;
   let totalInterest = 0;
 
@@ -118,7 +124,11 @@ async function loadData(){
       .where("month","==",m)
       .get();
 
-    let principal = 0, collected = 0, interest = 0, docId = "";
+    let principal = "";
+    let collected = "";
+    let interest = "";
+    let docId = "";
+    let hasPrev = false;
 
     if(!curSnap.empty){
       const d = curSnap.docs[0];
@@ -134,17 +144,21 @@ async function loadData(){
         .get();
 
       if(!prevSnap.empty){
+        hasPrev = true;
         const p = prevSnap.docs[0].data();
-        principal = p.principal - p.collected;
-        interest = (principal * RATE / 100).toFixed(2);
+        const balance = p.principal - p.collected;
+
+        if(balance <= 0) continue; // loan closed
+
+        principal = balance;
+        interest = (balance * RATE / 100).toFixed(2);
       }
     }
 
-    // ❌ Skip if closed
-    if(principal <= 0) continue;
-
-    totalPrincipal += Number(principal);
-    totalInterest += Number(interest);
+    if(principal !== ""){
+      totalPrincipal += Number(principal);
+      totalInterest += Number(interest || 0);
+    }
 
     rows.innerHTML += `
     <tr>
@@ -174,13 +188,13 @@ async function loadData(){
 }
 
 async function save(cid,docId){
-  const p = Number(document.getElementById("p_"+cid).value||0);
-  const c = Number(document.getElementById("c_"+cid).value||0);
-  const i = Number(document.getElementById("i_"+cid).value||0);
+  const p = Number(document.getElementById("p_"+cid).value || 0);
+  const c = Number(document.getElementById("c_"+cid).value || 0);
+  const i = Number(document.getElementById("i_"+cid).value || 0);
 
   const obj = {
     customerId: cid,
-    month: month.value,
+    month: document.getElementById("month").value,
     principal: p,
     collected: c,
     interest: i
