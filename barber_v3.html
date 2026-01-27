@@ -299,7 +299,7 @@
     </div>
 
     <div id="role-badge"></div>
-    <p id="status"></p>
+    
 
     <!-- CUSTOMER: SERVICES -->
     <div id="services-section" style="display:none;">
@@ -431,6 +431,13 @@
           <button id="admin-open-staff">👥 Manage Staff</button>
         </div>
       </div>
+      
+<div class="row" style="margin-top:8px;">
+  <div>
+    <button id="admin-open-profit">💰 Profit</button>
+  </div>
+</div>
+
 
       <!-- ✅ Bookings Panel (hidden until admin clicks) -->
       <div id="admin-bookings-panel" style="display:none;" class="section">
@@ -486,6 +493,71 @@
           </table>
         </div>
       </div>
+      
+<!-- ADMIN: PROFIT PANEL (hidden by default) -->
+<div id="admin-profit-panel" style="display:none;" class="section">
+  <h3>Profit</h3>
+
+  <div class="row" style="gap:8px; align-items:flex-end;">
+    <div>
+      <label for="profit-date-mode">Date Mode</label>
+      <select id="profit-date-mode">
+        <option value="today" selected>Today</option>
+        <option value="yesterday">Yesterday</option>
+        <option value="custom">Custom Date</option>
+        <option value="month">Month (YYYY-MM)</option>
+        <option value="range">Custom Range</option>
+      </select>
+    </div>
+
+    <div>
+      <label for="profit-status-filter">Status</label>
+      <select id="profit-status-filter">
+        <option value="completed" selected>completed</option>
+        <option value="paid">paid</option>
+        <option value="all">all</option>
+        <option value="pending">pending</option>
+        <option value="cancelled">cancelled</option>
+        <option value="no-show">no-show</option>
+      </select>
+    </div>
+
+    <div id="profit-date-custom-wrap" style="display:none;">
+      <label for="profit-custom-date">Custom Date</label>
+      <input id="profit-custom-date" type="date" />
+    </div>
+
+    <div id="profit-month-wrap" style="display:none;">
+      <label for="profit-month">Month</label>
+      <input id="profit-month" type="month" />
+    </div>
+
+    <div id="profit-range-wrap" style="display:none;">
+      <label for="profit-range-start">Range</label>
+      <div style="display:flex; gap:6px;">
+        <input id="profit-range-start" type="date" />
+        <input id="profit-range-end" type="date" />
+      </div>
+    </div>
+
+    <div>
+      <button id="btn-calc-profit" class="btn-success">Calculate Profit</button>
+      <button id="btn-export-profit" class="btn-warning">Export CSV</button>
+    </div>
+  </div>
+
+  <div id="profit-results" style="margin-top:14px;">
+    <div class="card" style="padding:12px; line-height:1.7;">
+      <div><strong>Period:</strong> <span id="profit-period-label">—</span></div>
+      <div><strong>Status Filter:</strong> <span id="profit-status-label">completed</span></div>
+      <div><strong>Total Bookings:</strong> <span id="profit-bookings-count">0</span></div>
+      <div><strong>Total Revenue / Profit:</strong> $<span id="profit-total">0.00</span></div>
+      <div><strong>Average Ticket:</strong> $<span id="profit-avg">0.00</span></div>
+      <div><strong>Total Tips:</strong> $<span id="profit-tips">0.00</span></div>
+    </div>
+  </div>
+</div>
+
     </div>
 
     <!-- ✅ ADMIN: STAFF MANAGEMENT (separate section; shown only when clicked) -->
@@ -604,6 +676,29 @@
       el.style.color = color || "#e67e22";
       el.innerText = msg || "";
     }
+function sendWhatsAppConfirmation({ phone, customerName, serviceName, barberName, date, time }) {
+  if (!phone) return;
+
+  // Ensure country code (India default)
+  let cleanedPhone = phone.replace(/\D/g, "");
+  if (!cleanedPhone.startsWith("91")) {
+    cleanedPhone = "91" + cleanedPhone;
+  }
+
+  const message =
+`✅ *Appointment Confirmed!*
+
+👤 Name: ${customerName}
+💈 Service: ${serviceName}
+✂️ Staff: ${barberName}
+📅 Date: ${date}
+⏰ Time: ${time}
+
+Thank you for choosing our barber shop 🙏`;
+
+  const url = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
+  window.open(url, "_blank");
+}
 
     function pillForStatus(s) {
       if (s === "booked") return `<span class="pill blue">BOOKED</span>`;
@@ -893,6 +988,15 @@ function showSectionForRole(role) {
           createdByRole: "customer",
           createdAt: serverTimestamp(),
         });
+        sendWhatsAppConfirmation({
+  phone,
+  customerName,
+  serviceName: currentSelectedService.name,
+  barberName,
+  date,
+  time
+});
+
         setMessage(statusEl,
           `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`,
           "#27ae60"
@@ -1211,9 +1315,18 @@ function showSectionForRole(role) {
           <td>${lastIn}</td>
           <td>${lastOut}</td>
           <td>
-            toggleEnable/Disable</button>
-            removeRemove</button>
-          </td>
+  <button
+    data-email="${s.id}"
+    data-action="toggle">
+    Enable / Disable
+  </button>
+  <button
+    data-email="${s.id}"
+    data-action="remove"
+    class="btn-danger">
+    Remove
+  </button>
+</td>
         `;
         tbody.appendChild(tr);
       });
@@ -1317,10 +1430,212 @@ function showSectionForRole(role) {
     });
     // Initial load for dropdowns
     refreshStaffLists().catch(() => {});
+    
+/***********************
+ * ADMIN: PROFIT (Daily / Monthly / Custom / Range)
+ * Minimal, plug-in only
+ ***********************/
+function profit_money(n) { return Number(n || 0).toFixed(2); }
+
+// Fallbacks for CSV helpers if not already defined in your file
+if (typeof escapeCSV !== "function") {
+  window.escapeCSV = function(value) {
+    const s = value === null || value === undefined ? "" : String(value);
+    const escaped = s.replace(/"/g, '""');
+    return /[",\n]/.test(escaped) ? `"${escaped}"` : escaped;
+  };
+}
+if (typeof downloadCSV !== "function") {
+  window.downloadCSV = function(filename, csvText) {
+    const blob = new Blob([csvText], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = filename; document.body.appendChild(a);
+    a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+  };
+}
+
+function profit_matchStatus(aStatus, statusMode) {
+  if (!statusMode || statusMode === "all") return true;
+  return (aStatus || "").toLowerCase() === statusMode.toLowerCase();
+}
+function profit_inDateRangeISO(dateISO, startISO, endISO) {
+  if (!dateISO) return false;
+  if (startISO && dateISO < startISO) return false;
+  if (endISO && dateISO > endISO) return false;
+  return true;
+}
+function profit_summarize(rows) {
+  let totalRevenue = 0, totalTips = 0, bookings = 0;
+  for (const a of rows) {
+    const price = Number(a.servicePrice ?? 0);
+    const tip = Number(a.tip ?? 0); // safe if missing
+    totalRevenue += price;
+    totalTips += tip;
+    bookings++;
+  }
+  return {
+    bookings,
+    totalRevenue,
+    totalTips,
+    avgTicket: bookings ? totalRevenue / bookings : 0
+  };
+}
+function profit_buildCSV(rows, summary, meta) {
+  const headers = [
+    "BookingId","Date","StartTime","StaffName","StaffEmail","Service",
+    "DurationMin","Price","Tip","Status","CustomerName","CustomerPhone",
+    "CustomerEmail","CreatedBy","CreatedByRole"
+  ];
+  const lines = [];
+  lines.push(headers.map(escapeCSV).join(","));
+  for (const a of rows) {
+    lines.push([
+      a.id, a.date || "", a.time || "", a.barberName || "", a.barberEmail || "",
+      a.serviceName || "", a.durationMin ?? "", a.servicePrice ?? "", a.tip ?? "",
+      a.status || "", a.customerName || "", a.phone || "", a.email || "",
+      a.createdBy || "", a.createdByRole || ""
+    ].map(escapeCSV).join(","));
+  }
+  lines.push("");
+  lines.push(escapeCSV(`Period: ${meta.period}`));
+  lines.push(escapeCSV(`Status Filter: ${meta.status}`));
+  lines.push(escapeCSV(`Total Bookings: ${summary.bookings}`));
+  lines.push(escapeCSV(`Total Revenue/Profit: $${profit_money(summary.totalRevenue)}`));
+  lines.push(escapeCSV(`Average Ticket: $${profit_money(summary.avgTicket)}`));
+  lines.push(escapeCSV(`Total Tips: $${profit_money(summary.totalTips)}`));
+  return lines.join("\n");
+}
+
+function profit_toggleDateInputs() {
+  const mode = $("profit-date-mode").value;
+  $("profit-date-custom-wrap").style.display = (mode === "custom") ? "block" : "none";
+  $("profit-month-wrap").style.display = (mode === "month") ? "block" : "none";
+  $("profit-range-wrap").style.display = (mode === "range") ? "block" : "none";
+}
+
+async function profit_fetchRows() {
+  const dateMode = $("profit-date-mode").value;
+  const statusMode = $("profit-status-filter").value || "completed";
+  const today = todayISO();
+  const yesterday = yesterdayISO();
+
+  let startISO = null, endISO = null, periodLabel = "";
+  if (dateMode === "today") {
+    startISO = today; endISO = today; periodLabel = `Today (${today})`;
+  } else if (dateMode === "yesterday") {
+    startISO = yesterday; endISO = yesterday; periodLabel = `Yesterday (${yesterday})`;
+  } else if (dateMode === "custom") {
+    const d = $("profit-custom-date").value?.trim();
+    if (!d) throw new Error("Select a custom date.");
+    startISO = d; endISO = d; periodLabel = `Date: ${d}`;
+  } else if (dateMode === "month") {
+    const m = $("profit-month").value?.trim(); // yyyy-mm
+    if (!m) throw new Error("Select a month (YYYY-MM).");
+    const [y, mm] = m.split("-");
+    const firstDay = `${y}-${mm}-01`;
+    const lastDate = new Date(Number(y), Number(mm), 0); // day 0 of next month
+    const lastDay = lastDate.toISOString().slice(0,10);
+    startISO = firstDay; endISO = lastDay; periodLabel = `Month: ${m}`;
+  } else if (dateMode === "range") {
+    const s = $("profit-range-start").value?.trim();
+    const e = $("profit-range-end").value?.trim();
+    if (!s || !e) throw new Error("Select both start and end dates for the range.");
+    if (e < s) throw new Error("Range end date cannot be before start date.");
+    startISO = s; endISO = e; periodLabel = `Range: ${s} to ${e}`;
+  } else {
+    startISO = today; endISO = today; periodLabel = `Today (${today})`;
+  }
+
+  // Fetch appointments ordered by createdAt to align with your current approach
+  const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+
+  const rows = [];
+  snap.forEach((d) => {
+    const a = d.data();
+    const rowDate = String(a.date || "").trim();
+    if (!profit_inDateRangeISO(rowDate, startISO, endISO)) return;
+    if (!profit_matchStatus(a.status, statusMode)) return;
+    rows.push({ id: d.id, ...a });
+  });
+
+  return { rows, periodLabel, statusMode };
+}
+
+async function profit_calculateAndRender() {
+  try {
+    const { rows, periodLabel, statusMode } = await profit_fetchRows();
+    const summary = profit_summarize(rows);
+    $("profit-period-label").innerText = periodLabel;
+    $("profit-status-label").innerText = statusMode;
+    $("profit-bookings-count").innerText = String(summary.bookings);
+    $("profit-total").innerText = profit_money(summary.totalRevenue);
+    $("profit-avg").innerText = profit_money(summary.avgTicket);
+    $("profit-tips").innerText = profit_money(summary.totalTips);
+
+    // cache for CSV
+    window.__lastProfitRows = rows;
+    window.__lastProfitSummary = summary;
+    window.__lastProfitMeta = { period: periodLabel, status: statusMode };
+  } catch (err) {
+    console.error("[Profit] Error:", err);
+    alert("Profit calculation failed: " + err.message);
+  }
+}
+
+async function profit_exportCSV() {
+  try {
+    if (!window.__lastProfitRows) await profit_calculateAndRender();
+    const rows = window.__lastProfitRows || [];
+    if (rows.length === 0) {
+      alert("No bookings found for selected filter to export.");
+      return;
+    }
+    const csv = profit_buildCSV(rows, window.__lastProfitSummary, window.__lastProfitMeta);
+    const dateMode = $("profit-date-mode").value;
+    const statusMode = $("profit-status-filter").value || "completed";
+    const fn = `profit_${dateMode}_${statusMode}_${todayISO()}.csv`;
+    downloadCSV(fn, csv);
+  } catch (err) {
+    console.error("[Profit] CSV Error:", err);
+    alert("Export failed: " + err.message);
+  }
+}
+
+// Wire up Profit navigation and controls without altering existing handlers
+(function wireProfitUI() {
+  const btnOpen = document.getElementById("admin-open-profit");
+  const pnlProfit = document.getElementById("admin-profit-panel");
+  if (!btnOpen || !pnlProfit) return;
+
+  btnOpen.addEventListener("click", async () => {
+    // Hide only sibling admin panels we know; do not touch other sections
+    const bookings = document.getElementById("admin-bookings-panel");
+    const staff = document.getElementById("admin-staff-section");
+    if (bookings) bookings.style.display = "none";
+    if (staff) staff.style.display = "none";
+    pnlProfit.style.display = "block";
+
+    profit_toggleDateInputs();
+    await profit_calculateAndRender(); // auto compute on open
+  });
+
+  const modeSel = document.getElementById("profit-date-mode");
+  if (modeSel) modeSel.addEventListener("change", profit_toggleDateInputs);
+
+  const btnCalc = document.getElementById("btn-calc-profit");
+  if (btnCalc) btnCalc.addEventListener("click", profit_calculateAndRender);
+
+  const btnExport = document.getElementById("btn-export-profit");
+  if (btnExport) btnExport.addEventListener("click", profit_exportCSV);
+})();
+
   </script>
 </body>
 
 </html>
+
 
 
 
