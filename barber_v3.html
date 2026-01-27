@@ -416,7 +416,151 @@ input[type="month"] {
   align-items: flex-start;            /* Avoid baseline misalignment */
   flex-wrap: wrap;                    /* Wrap gracefully on smaller widths */
 }
+/* === ALIGNMENT & LAYOUT FIXES (CLEAN) === */
 
+/* Normalize all row layouts */
+.row {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;   /* Avoid baseline misalignment */
+  flex-wrap: wrap;           /* Wrap gracefully on smaller widths */
+}
+
+/* Columns inside rows are flexible and not too narrow */
+.row > div {
+  flex: 1 1 0;
+  min-width: 220px;
+}
+
+/* Labels and inputs stack neatly */
+label {
+  display: block;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+input,
+select {
+  width: 100%;
+  display: block;
+  margin-top: 0;
+}
+
+/* Inline button alignment (no vertical wobble) */
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+/* Ensure status pills align in tables */
+.pill {
+  line-height: 1.2;
+  vertical-align: middle;
+}
+
+/* Table cells and header alignment */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  vertical-align: middle;
+  line-height: 1.35;
+}
+
+/* Ensure the table container actually scrolls horizontally when needed */
+.table-scroll {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Services list items: enforce consistent alignment */
+#services-list li {
+  align-items: center; /* Vertically center left/right chunks */
+}
+
+/* Auth + admin/staff rows: align inputs and buttons by baseline/end */
+#auth-section > div,
+#admin-section .row,
+#staff-section .row {
+  align-items: flex-end;
+}
+
+/* Admin sub-panels visual isolation */
+#admin-bookings-panel,
+#admin-staff-section,
+#admin-profit-panel,
+#admin-staff-details-panel {
+  background: #fff;
+  border: 1px solid #ecf0f1;
+  border-radius: 8px;
+  padding: 14px;
+  margin-top: 12px;
+}
+
+/* Make Staff Details panel look separate and full width */
+#admin-staff-details-panel {
+  width: 100%;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+/* Tighter helper text spacing */
+.muted {
+  display: block;
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+/* Improve cross-browser appearance of date/time inputs */
+input[type="date"],
+input[type="time"],
+input[type="month"] {
+  line-height: normal;
+  padding-top: 0.55em;
+  padding-bottom: 0.55em;
+}
+
+/* Buttons in narrow rows: avoid overflow pushes */
+#staff-checkin,
+#staff-checkout {
+  min-width: 120px;
+}
+
+/* --- Mobile polish --- */
+@media (max-width: 600px) {
+  .row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .container {
+    padding: 1.1em 1.2em;
+  }
+
+  /* Make table minimum width compact but readable */
+  .table-scroll table {
+    min-width: 760px; /* will scroll horizontally */
+  }
+
+  /* Buttons 100% width with consistent spacing */
+  button {
+    width: 100%;
+    margin: 0.4em 0;
+  }
+
+  /* Reduce excessive gaps on mobile */
+  .section {
+    margin-top: 0.8em;
+    padding-top: 0.8em;
+  }
+}
 
   </style>
 </head>
@@ -1963,6 +2107,7 @@ function staffdet_renderTable(rows) {
   })();
 </script>
 </html>
+
 
 
 
