@@ -442,6 +442,9 @@
   <div>
     <button id="admin-open-profit">💰 Profit</button>
   </div>
+  <div>
+    <button id="admin-open-staff-details">👤 View Staff Details</button>
+  </div>
 </div>
 
 
@@ -518,6 +521,36 @@
         <option value="range">Custom Range</option>
       </select>
     </div>
+    <!-- ADMIN: STAFF DETAILS PANEL (hidden by default) -->
+<div id="admin-staff-details-panel" style="display:none;" class="section">
+  <h3>Staff Details</h3>
+
+  <!-- Controls -->
+  <div class="row" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+    <div style="width:200px;">
+      <label for="staffdet-month">Month</label>
+      <input id="staffdet-month" type="month" />
+    </div>
+    <div>
+      <button id="btn-calc-staffdet" class="btn-success">Calculate</button>
+    </div>
+  </div>
+
+  <!-- Results -->
+  <div class="table-scroll" style="margin-top:12px;">
+    <table aria-label="Staff Working Days and Salary">
+      <thead>
+        <tr>
+          <th>Staff Name</th>
+          <th>Staff Email</th>
+          <th>Working Days (in month)</th>
+          <th>Salary (₹)</th>
+        </tr>
+      </thead>
+      <tbody id="staffdet-body"></tbody>
+    </table>
+  </div>
+</div>
 
     <!-- Status Filter -->
     <div style="width:180px;">
@@ -1647,11 +1680,144 @@ async function profit_exportCSV() {
   const btnExport = document.getElementById("btn-export-profit");
   if (btnExport) btnExport.addEventListener("click", profit_exportCSV);
 })();
+/***********************
+ * ADMIN: STAFF DETAILS (Working Days per Month + Daily Fixed Salary)
+ * Working day = date with at least one COMPLETED appointment by that staff.
+ ***********************/
+const STAFF_SALARY_PER_DAY_RS = 750; // ₹ per day (fixed)
 
+function monthOf(dateISO) {
+  // Returns 'YYYY-MM' (best effort)
+  if (!dateISO) return "";
+  const s = String(dateISO).trim();
+  return s.slice(0, 7); // assumes stored as 'YYYY-MM-DD'
+}
+
+function getCurrentMonth() {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${yyyy}-${mm}`; // 'YYYY-MM'
+}
+
+async function staffdet_fetchWorkingDaysByStaff(targetMonth) {
+  // Load staff list
+  const staffSnap = await getDocs(collection(db, "staff"));
+  const staffMap = new Map(); // email -> { name, email }
+  staffSnap.forEach(d => {
+    const data = d.data();
+    staffMap.set(d.id, { name: data.name || "", email: d.id });
+  });
+
+  // Load appointments (order by createdAt to match your pattern)
+  const q = query(collection(db, "appointments"), orderBy("createdAt", "desc"));
+  const snap = await getDocs(q);
+
+  // Count unique working dates per staff for the selected month
+  const datesByStaff = new Map(); // email -> Set('YYYY-MM-DD')
+  snap.forEach(docSnap => {
+    const a = docSnap.data();
+    const dateISO = (a.date || "").trim();        // expected 'YYYY-MM-DD'
+    const m = monthOf(dateISO);                    // 'YYYY-MM'
+    if (!m || m !== targetMonth) return;
+
+    // Status filter: count only completed days as worked
+    // 👉 If you want to count booked/in_progress too, replace the next line with:
+    // const ok = ["completed","in_progress","booked"].includes((a.status||"").toLowerCase());
+    const ok = (a.status || "").toLowerCase() === "completed";
+    if (!ok) return;
+
+    const email = a.barberEmail || "";
+    if (!email) return;
+
+    if (!datesByStaff.has(email)) datesByStaff.set(email, new Set());
+    datesByStaff.get(email).add(dateISO);
+  });
+
+  // Build result rows (include staff even if 0 days)
+  const rows = [];
+  for (const [email, staffInfo] of staffMap.entries()) {
+    const set = datesByStaff.get(email);
+    const workingDays = set ? set.size : 0;
+    rows.push({
+      name: staffInfo.name || email,
+      email,
+      workingDays,
+      salary: workingDays * STAFF_SALARY_PER_DAY_RS
+    });
+  }
+
+  // Sort nicely by name/email
+  rows.sort((a, b) => (a.name || a.email).localeCompare(b.name || b.email));
+  return rows;
+}
+
+function staffdet_renderTable(rows) {
+  const tbody = document.getElementById("staffdet-body");
+  tbody.innerHTML = "";
+  if (!rows || rows.length === 0) {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `<td colspan="4" class="muted">No staff found.</td>`;
+    tbody.appendChild(tr);
+    return;
+  }
+  rows.forEach(r => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${r.name || "N/A"}</td>
+      <td>${r.email}</td>
+      <td>${r.workingDays}</td>
+      <td>₹${Number(r.salary).toFixed(0)}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Wire up Staff Details UI
+(function wireStaffDetailsUI() {
+  const btnOpen = document.getElementById("admin-open-staff-details");
+  const pnl = document.getElementById("admin-staff-details-panel");
+  if (!btnOpen || !pnl) return;
+
+  // Default month
+  const inpMonth = document.getElementById("staffdet-month");
+  if (inpMonth) inpMonth.value = getCurrentMonth();
+
+  async function calcAndRender() {
+    try {
+      const m = (inpMonth && inpMonth.value) ? inpMonth.value : getCurrentMonth(); // 'YYYY-MM'
+      const rows = await staffdet_fetchWorkingDaysByStaff(m);
+      staffdet_renderTable(rows);
+    } catch (err) {
+      console.error("[StaffDetails] Error:", err);
+      alert("Failed to calculate staff details: " + err.message);
+    }
+  }
+
+  // Open button
+  btnOpen.addEventListener("click", async () => {
+    // Hide other admin panels
+    const bookings = document.getElementById("admin-bookings-panel");
+    const staffAdmin = document.getElementById("admin-staff-section");
+    const profit = document.getElementById("admin-profit-panel");
+    if (bookings) bookings.style.display = "none";
+    if (staffAdmin) staffAdmin.style.display = "none";
+    if (profit) profit.style.display = "none";
+
+    pnl.style.display = "block";
+    await calcAndRender();
+  });
+
+  // Calculate button
+  const btnCalc = document.getElementById("btn-calc-staffdet");
+  if (btnCalc) btnCalc.addEventListener("click", calcAndRender);
+})();
+``
   </script>
 </body>
 
 </html>
+
 
 
 
