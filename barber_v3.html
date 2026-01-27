@@ -1948,11 +1948,22 @@ function staffdet_renderTable(rows) {
   const btnCalc = document.getElementById("btn-calc-staffdet");
   if (btnCalc) btnCalc.addEventListener("click", calcAndRender);
 })();
-``
+`<script>
+  // Re-parent Staff Details panel under Admin section on load
+  (function () {
+    const adminSection = document.getElementById("admin-section");
+    const staffDetails = document.getElementById("admin-staff-details-panel");
+    if (adminSection && staffDetails && staffDetails.parentElement !== adminSection) {
+      adminSection.appendChild(staffDetails); // now it's a sibling panel, not nested in Profit
+    }
+  })();
+</script>
+```
   </script>
 </body>
 
 </html>
+
 
 
 
