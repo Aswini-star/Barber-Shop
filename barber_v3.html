@@ -498,8 +498,11 @@
 <div id="admin-profit-panel" style="display:none;" class="section">
   <h3>Profit</h3>
 
-  <div class="row" style="gap:8px; align-items:flex-end;">
-    <div>
+  <!-- Row Layout -->
+  <div class="row" style="display:flex; gap:12px; align-items:flex-end; flex-wrap:wrap;">
+
+    <!-- Date Mode -->
+    <div style="width:180px;">
       <label for="profit-date-mode">Date Mode</label>
       <select id="profit-date-mode">
         <option value="today" selected>Today</option>
@@ -510,7 +513,8 @@
       </select>
     </div>
 
-    <div>
+    <!-- Status Filter -->
+    <div style="width:180px;">
       <label for="profit-status-filter">Status</label>
       <select id="profit-status-filter">
         <option value="completed" selected>completed</option>
@@ -522,17 +526,20 @@
       </select>
     </div>
 
-    <div id="profit-date-custom-wrap" style="display:none;">
+    <!-- Custom Date -->
+    <div id="profit-date-custom-wrap" style="display:none; width:180px;">
       <label for="profit-custom-date">Custom Date</label>
       <input id="profit-custom-date" type="date" />
     </div>
 
-    <div id="profit-month-wrap" style="display:none;">
+    <!-- Month -->
+    <div id="profit-month-wrap" style="display:none; width:180px;">
       <label for="profit-month">Month</label>
       <input id="profit-month" type="month" />
     </div>
 
-    <div id="profit-range-wrap" style="display:none;">
+    <!-- Date Range -->
+    <div id="profit-range-wrap" style="display:none; width:260px;">
       <label for="profit-range-start">Range</label>
       <div style="display:flex; gap:6px;">
         <input id="profit-range-start" type="date" />
@@ -540,12 +547,15 @@
       </div>
     </div>
 
-    <div>
+    <!-- Buttons -->
+    <div style="display:flex; flex-direction:column; gap:6px;">
       <button id="btn-calc-profit" class="btn-success">Calculate Profit</button>
       <button id="btn-export-profit" class="btn-warning">Export CSV</button>
     </div>
+
   </div>
 
+  <!-- Results Section -->
   <div id="profit-results" style="margin-top:14px;">
     <div class="card" style="padding:12px; line-height:1.7;">
       <div><strong>Period:</strong> <span id="profit-period-label">—</span></div>
@@ -556,6 +566,7 @@
       <div><strong>Total Tips:</strong> $<span id="profit-tips">0.00</span></div>
     </div>
   </div>
+
 </div>
 
     </div>
@@ -1635,6 +1646,7 @@ async function profit_exportCSV() {
 </body>
 
 </html>
+
 
 
 
