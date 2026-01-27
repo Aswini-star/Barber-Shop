@@ -1,107 +1,339 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+
+  <!-- ✅ MUST for mobile fit -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Royal Cut Barber Shop</title>
 
   <style>
-    * {
-      box-sizing: border-box;
+    :root{
+      --bg1:#070a12;
+      --bg2:#0b1635;
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,0.75);
+      --border:rgba(255,255,255,0.16);
+      --card:rgba(255,255,255,0.07);
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+      --accent:#f59e0b;
     }
-    body {
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #1976d2, #64b5f6);
-      font-family: Arial, sans-serif;
+
+    /* ✅ hard stop for mobile overflow */
+    *{ box-sizing:border-box; }
+    html, body{
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden; /* prevents side scrolling */
     }
-    .login-box {
-      background: white;
-      padding: 24px;
-      width: 100%;
-      max-width: 360px;
-      border-radius: 12px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+
+      /* ✅ background that doesn't cause width overflow */
+      background:
+        radial-gradient(600px circle at 15% 10%, rgba(245,158,11,0.22), transparent 55%),
+        radial-gradient(600px circle at 85% 25%, rgba(96,165,250,0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+
+      /* ✅ safe padding on phones */
+      padding: max(12px, env(safe-area-inset-top))
+               max(12px, env(safe-area-inset-right))
+               max(12px, env(safe-area-inset-bottom))
+               max(12px, env(safe-area-inset-left));
+
+      display:flex;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
     }
-    h2 {
-      text-align: center;
-      margin-bottom: 20px;
+
+    /* ✅ main container fits all screens */
+    .shell{
+      width:100%;
+      max-width: 980px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
     }
-    input {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 12px;
-      font-size: 16px;
+
+    header{
+      padding:16px;
+      border-bottom:1px solid var(--border);
+
+      /* ✅ stack on mobile */
+      display:flex;
+      flex-direction:column;
+      gap:12px;
     }
-    button {
-      width: 100%;
-      padding: 12px;
-      background: #1976d2;
-      color: white;
-      border: none;
-      font-size: 16px;
-      border-radius: 6px;
+
+    .brandRow{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width:0;
     }
-    button:active {
-      transform: scale(0.98);
+
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
+      border:1px solid rgba(255,255,255,0.18);
     }
-    #msg {
-      margin-top: 10px;
-      text-align: center;
-      color: red;
-      font-size: 14px;
+
+    .logo span{
+      font-weight:900;
+      letter-spacing:0.7px;
+    }
+
+    .brand{
+      min-width:0;
+    }
+
+    /* ✅ responsive text that NEVER breaks layout */
+    .brand h1{
+      margin:0;
+      font-size: clamp(16px, 5vw, 22px);
+      line-height:1.15;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .brand p{
+      margin:4px 0 0;
+      font-size: clamp(12px, 3.5vw, 14px);
+      color:var(--muted);
+      line-height:1.35;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.2;
+
+      /* ✅ allow wrapping inside badge */
+      white-space:normal;
+      max-width:100%;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+      flex:0 0 auto;
+    }
+
+    main{
+      padding:16px;
+      display:flex;
+      flex-direction:column; /* ✅ mobile first */
+      gap:12px;
+    }
+
+    .hero{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--card);
+      padding:14px;
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size: clamp(20px, 6.2vw, 32px);
+      line-height:1.12;
+    }
+
+    .hero p{
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .chips{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.16);
+      color: var(--muted);
+      font-size:13px;
+      max-width:100%;
+    }
+
+    .chip b{
+      color: var(--text);
+      font-weight:800;
+    }
+
+    .cta{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--card);
+      padding:14px;
+    }
+
+    .cta h3{
+      margin:0 0 6px;
+      font-size:15px;
+    }
+    .cta p{
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    /* ✅ Mobile button: full width, no overflow */
+    .btn{
+      margin-top:12px;
+      width:100%;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid rgba(245,158,11,0.55);
+
+      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
+      color:var(--text);
+      font-weight:900;
+      letter-spacing:0.2px;
+
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+    }
+
+    footer{
+      padding:12px 16px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:12px;
+
+      display:flex;
+      flex-direction:column; /* ✅ stack on phones */
+      gap:6px;
+    }
+
+    /* ✅ Desktop enhancement: 2-column layout only when there is space */
+    @media (min-width: 900px){
+      header{
+        flex-direction:row;
+        justify-content:space-between;
+        align-items:flex-start;
+      }
+      main{
+        flex-direction:row;
+        align-items:stretch;
+      }
+      .hero{ flex: 1.35; }
+      .cta{ flex: 0.65; }
+      footer{
+        flex-direction:row;
+        justify-content:space-between;
+        align-items:center;
+      }
     }
   </style>
 </head>
 
 <body>
+  <div class="shell">
 
-<div class="login-box">
-  <h2>Login</h2>
-  <input id="email" placeholder="Email">
-  <input id="password" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p id="msg"></p>
-</div>
+    <header>
+      <div class="brandRow">
+        <div class="logo" aria-hidden="true"><span>AC</span></div>
+        <div class="brand">
+          <h1>Ashwini Cut Barber Shop</h1>
+          <p>12, Anna Salai, T. Nagar, vallam - 600017</p>
+        </div>
+      </div>
 
-<!-- Firebase SDKs -->
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
+      <div class="badges">
+        <div class="badge"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
+        <div class="badge">⭐ 4.8 • 2.1k+ Customers</div>
+      </div>
+    </header>
 
-<script>
-firebase.initializeApp({
-  apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-  authDomain: "barber-shop-4c26f.firebaseapp.com",
-  projectId: "barber-shop-4c26f",
-  storageBucket: "barber-shop-4c26f.firebasestorage.app",
-  messagingSenderId: "213114385226",
-  appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
-});
+    <main>
+      <section class="hero">
+        <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
+        <p>
+          Premium grooming with hygiene-first service. Tap continue to open your barber page.
+        </p>
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+        <div class="chips">
+          <div class="chip">💈 <b>Haircut</b> & Styling</div>
+          <div class="chip">🧔 <b>Beard</b> Trim & Shape</div>
+          <div class="chip">🧼 <b>Cleanup</b> & Facial</div>
+          <div class="chip">👦 <b>Kids</b> Haircut</div>
+        </div>
+      </section>
 
-/* ⚠️ TEMPORARY – REMOVE AFTER FIRST LOGIN */
-auth.onAuthStateChanged(user => {
-  if (user) {
-    db.collection("users").doc(user.uid).set({ role: "admin" });
-  }
-});
+      <aside class="cta">
+        <h3>Continue</h3>
+        <p>Tap the button to proceed.</p>
+        <button class="btn" id="continueBtn">Continue</button>
 
-function login() {
-  msg.innerText = "Logging in...";
-  auth.signInWithEmailAndPassword(email.value, password.value)
-    .then(res => db.collection("users").doc(res.user.uid).get())
-    .then(doc => {
-      const role = doc.data().role;
-      location.href = role + ".html";
-    })
-    .catch(e => msg.innerText = e.message);
-}
-</script>
+        <p style="margin-top:10px; font-size:12px; color: var(--muted);">
+          Opens: <b>barber_v3.html</b>
+        </p>
+      </aside>
+    </main>
 
+    <footer>
+      <span>© 2026 Ashwini Cut Barber Shop</span>
+      <span>Call: +91 99621 76423</span>
+    </footer>
+
+  </div>
+
+  <script>
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      window.location.assign("./barber_v3.html");
+    });
+  </script>
 </body>
 </html>
