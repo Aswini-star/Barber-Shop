@@ -665,12 +665,6 @@
 
     function setBadge(role) {
       const badge = $("role-badge");
-      
-if (role === "customer") {    // 👈 hide for customers
-    badge.style.display = "none";
-    return;
-  }
-
       badge.style.display = "block";
       let cls = "pill blue";
       if (role === "admin") cls = "pill red";
@@ -726,24 +720,6 @@ function showSectionForRole(role) {
   $("staff-section").style.display = "none";
   $("admin-section").style.display = "none";
   $("admin-staff-section").style.display = "none";
-  function updateHeaderUI(role) {
-  // Elements that show role and login status
-  const roleBadge = $("role-badge");
-  const statusEl = $("status");
-
-  if (role === "customer") {
-    // Hide both for customers
-    roleBadge.style.display = "none";
-    statusEl.style.display = "none";
-  } else {
-    // Show for staff/admin; keep hidden for guests until login
-    if (role !== "guest") {
-      roleBadge.style.display = "block";
-      statusEl.style.display = "block";
-    }
-  }
-}
-``
 
   // Hide admin panel by default
   $("admin-bookings-panel").style.display = "none";
@@ -1417,27 +1393,14 @@ function showSectionForRole(role) {
       try {
         currentUser = user || null;
         if (user) {
+          $("status").style.color = "#27ae60";
+          $("status").innerText = `Logged in as: ${user.email}`;
           $("auth-section").style.display = "none";
-$("logout-section").style.display = "block";
-
-currentRole = await determineRole(user);
-
-// Status text: show only to staff/admin
-if (currentRole === "customer") {
-  $("status").innerText = "";
-  $("status").style.display = "none";
-} else {
-  $("status").style.display = "block";
-  $("status").style.color = "#27ae60";
-  $("status").innerText = `Logged in as: ${user.email}`;
-}
-
-// Badge: keep default logic, then hide if customer
-setBadge(currentRole);
-updateHeaderUI(currentRole);
-
-// Update the rest of UI
-showSectionForRole(currentRole);
+          $("logout-section").style.display = "block";
+          currentRole = await determineRole(user);
+          setBadge(currentRole);
+          // update UI for role
+          showSectionForRole(currentRole);
           // refresh staff list cache for dropdowns (customer booking + staff manual booking)
           await refreshStaffLists();
           if (currentRole === "staff") {
@@ -1449,7 +1412,6 @@ showSectionForRole(currentRole);
         } else {
           $("status").style.color = "#27ae60";
           $("status").innerText = "Not logged in";
-          $("status").style.display = "none";
           $("auth-section").style.display = "block";
           $("logout-section").style.display = "none";
           $("role-badge").style.display = "none";
@@ -1673,8 +1635,6 @@ async function profit_exportCSV() {
 </body>
 
 </html>
-
-
 
 
 
