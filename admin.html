@@ -1,122 +1,141 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Admin – Monthly Ledger</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <title>Admin • Create User</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --input:#0b1220; --ok:#34d399; --err:#f87171; --btn:#22d3ee60; --btnbg:#22d3ee30; }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    main{max-width:520px;margin:8vh auto;background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border)}
+    h1{margin:0 0 8px;font-size:20px}
+    label{display:block;font-size:12px;color:var(--muted);margin-top:12px}
+    input,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
+    button{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--btnbg);color:#fff;border:1px solid var(--btn);cursor:pointer}
+    pre{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px;min-height:40px;color:var(--muted)}
+    a{color:#7dd3fc;text-decoration:none}
+    .ok{color:var(--ok)} .err{color:var(--err)}
+  </style>
 
-<style>
-body { font-family: Arial; background:#f2f4f7; padding:10px }
-.card { background:#fff; padding:15px; margin-bottom:15px; border-radius:10px }
-input,select,button { width:100%; padding:10px; margin-top:8px }
-button { background:#007bff; color:#fff; border:none; border-radius:6px }
-table { width:100%; border-collapse:collapse }
-th,td { padding:8px; border-bottom:1px solid #ddd }
-</style>
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-functions.js";
+
+    // 1) Your Firebase config (same as index.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+    };
+
+    // 2) Functions region in India:
+    //    "asia-south1" = Mumbai, "asia-south2" = Delhi NCR  [1](https://bootstrapped.app/guide/how-to-use-firebase-authentication-with-custom-tokens)
+    //    getFunctions(app, regionOrCustomDomain) lets you target that region. [2](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
+    const FUNCTIONS_REGION = "asia-south1";
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const functions = getFunctions(app, FUNCTIONS_REGION);
+
+    const $ = (id) => document.getElementById(id);
+    const setStatus = (m, cls="") => { const el = $("status"); el.textContent = m; el.className = cls; };
+
+    async function createOrUpdateUser(e){
+      e.preventDefault();
+      const username = $("username").value.trim();
+      const password = $("password").value;
+      const role = $("role").value;
+      const disabled = $("disabled").checked;
+      if(!username || password.length < 8){
+        setStatus("Username & password (≥ 8 chars) required.","err"); return;
+      }
+      try{
+        setStatus("Creating…");
+        const fn = httpsCallable(functions, "adminCreateUser");
+        const { data } = await fn({ username, password, role, disabled });
+        setStatus(`OK: uid=${data.uid} role=${data.role} disabled=${data.disabled}`,"ok");
+      }catch(err){
+        console.error(err);
+        setStatus(err?.message || "Failed.","err");
+      }
+    }
+
+    async function doSignout(){
+      await signOut(auth);
+      setStatus("Signed out.");
+      $("panel").style.display = "none";
+      $("notAdmin").style.display = "block";
+    }
+
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){
+        $("panel").style.display = "none";
+        $("notAdmin").style.display = "block";
+        setStatus("Not signed in.");
+        return;
+      }
+      const idt = await user.getIdTokenResult(true);
+      const role = idt.claims.role || "user";
+      if(role !== "admin"){
+        $("panel").style.display = "none";
+        $("notAdmin").style.display = "block";
+        setStatus("You are signed in but not an admin.","err");
+      }else{
+        $("panel").style.display = "block";
+        $("notAdmin").style.display = "none";
+        $("whoami").textContent = `Admin: uid=${user.uid}`;
+        setStatus("Admin ready.","ok");
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", ()=>{
+      $("create-form").addEventListener("submit", createOrUpdateUser);
+      $("signout-btn").addEventListener("click", doSignout);
+    });
+  </script>
 </head>
-
 <body>
+  <main>
+    <h1>Admin • Create User</h1>
+    <p style="color:#94a3b8;font-size:13px">Sign in as <b>raja</b> on index.htmllogin</a> first.</p>
 
-<h2>Monthly Customer Ledger</h2>
+    <section id="panel" style="display:none">
+      <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+        <div id="whoami" class="ok"></div>
+        <button id="signout-btn">Sign out</button>
+      </div>
 
-<div class="card">
-  <h3>Add Customer</h3>
-  <input id="name" placeholder="Customer Name">
-  <input id="principal" type="number" placeholder="Opening Principal">
-  <input id="rate" type="number" placeholder="Monthly Interest %">
-  <button onclick="addCustomer()">Add</button>
-</div>
+      <form id="create-form" autocomplete="off" style="margin-top:10px">
+        <label>Username (e.g., +447900123456)</label>
+        <input id="username" required />
+        <label>Password (≥ 8 chars)</label>
+        <input id="password" type="password" required />
+        <label>Role</label>
+        <select id="role">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:10px">
+          <input type="checkbox" id="disabled" /> Disabled
+        </label>
+        <button type="submit">Create / Update</button>
+      </form>
+    </section>
 
-<div class="card">
-  <h3>Select Month</h3>
-  <select id="month"></select>
-  <button onclick="loadData()">Load</button>
-</div>
+    <section id="notAdmin" style="display:none;margin-top:8px">
+      <p class="err">You must be signed in as an admin to use this page.</p>
+      <p style="color:#94a3b8;font-size:12px">If you just promoted a user to admin on the server, sign out and sign in again so the new claim is picked up.</p>
+    </section>
 
-<div class="card">
-  <table>
-    <thead>
-      <tr><th>Name</th><th>Principal</th><th>Collected</th><th>Interest</th></tr>
-    </thead>
-    <tbody id="list"></tbody>
-  </table>
-</div>
+    <pre id="status">Loading…</pre>
 
-<!-- Firebase -->
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore-compat.js"></script>
-
-<script>
-firebase.initializeApp({
-  apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-  authDomain: "barber-shop-4c26f.firebaseapp.com",
-  projectId: "barber-shop-4c26f"
-});
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-/* 🔑 AUTH FIX (THIS WAS MISSING) */
-auth.signInAnonymously()
-  .then(()=>console.log("Auth OK"))
-  .catch(e=>alert(e.message));
-
-function currentMonth(){
-  const d=new Date();
-  return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0");
-}
-
-/* MONTH LIST */
-const sel=document.getElementById("month");
-for(let y=2024;y<=2035;y++){
-  for(let m=0;m<12;m++){
-    const v=`${y}-${String(m+1).padStart(2,"0")}`;
-    sel.innerHTML+=`<option value="${v}">${v}</option>`;
-  }
-}
-sel.value=currentMonth();
-
-/* ADD CUSTOMER */
-async function addCustomer(){
-  const name=nameEl.value.trim();
-  const principal=+principalEl.value;
-  const rate=+rateEl.value;
-
-  if(!name||!principal||!rate){ alert("Fill all"); return; }
-
-  const ref=await db.collection("customers").add({name,rate});
-  await ref.collection("ledger").doc(currentMonth()).set({
-    principal, collected:0, interest:principal*rate/100
-  });
-
-  loadData();
-}
-
-async function loadData(){
-  const m=sel.value;
-  list.innerHTML="";
-  const snap=await db.collection("customers").get();
-
-  for(const d of snap.docs){
-    const l=await d.ref.collection("ledger").doc(m).get();
-    if(!l.exists) continue;
-    const r=l.data();
-    list.innerHTML+=`
-      <tr>
-        <td>${d.data().name}</td>
-        <td>${r.principal}</td>
-        <td><input value="${r.collected}"
-          onchange="d.ref.collection('ledger').doc('${m}')
-          .update({collected:+this.value})"></td>
-        <td>${r.interest}</td>
-      </tr>`;
-  }
-}
-
-/* shortcuts */
-const nameEl=name, principalEl=principal, rateEl=rate, list=list;
-</script>
-
+    <p style="color:#94a3b8;font-size:12px;margin-top:8px">
+      If this page is on GitHub Pages, ensure its domain is in Firebase <b>Authorized domains</b> (Auth → Settings).
+    </p>
+  </main>
 </body>
 </html>
