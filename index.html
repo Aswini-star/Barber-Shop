@@ -2,232 +2,123 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Phone Login • Firebase</title>
+  <title>Login • Firebase Custom Auth</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    :root {
-      --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8;
-      --accent:#22d3ee; --danger:#f87171; --success:#34d399; --border:#1f2937; --input-bg:#0b1220;
-    }
-    * { box-sizing: border-box; }
-    html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
-    main { max-width: 480px; margin: 6vh auto; padding: 28px; border: 1px solid var(--border); border-radius: 16px; background: #0b1220a6; }
-    h1 { margin: 0 0 6px; font-size: 22px; }
-    p.sub { margin: 0 0 18px; color: var(--muted); font-size: 13.5px; }
-    form { display: grid; gap: 10px; margin: 16px 0; }
-    label { font-size: 13px; color: var(--muted); }
-    input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); }
-    input:focus { border-color: rgba(34,211,238,.6); outline: none; box-shadow: 0 0 0 4px rgba(34,211,238,.12); }
-    button { padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(34,211,238,.14), rgba(34,211,238,.10)); color:#fff; font-weight:600; cursor:pointer; }
-    button.secondary { background: transparent; border-color: var(--border); color: var(--muted); font-weight: 500; }
-    .row { display: flex; gap: 10px; align-items: center; }
-    .row > * { flex: 1; }
-    .hidden { display: none !important; }
-    pre#status { background: rgba(2,6,23,.6); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; min-height: 48px; white-space: pre-wrap; color: var(--muted); font-size: 13px; margin-top: 14px; }
-    .pill { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); padding: 6px 10px; border-radius: 999px; border: 1px dashed var(--border); margin-top: 6px; }
-    .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --input:#0b1220; --ok:#34d399; --err:#f87171; --btn:#22d3ee60; --btnbg:#22d3ee30; }
+    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
+    main{max-width:420px;margin:9vh auto;background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border)}
+    h1{margin:0 0 8px;font-size:20px}
+    label{display:block;font-size:12px;color:var(--muted);margin-top:12px}
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
+    button{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--btnbg);color:#fff;border:1px solid var(--btn);cursor:pointer}
+    pre{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px;min-height:40px;color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center}
+    a{color:#7dd3fc;text-decoration:none}
+    .ok{color:var(--ok)} .err{color:var(--err)}
   </style>
+
+  <!-- App code (ESM) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-functions.js";
+
+    // 1) Your Firebase config (paste from Console)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+    };
+
+    // 2) Functions region in India:
+    //    "asia-south1" = Mumbai, "asia-south2" = Delhi NCR  [1](https://bootstrapped.app/guide/how-to-use-firebase-authentication-with-custom-tokens)
+    //    The Web SDK accepts the region string: getFunctions(app, regionOrCustomDomain). [2](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
+    const FUNCTIONS_REGION = "asia-south1";
+
+    // Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const functions = getFunctions(app, FUNCTIONS_REGION);
+
+    // UI helpers
+    const $ = (id) => document.getElementById(id);
+    const setStatus = (msg, cls="") => { const el = $("status"); el.textContent = msg; el.className = cls; };
+
+    // Login flow: call callable 'login' -> receive {token} -> signInWithCustomToken
+    async function doLogin(e){
+      e.preventDefault();
+      const username = $("username").value.trim();
+      const password = $("password").value;
+      if(!username || !password){ setStatus("Enter username & password","err"); return; }
+      setStatus("Signing in…");
+      try{
+        const loginFn = httpsCallable(functions, "login");
+        const { data } = await loginFn({ username, password });
+        await signInWithCustomToken(auth, data.token);
+        await auth.currentUser.getIdToken(true); // refresh to pick up claims
+        setStatus("Signed in.","ok");
+      }catch(err){
+        console.error(err);
+        setStatus(err?.message || "Login failed.","err");
+      }
+    }
+
+    async function doSignout(){
+      await signOut(auth);
+      setStatus("Signed out.");
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+      if(user){
+        const idt = await user.getIdTokenResult();
+        const role = idt.claims.role || "user";
+        $("authed").style.display = "block";
+        $("whoami").textContent = `uid=${user.uid}, role=${role}`;
+        $("adminLinkWrap").style.display = role === "admin" ? "block" : "none";
+      }else{
+        $("authed").style.display = "none";
+        $("whoami").textContent = "";
+      }
+    });
+
+    window.addEventListener("DOMContentLoaded", ()=>{
+      $("login-form").addEventListener("submit", doLogin);
+      $("signout-btn").addEventListener("click", doSignout);
+    });
+  </script>
 </head>
 <body>
   <main>
-    <h1>Sign in with your phone</h1>
-    <p class="sub">Enter your mobile number in E.164 format (e.g., <code>+447900123456</code>), then verify the code.</p>
+    <h1>Sign in</h1>
+    <p style="color:#94a3b8;font-size:13px">Username can be a phone number (e.g., +447900123456).</p>
 
-    <!-- Step 1: Phone -->
-    <form id="phone-form" autocomplete="off" novalidate>
-      <label for="phone">Phone number</label>
-      <div class="row">
-        <input id="phone" type="tel" placeholder="+447900123456" required />
-        <button id="send-otp-btn" type="submit">Send Code</button>
-      </div>
-      <div class="pill">reCAPTCHA (invisible) enabled</div>
+    <form id="login-form" autocomplete="off">
+      <label>Username</label>
+      <input id="username" placeholder="+447900123456" required />
+      <label>Password</label>
+      <input id="password" type="password" placeholder="••••••••" required />
+      <button type="submit">Sign in</button>
     </form>
 
-    <!-- Step 2: OTP -->
-    <form id="otp-form" class="hidden" autocomplete="one-time-code" novalidate>
-      <label for="otp">Verification code</label>
-      <div class="row">
-        <input id="otp" inputmode="numeric" placeholder="6-digit code" required />
-        <button id="verify-otp-btn" type="submit">Verify & Sign In</button>
+    <section id="authed" style="display:none;margin-top:12px">
+      <div class="row" style="justify-content:space-between">
+        <div id="whoami" class="ok"></div>
+        <button id="signout-btn">Sign out</button>
       </div>
-      <div class="row">
-        <button id="resend-btn" type="button" class="secondary">Resend Code</button>
-        <button id="edit-phone-btn" type="button" class="secondary">Edit Phone</button>
+      <div id="adminLinkWrap" style="display:none;margin-top:10px">
+        <a href="admino Admin</a>
       </div>
-      <div class="note" id="timer-note"></div>
-    </form>
+    </section>
 
-    <!-- reCAPTCHA container (required even for invisible) -->
-    <div id="recaptcha-container"></div>
-
-    <!-- Status -->
     <pre id="status">Not signed in.</pre>
 
-    <!-- Sign out -->
-    <button id="signout-btn" class="hidden">Sign out</button>
+    <p style="color:#94a3b8;font-size:12px;margin-top:8px">
+      If this page is on GitHub Pages, add your domain to Firebase <b>Authorized domains</b> (Auth → Settings). 
+    </p>
   </main>
-
-  <!-- Single inline module (no external <script src> in <head>) -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import {
-      getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-    import {
-      getFirestore, doc, getDoc, setDoc, serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
-
-    // 1) Replace with YOUR Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyAHJhFtJUNbQB8_3mQUqvTo0aR7XK8CMzg",
-  authDomain: "loan-9cd9e.firebaseapp.com",
-  projectId: "loan-9cd9e",
-  storageBucket: "loan-9cd9e.firebasestorage.app",
-  messagingSenderId: "763284737698",
-  appId: "1:763284737698:web:b7d53bcebb9d88f82cd1fb"
-    };
-
-    // 2) Init
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    auth.languageCode = "en";
-
-    // 3) DOM
-    const phoneForm = document.getElementById("phone-form");
-    const otpForm = document.getElementById("otp-form");
-    const phoneInput = document.getElementById("phone");
-    const otpInput = document.getElementById("otp");
-    const statusEl = document.getElementById("status");
-    const signoutBtn = document.getElementById("signout-btn");
-    const resendBtn = document.getElementById("resend-btn");
-    const editPhoneBtn = document.getElementById("edit-phone-btn");
-    const timerNote = document.getElementById("timer-note");
-
-    // 4) State
-    let confirmationResult = null;
-    let currentPhone = "";
-    let cooldown = 30;
-    let timerId = null;
-
-    // Helpers
-    const setStatus = (msg, color) => { statusEl.textContent = msg; statusEl.style.color = color || "#94a3b8"; };
-    const isE164 = (p) => /^\+[1-9]\d{7,14}$/.test(p);
-    const show = (el) => el.classList.remove("hidden");
-    const hide = (el) => el.classList.add("hidden");
-    const startTimer = (sec) => {
-      clearInterval(timerId);
-      let t = sec;
-      timerNote.textContent = `You can resend the code in ${t}s.`;
-      timerId = setInterval(() => {
-        t--;
-        if (t <= 0) { clearInterval(timerId); timerNote.textContent = "You can resend the code now."; resendBtn.disabled = false; }
-        else { timerNote.textContent = `You can resend the code in ${t}s.`; }
-      }, 1000);
-    };
-    const resetRecaptcha = async () => {
-      try {
-        const id = await recaptchaVerifier.render();
-        if (window.grecaptcha?.reset) window.grecaptcha.reset(id);
-      } catch {}
-    };
-
-    // 5) reCAPTCHA (Invisible)
-    const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
-      size: "invisible",
-      callback: () => {},
-      "expired-callback": () => setStatus("reCAPTCHA expired. Please try again.", "#f87171"),
-    });
-
-    // 6) Firestore upsert (optional)
-    async function upsertUserProfile(user) {
-      if (!user?.uid) return;
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        await setDoc(ref, { lastLogin: serverTimestamp() }, { merge: true });
-      } else {
-        await setDoc(ref, {
-          uid: user.uid,
-          phoneNumber: user.phoneNumber || null,
-          createdAt: serverTimestamp(),
-          lastLogin: serverTimestamp(),
-        });
-      }
-    }
-
-    // 7) Send Code
-    phoneForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      const phone = phoneInput.value.trim();
-      if (!isE164(phone)) return setStatus("Enter a valid E.164 phone, e.g., +447900123456.", "#f87171");
-      try {
-        setStatus("Sending code…");
-        confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
-        currentPhone = phone;
-        setStatus("Code sent. Check your SMS.");
-        hide(phoneForm); show(otpForm); otpInput.focus();
-        resendBtn.disabled = true; startTimer(cooldown);
-      } catch (err) {
-        console.error(err);
-        await resetRecaptcha();
-        setStatus(err?.message || "Failed to send code.", "#f87171");
-      }
-    });
-
-    // 8) Verify Code
-    otpForm.addEventListener("submit", async (e) => {
-      e.preventDefault();
-      if (!confirmationResult) return setStatus("No pending verification. Request a new code.", "#f87171");
-      const code = otpInput.value.trim();
-      if (!code) return setStatus("Please enter the 6-digit code.", "#f87171");
-      try {
-        setStatus("Verifying code…");
-        const cred = await confirmationResult.confirm(code);
-        await upsertUserProfile(cred.user);
-        setStatus(`Signed in as ${cred.user.phoneNumber}`, "#34d399");
-        show(signoutBtn);
-      } catch (err) {
-        console.error(err);
-        setStatus(err?.message || "Invalid code.", "#f87171");
-      }
-    });
-
-    // 9) Resend & Edit
-    resendBtn.addEventListener("click", async () => {
-      if (!currentPhone) return;
-      try {
-        resendBtn.disabled = true;
-        setStatus("Resending code…");
-        confirmationResult = await signInWithPhoneNumber(auth, currentPhone, recaptchaVerifier);
-        setStatus("Code resent. Check your SMS.");
-        startTimer(cooldown);
-      } catch (err) {
-        console.error(err);
-        await resetRecaptcha();
-        setStatus(err?.message || "Failed to resend code.", "#f87171");
-        resendBtn.disabled = false;
-      }
-    });
-    editPhoneBtn.addEventListener("click", async () => {
-      show(phoneForm); hide(otpForm); otpForm.reset(); phoneInput.focus();
-      await resetRecaptcha();
-      setStatus("Edit your phone number and send the code again.");
-    });
-
-    // 10) Auth state
-    onAuthStateChanged(auth, (user) => {
-      if (user) { setStatus(`Authenticated: ${user.phoneNumber || user.uid}`, "#34d399"); show(signoutBtn); }
-      else { setStatus("Not signed in."); }
-    });
-
-    // 11) Sign out
-    signoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      setStatus("Signed out.");
-      show(phoneForm); hide(otpForm); otpForm.reset();
-      await resetRecaptcha();
-    });
-  </script>
 </body>
 </html>
