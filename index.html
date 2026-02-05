@@ -1,341 +1,423 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <title>Phone Login • Firebase</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
-  <!-- ✅ MUST for mobile fit -->
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-
-  <title>Ashwini Cut Barber Shop</title>
-
+  <!-- Styling kept simple & self-contained -->
   <style>
-    :root{
-      --bg1:#070a12;
-      --bg2:#0b1635;
-      --text:#eaf0ff;
-      --muted:rgba(234,240,255,0.75);
-      --border:rgba(255,255,255,0.16);
-      --card:rgba(255,255,255,0.07);
-      --shadow: 0 18px 45px rgba(0,0,0,0.45);
-      --accent:#f59e0b;
+    :root {
+      --bg: #0f172a;
+      --card: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22d3ee;
+      --danger: #f87171;
+      --success: #34d399;
+      --border: #1f2937;
+      --input-bg: #0b1220;
     }
-
-/* Hide login status text and role badge everywhere */
-    #status,
-    #role-badge {
-      display: none !important;
-    }
-
-    /* ✅ hard stop for mobile overflow */
-    *{ box-sizing:border-box; }
-    html, body{
-      width:100%;
-      max-width:100%;
-      overflow-x:hidden; /* prevents side scrolling */
-    }
-
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
-      color:var(--text);
-
-      /* ✅ background that doesn't cause width overflow */
-      background:
-        radial-gradient(600px circle at 15% 10%, rgba(245,158,11,0.22), transparent 55%),
-        radial-gradient(600px circle at 85% 25%, rgba(96,165,250,0.18), transparent 60%),
-        linear-gradient(180deg, var(--bg1), var(--bg2));
-
-      /* ✅ safe padding on phones */
-      padding: max(12px, env(safe-area-inset-top))
-               max(12px, env(safe-area-inset-right))
-               max(12px, env(safe-area-inset-bottom))
-               max(12px, env(safe-area-inset-left));
-
-      display:flex;
-      min-height:100vh;
-      align-items:center;
-      justify-content:center;
-    }
-
-    /* ✅ main container fits all screens */
-    .shell{
-      width:100%;
-      max-width: 980px;
-      border:1px solid var(--border);
-      border-radius:18px;
-      overflow:hidden;
-      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
-      box-shadow: var(--shadow);
-    }
-
-    header{
-      padding:16px;
-      border-bottom:1px solid var(--border);
-
-      /* ✅ stack on mobile */
-      display:flex;
-      flex-direction:column;
-      gap:12px;
-    }
-
-    .brandRow{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      min-width:0;
-    }
-
-    .logo{
-      width:42px;
-      height:42px;
-      border-radius:14px;
-      display:grid;
-      place-items:center;
-      flex: 0 0 auto;
-      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
-      border:1px solid rgba(255,255,255,0.18);
-    }
-
-    .logo span{
-      font-weight:900;
-      letter-spacing:0.7px;
-    }
-
-    .brand{
-      min-width:0;
-    }
-
-    /* ✅ responsive text that NEVER breaks layout */
-    .brand h1{
-      margin:0;
-      font-size: clamp(16px, 5vw, 22px);
-      line-height:1.15;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-
-    .brand p{
-      margin:4px 0 0;
-      font-size: clamp(12px, 3.5vw, 14px);
-      color:var(--muted);
-      line-height:1.35;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-
-    .badges{
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(0,0,0,0.18);
-      color: var(--muted);
-      font-size:12px;
-      line-height:1.2;
-
-      /* ✅ allow wrapping inside badge */
-      white-space:normal;
-      max-width:100%;
-    }
-
-    .dot{
-      width:8px;
-      height:8px;
-      border-radius:50%;
-      background:#22c55e;
-      box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
-      flex:0 0 auto;
-    }
-
-    main{
-      padding:16px;
-      display:flex;
-      flex-direction:column; /* ✅ mobile first */
-      gap:12px;
-    }
-
-    .hero{
-      border:1px solid var(--border);
-      border-radius:16px;
-      background: var(--card);
-      padding:14px;
-    }
-
-    .hero h2{
-      margin:0 0 8px;
-      font-size: clamp(20px, 6.2vw, 32px);
-      line-height:1.12;
-    }
-
-    .hero p{
-      margin:0;
-      color: var(--muted);
-      font-size:14px;
-      line-height:1.6;
-    }
-
-    .chips{
-      margin-top:12px;
-      display:flex;
-      flex-wrap:wrap;
-      gap:8px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,0.14);
-      background: rgba(0,0,0,0.16);
-      color: var(--muted);
-      font-size:13px;
-      max-width:100%;
-    }
-
-    .chip b{
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%;
+      margin: 0;
+      background: radial-gradient(1200px 600px at 10% 10%, rgba(34,211,238,.12), transparent 50%),
+                  radial-gradient(1000px 500px at 90% 20%, rgba(52,211,153,.10), transparent 50%),
+                  var(--bg);
       color: var(--text);
-      font-weight:800;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
     }
-
-    .cta{
-      border:1px solid var(--border);
-      border-radius:16px;
-      background: var(--card);
-      padding:14px;
+    main {
+      max-width: 480px;
+      margin: 6vh auto;
+      padding: 28px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 12px 40px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.04);
     }
-
-    .cta h3{
-      margin:0 0 6px;
-      font-size:15px;
+    h1 {
+      margin: 0 0 6px;
+      font-size: 22px;
+      letter-spacing: .2px;
     }
-    .cta p{
-      margin:0;
+    p.sub {
+      margin: 0 0 18px;
       color: var(--muted);
-      font-size:14px;
-      line-height:1.55;
+      font-size: 13.5px;
     }
-
-    /* ✅ Mobile button: full width, no overflow */
-    .btn{
-      margin-top:12px;
-      width:100%;
-      display:inline-flex;
-      justify-content:center;
-      align-items:center;
-
-      padding:14px 16px;
-      border-radius:14px;
-      border:1px solid rgba(245,158,11,0.55);
-
-      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
-      color:var(--text);
-      font-weight:900;
-      letter-spacing:0.2px;
-
-      cursor:pointer;
-      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    form {
+      display: grid;
+      gap: 10px;
+      margin: 16px 0;
     }
-    .btn:hover{
-      transform: translateY(-1px);
-      filter: brightness(1.08);
-      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+    label {
+      font-size: 13px;
+      color: var(--muted);
     }
-
-    footer{
-      padding:12px 16px;
-      border-top:1px solid var(--border);
-      color:var(--muted);
-      font-size:12px;
-
-      display:flex;
-      flex-direction:column; /* ✅ stack on phones */
-      gap:6px;
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid var(--border);
+      outline: none;
+      color: var(--text);
+      background: var(--input-bg);
+      transition: border .2s, box-shadow .2s;
     }
+    input:focus {
+      border-color: rgba(34,211,238,.6);
+      box-shadow: 0 0 0 4px rgba(34,211,238,.12);
+    }
+    button {
+      appearance: none;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: linear-gradient(180deg, rgba(34,211,238,.14), rgba(34,211,238,.10));
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform .06s ease, background .2s, border .2s, box-shadow .2s;
+    }
+    button:hover {
+      background: linear-gradient(180deg, rgba(34,211,238,.18), rgba(34,211,238,.12));
+      box-shadow: 0 10px 25px rgba(34,211,238,.10);
+    }
+    button:active { transform: translateY(1px); }
+    button.secondary {
+      background: transparent;
+      border-color: var(--border);
+      color: var(--muted);
+      font-weight: 500;
+    }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .row > * { flex: 1; }
+    .hidden { display: none !important; }
 
-    /* ✅ Desktop enhancement: 2-column layout only when there is space */
-    @media (min-width: 900px){
-      header{
-        flex-direction:row;
-        justify-content:space-between;
-        align-items:flex-start;
-      }
-      main{
-        flex-direction:row;
-        align-items:stretch;
-      }
-      .hero{ flex: 1.35; }
-      .cta{ flex: 0.65; }
-      footer{
-        flex-direction:row;
-        justify-content:space-between;
-        align-items:center;
-      }
+    pre#status {
+      background: rgba(2,6,23,.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      min-height: 48px;
+      white-space: pre-wrap;
+      word-break: break-word;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 14px;
+    }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-size: 12px; color: var(--muted);
+      padding: 6px 10px; border-radius: 999px;
+      border: 1px dashed var(--border);
+      margin-top: 6px;
+    }
+    .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
+    .success { color: var(--success); }
+    .danger  { color: var(--danger); }
+    footer {
+      margin-top: 20px; font-size: 12px; color: var(--muted);
+      display: grid; gap: 6px;
+    }
+    code.kbd {
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      padding: 1px 6px; border-radius: 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px; color: #d1d5db;
     }
   </style>
+
+  <!-- Firebase SDKs (v10+) ES Modules -->
+  https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js</script>
+  <script type="module" crossorigin src="httpsirebase-auth.js</script>
+  https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js</script>
 </head>
 
 <body>
-  <div class="shell">
+  <main>
+    <h1>Sign in with your phone</h1>
+    <p class="sub">Enter your mobile number in E.164 format (e.g., <code class="kbd">+447900123456</code>), then verify the code.</p>
 
-    <header>
-      <div class="brandRow">
-        <div class="logo" aria-hidden="true"><span>AC</span></div>
-        <div class="brand">
-          <h1>Ashwini Cut Barber Shop</h1>
-          <p>12, Anna Salai, T. Nagar, vallam - 600017</p>
-        </div>
+    <!-- Step 1: Phone input -->
+    <form id="phone-form" autocomplete="off" novalidate>
+      <label for="phone">Phone number</label>
+      <div class="row">
+        <input id="phone" type="tel" placeholder="+447900123456" required />
+        <button id="send-otp-btn" type="submit">Send Code</button>
       </div>
+      <div class="pill">reCAPTCHA is enabled (invisible)</div>
+    </form>
 
-      <div class="badges">
-        <div class="badge"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
-        <div class="badge">⭐ 4.8 • 2.1k+ Customers</div>
+    <!-- Step 2: OTP input -->
+    <form id="otp-form" class="hidden" autocomplete="one-time-code" novalidate>
+      <label for="otp">Verification code</label>
+      <div class="row">
+        <input id="otp" inputmode="numeric" placeholder="6-digit code" required />
+        <button id="verify-otp-btn" type="submit">Verify & Sign In</button>
       </div>
-    </header>
+      <div class="row">
+        <button id="resend-btn" type="button" class="secondary">Resend Code</button>
+        <button id="edit-phone-btn" type="button" class="secondary">Edit Phone</button>
+      </div>
+      <div class="note" id="timer-note"></div>
+    </form>
 
-    <main>
-      <section class="hero">
-        <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
-        <p>
-          Premium grooming with hygiene-first service. Tap continue to open your barber page.
-        </p>
+    <!-- reCAPTCHA container (required even for invisible) -->
+    <div id="recaptcha-container"></div>
 
-        <div class="chips">
-          <div class="chip">💈 <b>Haircut</b> & Styling</div>
-          <div class="chip">🧔 <b>Beard</b> Trim & Shape</div>
-          <div class="chip">🧼 <b>Cleanup</b> & Facial</div>
-          <div class="chip">👦 <b>Kids</b> Haircut</div>
-        </div>
-      </section>
+    <!-- Auth status -->
+    <pre id="status">Not signed in.</pre>
 
-      <aside class="cta">
-        <h3>Continue</h3>
-        <p>Tap the button to proceed.</p>
-        <button class="btn" id="continueBtn">Continue</button>
-
-              </aside>
-    </main>
+    <!-- Sign out -->
+    <button id="signout-btn" class="hidden">Sign out</button>
 
     <footer>
-      <span>© 2026 Ashwini Cut Barber Shop</span>
-      <span>Call: +91 99621 76423</span>
+      <div>Tips: Add <code class="kbd">localhost</code> (and your domain) to Firebase Auth → Settings → Authorized domains.</div>
+      <div>For development, use test phone numbers in Firebase Auth → Phone to skip SMS & reCAPTCHA.</div>
     </footer>
+  </main>
 
-  </div>
+  <!-- App logic -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import {
+      getAuth,
+      RecaptchaVerifier,
+      signInWithPhoneNumber,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
 
-  <script>
-    document.getElementById("continueBtn").addEventListener("click", () => {
-      window.location.assign("./barber_v3.html");
+    /* ============================
+       1) Replace with your config
+       ============================ */
+    const firebaseConfig = {
+      apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
+      authDomain: "barber-shop-4c26f.firebaseapp.com",
+      projectId: "barber-shop-4c26f",
+      storageBucket: "barber-shop-4c26f.firebasestorage.app",
+      messagingSenderId: "213114385226",
+      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
+
+    };
+
+    /* ============================
+       2) Initialize Firebase
+       ============================ */
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    auth.languageCode = "en"; // set SMS language if needed
+
+    /* ============================
+       3) DOM References
+       ============================ */
+    const phoneForm = document.getElementById("phone-form");
+    const otpForm = document.getElementById("otp-form");
+    const phoneInput = document.getElementById("phone");
+    const otpInput = document.getElementById("otp");
+    const statusEl = document.getElementById("status");
+    const signoutBtn = document.getElementById("signout-btn");
+    const resendBtn = document.getElementById("resend-btn");
+    const editPhoneBtn = document.getElementById("edit-phone-btn");
+    const timerNote = document.getElementById("timer-note");
+
+    /* ============================
+       4) State
+       ============================ */
+    let confirmationResult = null;
+    let currentPhone = "";
+    let cooldown = 30; // seconds for resend
+    let timerId = null;
+
+    /* ============================
+       Helpers
+       ============================ */
+    const setStatus = (msg, color) => {
+      statusEl.textContent = msg;
+      statusEl.style.color = color || "var(--muted)";
+    };
+
+    const isE164 = (phone) => /^\+[1-9]\d{7,14}$/.test(phone);
+
+    const show = (el) => el.classList.remove("hidden");
+    const hide = (el) => el.classList.add("hidden");
+
+    const startTimer = (sec) => {
+      clearInterval(timerId);
+      let remaining = sec;
+      timerNote.textContent = `You can resend the code in ${remaining}s.`;
+      timerId = setInterval(() => {
+        remaining--;
+        if (remaining <= 0) {
+          clearInterval(timerId);
+          timerNote.textContent = "You can resend the code now.";
+          resendBtn.disabled = false;
+        } else {
+          timerNote.textContent = `You can resend the code in ${remaining}s.`;
+        }
+      }, 1000);
+    };
+
+    const resetRecaptcha = async () => {
+      try {
+        const widgetId = await recaptchaVerifier.render();
+        if (window.grecaptcha && typeof window.grecaptcha.reset === "function") {
+          window.grecaptcha.reset(widgetId);
+        }
+      } catch (_) { /* no-op */ }
+    };
+
+    /* ============================
+       5) reCAPTCHA (Invisible)
+       ============================ */
+    const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+      size: "invisible",
+      callback: () => {
+        // Automatically triggered when reCAPTCHA is solved.
+      },
+      "expired-callback": () => {
+        setStatus("reCAPTCHA expired. Please try again.", "var(--danger)");
+      },
+    });
+
+    /* ============================
+       6) Firestore upsert (optional)
+       ============================ */
+    async function upsertUserProfile(user) {
+      if (!user?.uid) return;
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        await setDoc(ref, { lastLogin: serverTimestamp() }, { merge: true });
+      } else {
+        await setDoc(ref, {
+          uid: user.uid,
+          phoneNumber: user.phoneNumber || null,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp(),
+        });
+      }
+    }
+
+    /* ============================
+       7) Send Code
+       ============================ */
+    phoneForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const phone = phoneInput.value.trim();
+      if (!isE164(phone)) {
+        setStatus("Please enter a valid E.164 phone number, e.g., +447900123456.", "var(--danger)");
+        return;
+      }
+      try {
+        setStatus("Sending code…");
+        confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
+        currentPhone = phone;
+        setStatus("Code sent. Please check your SMS.");
+        hide(phoneForm);
+        show(otpForm);
+        otpInput.focus();
+        resendBtn.disabled = true;
+        startTimer(cooldown);
+      } catch (err) {
+        console.error(err);
+        await resetRecaptcha();
+        setStatus(err?.message || "Failed to send code.", "var(--danger)");
+      }
+    });
+
+    /* ============================
+       8) Verify Code
+       ============================ */
+    otpForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      if (!confirmationResult) {
+        setStatus("No pending verification. Please request a new code.", "var(--danger)");
+        return;
+      }
+      const code = otpInput.value.trim();
+      if (!code) {
+        setStatus("Please enter the 6-digit code.", "var(--danger)");
+        return;
+      }
+      try {
+        setStatus("Verifying code…");
+        const cred = await confirmationResult.confirm(code);
+        await upsertUserProfile(cred.user);
+        setStatus(`Signed in as ${cred.user.phoneNumber}`, "var(--success)");
+        show(signoutBtn);
+        otpForm.reset();
+        // (Optional) navigate to your app/dashboard here.
+      } catch (err) {
+        console.error(err);
+        setStatus(err?.message || "Invalid code.", "var(--danger)");
+      }
+    });
+
+    /* ============================
+       9) Resend & Edit Phone
+       ============================ */
+    resendBtn.addEventListener("click", async () => {
+      if (!currentPhone) return;
+      try {
+        resendBtn.disabled = true;
+        setStatus("Resending code…");
+        confirmationResult = await signInWithPhoneNumber(auth, currentPhone, recaptchaVerifier);
+        setStatus("Code resent. Check your SMS.");
+        startTimer(cooldown);
+      } catch (err) {
+        console.error(err);
+        await resetRecaptcha();
+        setStatus(err?.message || "Failed to resend code.", "var(--danger)");
+        resendBtn.disabled = false;
+      }
+    });
+
+    editPhoneBtn.addEventListener("click", async () => {
+      show(phoneForm);
+      hide(otpForm);
+      otpForm.reset();
+      phoneInput.focus();
+      await resetRecaptcha();
+      setStatus("Edit your phone number and send the code again.");
+    });
+
+    /* ============================
+       10) Auth State Listener
+       ============================ */
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setStatus(`Authenticated: ${user.phoneNumber || user.uid}`, "var(--success)");
+        show(signoutBtn);
+      } else {
+        setStatus("Not signed in.");
+        hide(signoutBtn);
+        // Keep forms as-is so user can continue flow.
+      }
+    });
+
+    /* ============================
+       11) Sign Out
+       ============================ */
+    signoutBtn.addEventListener("click", async () => {
+      await signOut(auth);
+      setStatus("Signed out.");
+      show(phoneForm);
+      hide(otpForm);
+      otpForm.reset();
+      await resetRecaptcha();
     });
   </script>
 </body>
