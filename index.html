@@ -24,7 +24,7 @@
     import { getAuth, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-functions.js";
 
-    // --- 1) Your Firebase config ---
+    // Your Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
       authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -34,8 +34,7 @@
       appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
     };
 
-    // --- 2) Functions region: India (Mumbai by default) ---
-    // Use "asia-south2" for Delhi if that's where you deployed.  (Client must match backend region)  [4](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
+    // Functions region (must match your backend)
     const FUNCTIONS_REGION = "asia-south1";
 
     const app = initializeApp(firebaseConfig);
@@ -45,7 +44,7 @@
     const $ = (id) => document.getElementById(id);
     const setStatus = (msg, cls="") => { const el = $("status"); el.textContent = msg; el.className = cls; };
 
-    // ---- Login using callable 'login' ----
+    // Login function
     async function doLogin(e){
       e.preventDefault();
       const username = $("username").value.trim();
@@ -57,30 +56,41 @@
         await signInWithCustomToken(auth, data.token);
         await auth.currentUser.getIdToken(true);
         setStatus("Signed in.","ok");
-      }catch(err){ console.error(err); setStatus(err?.message || "Login failed.","err"); }
+      }catch(err){
+        console.error(err);
+        setStatus(err?.message || "Login failed.","err");
+      }
     }
 
-    // ---- Unlock Admin (create/promote) using SECRET CODE ----
+    // Admin unlock (create/promote)
     async function doUnlock(e){
       e.preventDefault();
       const username = $("u_username").value.trim();
       const password = $("u_password").value;
       const adminCode = $("u_code").value.trim();
-      const createIfMissing = true; // allow bootstrap in one shot
+      const createIfMissing = true;
       try{
         setStatus("Unlocking admin…");
         const fn = httpsCallable(functions, "unlockAdmin");
         const { data } = await fn({ username, password, adminCode, createIfMissing });
-        // After promote/create, sign in with same creds
+        console.log("unlockAdmin response:", data);
+
+        // After unlocking, login
         const loginFn = httpsCallable(functions, "login");
         const { data: loginData } = await loginFn({ username, password });
         await signInWithCustomToken(auth, loginData.token);
         await auth.currentUser.getIdToken(true);
         setStatus("Admin unlocked. Signed in.","ok");
-      }catch(err){ console.error(err); setStatus(err?.message || "Failed to unlock admin.","err"); }
+      }catch(err){
+        console.error("Unlock admin error:", err);
+        setStatus(err?.message || JSON.stringify(err) || "Failed to unlock admin.","err");
+      }
     }
 
-    async function doSignout(){ await signOut(auth); setStatus("Signed out."); }
+    async function doSignout(){
+      await signOut(auth);
+      setStatus("Signed out.");
+    }
 
     onAuthStateChanged(auth, async (user)=>{
       if(user){
@@ -92,6 +102,7 @@
       }else{
         $("authed").style.display = "none";
         $("whoami").textContent = "";
+        $("adminLinkWrap").style.display = "none";
       }
     });
 
@@ -116,7 +127,7 @@
       <button type="submit">Sign in</button>
     </form>
 
-    <!-- Quick Admin Unlock (create/promote using secret code) -->
+    <!-- Quick Admin Unlock -->
     <div class="card">
       <h2>Quick Admin Unlock</h2>
       <p style="color:#94a3b8;font-size:13px;margin:0">
@@ -139,7 +150,7 @@
         <button id="signout-btn">Sign out</button>
       </div>
       <div id="adminLinkWrap" style="display:none;margin-top:10px">
-        admin.htmlGo to Admin</a>
+        <a href="admin.html">Go to Admin</a>
       </div>
     </section>
 
@@ -147,7 +158,7 @@
 
     <p style="color:#94a3b8;font-size:12px;margin-top:8px">
       Hosted on GitHub Pages? Add your Pages domain to Firebase <b>Authorized domains</b> (Auth → Settings).  
-      Client must call Functions in the right region via <code>getFunctions(app, "asia-south1")</code>. [6](https://digitaldeliverygroup.org/create-a-custom-token-using-firebaseadmin-in-nodejs/)[4](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
+      Client must call Functions in the right region via <code>getFunctions(app, "asia-south1")</code>.
     </p>
   </main>
 </body>
