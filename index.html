@@ -132,9 +132,9 @@
   </style>
 
   <!-- Firebase SDKs (v10+) ES Modules -->
-  https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js</script>
+  https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js</script>
   <script type="module" crossorigin src="httpsirebase-auth.js</script>
-  https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js</script>
+  https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js</script>
 </head>
 
 <body>
@@ -183,21 +183,21 @@
 
   <!-- App logic -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import {
       getAuth,
       RecaptchaVerifier,
       signInWithPhoneNumber,
       onAuthStateChanged,
       signOut
-    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-auth.js";
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
     import {
       getFirestore,
       doc,
       getDoc,
       setDoc,
       serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore.js";
+    } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
     /* ============================
        1) Replace with your config
