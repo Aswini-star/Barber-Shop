@@ -4,155 +4,46 @@
   <meta charset="UTF-8" />
   <title>Phone Login • Firebase</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-  <!-- Styling kept simple & self-contained -->
   <style>
     :root {
-      --bg: #0f172a;
-      --card: #111827;
-      --text: #e5e7eb;
-      --muted: #94a3b8;
-      --accent: #22d3ee;
-      --danger: #f87171;
-      --success: #34d399;
-      --border: #1f2937;
-      --input-bg: #0b1220;
+      --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8;
+      --accent:#22d3ee; --danger:#f87171; --success:#34d399; --border:#1f2937; --input-bg:#0b1220;
     }
     * { box-sizing: border-box; }
-    html, body {
-      height: 100%;
-      margin: 0;
-      background: radial-gradient(1200px 600px at 10% 10%, rgba(34,211,238,.12), transparent 50%),
-                  radial-gradient(1000px 500px at 90% 20%, rgba(52,211,153,.10), transparent 50%),
-                  var(--bg);
-      color: var(--text);
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
-    }
-    main {
-      max-width: 480px;
-      margin: 6vh auto;
-      padding: 28px;
-      background: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.00));
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      box-shadow: 0 12px 40px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.04);
-    }
-    h1 {
-      margin: 0 0 6px;
-      font-size: 22px;
-      letter-spacing: .2px;
-    }
-    p.sub {
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 13.5px;
-    }
-    form {
-      display: grid;
-      gap: 10px;
-      margin: 16px 0;
-    }
-    label {
-      font-size: 13px;
-      color: var(--muted);
-    }
-    input {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid var(--border);
-      outline: none;
-      color: var(--text);
-      background: var(--input-bg);
-      transition: border .2s, box-shadow .2s;
-    }
-    input:focus {
-      border-color: rgba(34,211,238,.6);
-      box-shadow: 0 0 0 4px rgba(34,211,238,.12);
-    }
-    button {
-      appearance: none;
-      padding: 12px 14px;
-      border-radius: 10px;
-      border: 1px solid rgba(255,255,255,.08);
-      background: linear-gradient(180deg, rgba(34,211,238,.14), rgba(34,211,238,.10));
-      color: white;
-      font-weight: 600;
-      cursor: pointer;
-      transition: transform .06s ease, background .2s, border .2s, box-shadow .2s;
-    }
-    button:hover {
-      background: linear-gradient(180deg, rgba(34,211,238,.18), rgba(34,211,238,.12));
-      box-shadow: 0 10px 25px rgba(34,211,238,.10);
-    }
-    button:active { transform: translateY(1px); }
-    button.secondary {
-      background: transparent;
-      border-color: var(--border);
-      color: var(--muted);
-      font-weight: 500;
-    }
+    html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text); font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+    main { max-width: 480px; margin: 6vh auto; padding: 28px; border: 1px solid var(--border); border-radius: 16px; background: #0b1220a6; }
+    h1 { margin: 0 0 6px; font-size: 22px; }
+    p.sub { margin: 0 0 18px; color: var(--muted); font-size: 13.5px; }
+    form { display: grid; gap: 10px; margin: 16px 0; }
+    label { font-size: 13px; color: var(--muted); }
+    input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); }
+    input:focus { border-color: rgba(34,211,238,.6); outline: none; box-shadow: 0 0 0 4px rgba(34,211,238,.12); }
+    button { padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.08); background: linear-gradient(180deg, rgba(34,211,238,.14), rgba(34,211,238,.10)); color:#fff; font-weight:600; cursor:pointer; }
+    button.secondary { background: transparent; border-color: var(--border); color: var(--muted); font-weight: 500; }
     .row { display: flex; gap: 10px; align-items: center; }
     .row > * { flex: 1; }
     .hidden { display: none !important; }
-
-    pre#status {
-      background: rgba(2,6,23,.6);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px 14px;
-      min-height: 48px;
-      white-space: pre-wrap;
-      word-break: break-word;
-      color: var(--muted);
-      font-size: 13px;
-      margin-top: 14px;
-    }
-    .pill {
-      display: inline-flex; align-items: center; gap: 8px;
-      font-size: 12px; color: var(--muted);
-      padding: 6px 10px; border-radius: 999px;
-      border: 1px dashed var(--border);
-      margin-top: 6px;
-    }
+    pre#status { background: rgba(2,6,23,.6); border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; min-height: 48px; white-space: pre-wrap; color: var(--muted); font-size: 13px; margin-top: 14px; }
+    .pill { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); padding: 6px 10px; border-radius: 999px; border: 1px dashed var(--border); margin-top: 6px; }
     .note { font-size: 12px; color: var(--muted); margin-top: 8px; }
-    .success { color: var(--success); }
-    .danger  { color: var(--danger); }
-    footer {
-      margin-top: 20px; font-size: 12px; color: var(--muted);
-      display: grid; gap: 6px;
-    }
-    code.kbd {
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
-      padding: 1px 6px; border-radius: 6px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px; color: #d1d5db;
-    }
   </style>
-
-  <!-- Firebase SDKs (v10+) ES Modules -->
-  https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js</script>
-  <script type="module" crossorigin src="httpsirebase-auth.js</script>
-  https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js</script>
 </head>
-
 <body>
   <main>
     <h1>Sign in with your phone</h1>
-    <p class="sub">Enter your mobile number in E.164 format (e.g., <code class="kbd">+447900123456</code>), then verify the code.</p>
+    <p class="sub">Enter your mobile number in E.164 format (e.g., <code>+447900123456</code>), then verify the code.</p>
 
-    <!-- Step 1: Phone input -->
+    <!-- Step 1: Phone -->
     <form id="phone-form" autocomplete="off" novalidate>
       <label for="phone">Phone number</label>
       <div class="row">
         <input id="phone" type="tel" placeholder="+447900123456" required />
         <button id="send-otp-btn" type="submit">Send Code</button>
       </div>
-      <div class="pill">reCAPTCHA is enabled (invisible)</div>
+      <div class="pill">reCAPTCHA (invisible) enabled</div>
     </form>
 
-    <!-- Step 2: OTP input -->
+    <!-- Step 2: OTP -->
     <form id="otp-form" class="hidden" autocomplete="one-time-code" novalidate>
       <label for="otp">Verification code</label>
       <div class="row">
@@ -169,39 +60,24 @@
     <!-- reCAPTCHA container (required even for invisible) -->
     <div id="recaptcha-container"></div>
 
-    <!-- Auth status -->
+    <!-- Status -->
     <pre id="status">Not signed in.</pre>
 
     <!-- Sign out -->
     <button id="signout-btn" class="hidden">Sign out</button>
-
-    <footer>
-      <div>Tips: Add <code class="kbd">localhost</code> (and your domain) to Firebase Auth → Settings → Authorized domains.</div>
-      <div>For development, use test phone numbers in Firebase Auth → Phone to skip SMS & reCAPTCHA.</div>
-    </footer>
   </main>
 
-  <!-- App logic -->
+  <!-- Single inline module (no external <script src> in <head>) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
     import {
-      getAuth,
-      RecaptchaVerifier,
-      signInWithPhoneNumber,
-      onAuthStateChanged,
-      signOut
+      getAuth, RecaptchaVerifier, signInWithPhoneNumber, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
     import {
-      getFirestore,
-      doc,
-      getDoc,
-      setDoc,
-      serverTimestamp
+      getFirestore, doc, getDoc, setDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-firestore.js";
 
-    /* ============================
-       1) Replace with your config
-       ============================ */
+    // 1) Replace with YOUR Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
       authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -209,20 +85,15 @@
       storageBucket: "barber-shop-4c26f.firebasestorage.app",
       messagingSenderId: "213114385226",
       appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
-
     };
 
-    /* ============================
-       2) Initialize Firebase
-       ============================ */
+    // 2) Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
-    auth.languageCode = "en"; // set SMS language if needed
+    auth.languageCode = "en";
 
-    /* ============================
-       3) DOM References
-       ============================ */
+    // 3) DOM
     const phoneForm = document.getElementById("phone-form");
     const otpForm = document.getElementById("otp-form");
     const phoneInput = document.getElementById("phone");
@@ -233,68 +104,42 @@
     const editPhoneBtn = document.getElementById("edit-phone-btn");
     const timerNote = document.getElementById("timer-note");
 
-    /* ============================
-       4) State
-       ============================ */
+    // 4) State
     let confirmationResult = null;
     let currentPhone = "";
-    let cooldown = 30; // seconds for resend
+    let cooldown = 30;
     let timerId = null;
 
-    /* ============================
-       Helpers
-       ============================ */
-    const setStatus = (msg, color) => {
-      statusEl.textContent = msg;
-      statusEl.style.color = color || "var(--muted)";
-    };
-
-    const isE164 = (phone) => /^\+[1-9]\d{7,14}$/.test(phone);
-
+    // Helpers
+    const setStatus = (msg, color) => { statusEl.textContent = msg; statusEl.style.color = color || "#94a3b8"; };
+    const isE164 = (p) => /^\+[1-9]\d{7,14}$/.test(p);
     const show = (el) => el.classList.remove("hidden");
     const hide = (el) => el.classList.add("hidden");
-
     const startTimer = (sec) => {
       clearInterval(timerId);
-      let remaining = sec;
-      timerNote.textContent = `You can resend the code in ${remaining}s.`;
+      let t = sec;
+      timerNote.textContent = `You can resend the code in ${t}s.`;
       timerId = setInterval(() => {
-        remaining--;
-        if (remaining <= 0) {
-          clearInterval(timerId);
-          timerNote.textContent = "You can resend the code now.";
-          resendBtn.disabled = false;
-        } else {
-          timerNote.textContent = `You can resend the code in ${remaining}s.`;
-        }
+        t--;
+        if (t <= 0) { clearInterval(timerId); timerNote.textContent = "You can resend the code now."; resendBtn.disabled = false; }
+        else { timerNote.textContent = `You can resend the code in ${t}s.`; }
       }, 1000);
     };
-
     const resetRecaptcha = async () => {
       try {
-        const widgetId = await recaptchaVerifier.render();
-        if (window.grecaptcha && typeof window.grecaptcha.reset === "function") {
-          window.grecaptcha.reset(widgetId);
-        }
-      } catch (_) { /* no-op */ }
+        const id = await recaptchaVerifier.render();
+        if (window.grecaptcha?.reset) window.grecaptcha.reset(id);
+      } catch {}
     };
 
-    /* ============================
-       5) reCAPTCHA (Invisible)
-       ============================ */
+    // 5) reCAPTCHA (Invisible)
     const recaptchaVerifier = new RecaptchaVerifier(auth, "recaptcha-container", {
       size: "invisible",
-      callback: () => {
-        // Automatically triggered when reCAPTCHA is solved.
-      },
-      "expired-callback": () => {
-        setStatus("reCAPTCHA expired. Please try again.", "var(--danger)");
-      },
+      callback: () => {},
+      "expired-callback": () => setStatus("reCAPTCHA expired. Please try again.", "#f87171"),
     });
 
-    /* ============================
-       6) Firestore upsert (optional)
-       ============================ */
+    // 6) Firestore upsert (optional)
     async function upsertUserProfile(user) {
       if (!user?.uid) return;
       const ref = doc(db, "users", user.uid);
@@ -311,64 +156,44 @@
       }
     }
 
-    /* ============================
-       7) Send Code
-       ============================ */
+    // 7) Send Code
     phoneForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       const phone = phoneInput.value.trim();
-      if (!isE164(phone)) {
-        setStatus("Please enter a valid E.164 phone number, e.g., +447900123456.", "var(--danger)");
-        return;
-      }
+      if (!isE164(phone)) return setStatus("Enter a valid E.164 phone, e.g., +447900123456.", "#f87171");
       try {
         setStatus("Sending code…");
         confirmationResult = await signInWithPhoneNumber(auth, phone, recaptchaVerifier);
         currentPhone = phone;
-        setStatus("Code sent. Please check your SMS.");
-        hide(phoneForm);
-        show(otpForm);
-        otpInput.focus();
-        resendBtn.disabled = true;
-        startTimer(cooldown);
+        setStatus("Code sent. Check your SMS.");
+        hide(phoneForm); show(otpForm); otpInput.focus();
+        resendBtn.disabled = true; startTimer(cooldown);
       } catch (err) {
         console.error(err);
         await resetRecaptcha();
-        setStatus(err?.message || "Failed to send code.", "var(--danger)");
+        setStatus(err?.message || "Failed to send code.", "#f87171");
       }
     });
 
-    /* ============================
-       8) Verify Code
-       ============================ */
+    // 8) Verify Code
     otpForm.addEventListener("submit", async (e) => {
       e.preventDefault();
-      if (!confirmationResult) {
-        setStatus("No pending verification. Please request a new code.", "var(--danger)");
-        return;
-      }
+      if (!confirmationResult) return setStatus("No pending verification. Request a new code.", "#f87171");
       const code = otpInput.value.trim();
-      if (!code) {
-        setStatus("Please enter the 6-digit code.", "var(--danger)");
-        return;
-      }
+      if (!code) return setStatus("Please enter the 6-digit code.", "#f87171");
       try {
         setStatus("Verifying code…");
         const cred = await confirmationResult.confirm(code);
         await upsertUserProfile(cred.user);
-        setStatus(`Signed in as ${cred.user.phoneNumber}`, "var(--success)");
+        setStatus(`Signed in as ${cred.user.phoneNumber}`, "#34d399");
         show(signoutBtn);
-        otpForm.reset();
-        // (Optional) navigate to your app/dashboard here.
       } catch (err) {
         console.error(err);
-        setStatus(err?.message || "Invalid code.", "var(--danger)");
+        setStatus(err?.message || "Invalid code.", "#f87171");
       }
     });
 
-    /* ============================
-       9) Resend & Edit Phone
-       ============================ */
+    // 9) Resend & Edit
     resendBtn.addEventListener("click", async () => {
       if (!currentPhone) return;
       try {
@@ -380,43 +205,27 @@
       } catch (err) {
         console.error(err);
         await resetRecaptcha();
-        setStatus(err?.message || "Failed to resend code.", "var(--danger)");
+        setStatus(err?.message || "Failed to resend code.", "#f87171");
         resendBtn.disabled = false;
       }
     });
-
     editPhoneBtn.addEventListener("click", async () => {
-      show(phoneForm);
-      hide(otpForm);
-      otpForm.reset();
-      phoneInput.focus();
+      show(phoneForm); hide(otpForm); otpForm.reset(); phoneInput.focus();
       await resetRecaptcha();
       setStatus("Edit your phone number and send the code again.");
     });
 
-    /* ============================
-       10) Auth State Listener
-       ============================ */
+    // 10) Auth state
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        setStatus(`Authenticated: ${user.phoneNumber || user.uid}`, "var(--success)");
-        show(signoutBtn);
-      } else {
-        setStatus("Not signed in.");
-        hide(signoutBtn);
-        // Keep forms as-is so user can continue flow.
-      }
+      if (user) { setStatus(`Authenticated: ${user.phoneNumber || user.uid}`, "#34d399"); show(signoutBtn); }
+      else { setStatus("Not signed in."); }
     });
 
-    /* ============================
-       11) Sign Out
-       ============================ */
+    // 11) Sign out
     signoutBtn.addEventListener("click", async () => {
       await signOut(auth);
       setStatus("Signed out.");
-      show(phoneForm);
-      hide(otpForm);
-      otpForm.reset();
+      show(phoneForm); hide(otpForm); otpForm.reset();
       await resetRecaptcha();
     });
   </script>
