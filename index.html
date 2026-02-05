@@ -2,27 +2,29 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Admin • Create User</title>
+  <title>Login • Firebase Custom Auth</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --input:#0b1220; --ok:#34d399; --err:#f87171; --btn:#22d3ee60; --btnbg:#22d3ee30; }
     body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    main{max-width:520px;margin:8vh auto;background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border)}
+    main{max-width:420px;margin:9vh auto;background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border)}
     h1{margin:0 0 8px;font-size:20px}
     label{display:block;font-size:12px;color:var(--muted);margin-top:12px}
-    input,select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
+    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
     button{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--btnbg);color:#fff;border:1px solid var(--btn);cursor:pointer}
     pre{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px;min-height:40px;color:var(--muted)}
+    .row{display:flex;gap:10px;align-items:center}
     a{color:#7dd3fc;text-decoration:none}
     .ok{color:var(--ok)} .err{color:var(--err)}
   </style>
 
+  <!-- App code (ESM) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-functions.js";
 
-    // 1) Your Firebase config (same as index.html)
+    // 1) Your Firebase config (paste from Console)
     const firebaseConfig = {
       apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
       authDomain: "barber-shop-4c26f.firebaseapp.com",
@@ -34,107 +36,88 @@
 
     // 2) Functions region in India:
     //    "asia-south1" = Mumbai, "asia-south2" = Delhi NCR  [1](https://bootstrapped.app/guide/how-to-use-firebase-authentication-with-custom-tokens)
-    //    getFunctions(app, regionOrCustomDomain) lets you target that region. [2](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
+    //    The Web SDK accepts the region string: getFunctions(app, regionOrCustomDomain). [2](https://flamesshield.com/blog/2025-10-01-a-step-by-step-guide-to-writing-secure-firestore-rules/)
     const FUNCTIONS_REGION = "asia-south1";
 
+    // Init
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const functions = getFunctions(app, FUNCTIONS_REGION);
 
+    // UI helpers
     const $ = (id) => document.getElementById(id);
-    const setStatus = (m, cls="") => { const el = $("status"); el.textContent = m; el.className = cls; };
+    const setStatus = (msg, cls="") => { const el = $("status"); el.textContent = msg; el.className = cls; };
 
-    async function createOrUpdateUser(e){
+    // Login flow: call callable 'login' -> receive {token} -> signInWithCustomToken
+    async function doLogin(e){
       e.preventDefault();
       const username = $("username").value.trim();
       const password = $("password").value;
-      const role = $("role").value;
-      const disabled = $("disabled").checked;
-      if(!username || password.length < 8){
-        setStatus("Username & password (≥ 8 chars) required.","err"); return;
-      }
+      if(!username || !password){ setStatus("Enter username & password","err"); return; }
+      setStatus("Signing in…");
       try{
-        setStatus("Creating…");
-        const fn = httpsCallable(functions, "adminCreateUser");
-        const { data } = await fn({ username, password, role, disabled });
-        setStatus(`OK: uid=${data.uid} role=${data.role} disabled=${data.disabled}`,"ok");
+        const loginFn = httpsCallable(functions, "login");
+        const { data } = await loginFn({ username, password });
+        await signInWithCustomToken(auth, data.token);
+        await auth.currentUser.getIdToken(true); // refresh to pick up claims
+        setStatus("Signed in.","ok");
       }catch(err){
         console.error(err);
-        setStatus(err?.message || "Failed.","err");
+        setStatus(err?.message || "Login failed.","err");
       }
     }
 
     async function doSignout(){
       await signOut(auth);
       setStatus("Signed out.");
-      $("panel").style.display = "none";
-      $("notAdmin").style.display = "block";
     }
 
-    onAuthStateChanged(auth, async (user)=>{
-      if(!user){
-        $("panel").style.display = "none";
-        $("notAdmin").style.display = "block";
-        setStatus("Not signed in.");
-        return;
-      }
-      const idt = await user.getIdTokenResult(true);
-      const role = idt.claims.role || "user";
-      if(role !== "admin"){
-        $("panel").style.display = "none";
-        $("notAdmin").style.display = "block";
-        setStatus("You are signed in but not an admin.","err");
+    onAuthStateChanged(auth, async (user) => {
+      if(user){
+        const idt = await user.getIdTokenResult();
+        const role = idt.claims.role || "user";
+        $("authed").style.display = "block";
+        $("whoami").textContent = `uid=${user.uid}, role=${role}`;
+        $("adminLinkWrap").style.display = role === "admin" ? "block" : "none";
       }else{
-        $("panel").style.display = "block";
-        $("notAdmin").style.display = "none";
-        $("whoami").textContent = `Admin: uid=${user.uid}`;
-        setStatus("Admin ready.","ok");
+        $("authed").style.display = "none";
+        $("whoami").textContent = "";
       }
     });
 
     window.addEventListener("DOMContentLoaded", ()=>{
-      $("create-form").addEventListener("submit", createOrUpdateUser);
+      $("login-form").addEventListener("submit", doLogin);
       $("signout-btn").addEventListener("click", doSignout);
     });
   </script>
 </head>
 <body>
   <main>
-    <h1>Admin • Create User</h1>
-    <p style="color:#94a3b8;font-size:13px">Sign in as <b>raja</b> on index.htmllogin</a> first.</p>
+    <h1>Sign in</h1>
+    <p style="color:#94a3b8;font-size:13px">Username can be a phone number (e.g., +447900123456).</p>
 
-    <section id="panel" style="display:none">
-      <div class="row" style="display:flex;justify-content:space-between;align-items:center">
+    <form id="login-form" autocomplete="off">
+      <label>Username</label>
+      <input id="username" placeholder="+447900123456" required />
+      <label>Password</label>
+      <input id="password" type="password" placeholder="••••••••" required />
+      <button type="submit">Sign in</button>
+    </form>
+
+    <section id="authed" style="display:none;margin-top:12px">
+      <div class="row" style="justify-content:space-between">
         <div id="whoami" class="ok"></div>
         <button id="signout-btn">Sign out</button>
       </div>
-
-      <form id="create-form" autocomplete="off" style="margin-top:10px">
-        <label>Username (e.g., +447900123456)</label>
-        <input id="username" required />
-        <label>Password (≥ 8 chars)</label>
-        <input id="password" type="password" required />
-        <label>Role</label>
-        <select id="role">
-          <option value="user">user</option>
-          <option value="admin">admin</option>
-        </select>
-        <label style="display:flex;align-items:center;gap:8px;margin-top:10px">
-          <input type="checkbox" id="disabled" /> Disabled
-        </label>
-        <button type="submit">Create / Update</button>
-      </form>
+      <div id="adminLinkWrap" style="display:none;margin-top:10px">
+        <a href="admino Admin</a>
+      </div>
     </section>
 
-    <section id="notAdmin" style="display:none;margin-top:8px">
-      <p class="err">You must be signed in as an admin to use this page.</p>
-      <p style="color:#94a3b8;font-size:12px">If you just promoted a user to admin on the server, sign out and sign in again so the new claim is picked up.</p>
-    </section>
-
-    <pre id="status">Loading…</pre>
+    <pre id="status">Not signed in.</pre>
 
     <p style="color:#94a3b8;font-size:12px;margin-top:8px">
-      If this page is on GitHub Pages, ensure its domain is in Firebase <b>Authorized domains</b> (Auth → Settings).
+      If this page is on GitHub Pages, add your domain to Firebase <b>Authorized domains</b> (Auth → Settings). 
     </p>
   </main>
 </body>
