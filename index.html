@@ -1,165 +1,342 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Login • Custom Auth + Admin Unlock</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- ✅ MUST for mobile fit -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <title>Ashwini Cut Barber Shop</title>
+
   <style>
-    :root { --bg:#0f172a; --card:#111827; --text:#e5e7eb; --muted:#94a3b8; --border:#1f2937; --input:#0b1220; --ok:#34d399; --err:#f87171; --btn:#22d3ee60; --btnbg:#22d3ee30; }
-    body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    main{max-width:480px;margin:7vh auto;background:var(--card);padding:24px;border-radius:12px;border:1px solid var(--border)}
-    h1{margin:0 0 8px;font-size:20px}
-    h2{margin:18px 0 6px;font-size:16px}
-    label{display:block;font-size:12px;color:var(--muted);margin-top:12px}
-    input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--border);background:var(--input);color:var(--text)}
-    button{margin-top:14px;padding:10px 12px;border-radius:8px;background:var(--btnbg);color:#fff;border:1px solid var(--btn);cursor:pointer}
-    pre{background:var(--input);border:1px solid var(--border);border-radius:8px;padding:10px;min-height:40px;color:var(--muted)}
-    .row{display:flex;gap:10px;align-items:center}
-    .ok{color:var(--ok)} .err{color:var(--err)}
-    .card{margin-top:16px;padding:14px;border:1px dashed var(--border);border-radius:10px;background:#0b1220aa}
-    a{color:#7dd3fc;text-decoration:none}
+    :root{
+      --bg1:#070a12;
+      --bg2:#0b1635;
+      --text:#eaf0ff;
+      --muted:rgba(234,240,255,0.75);
+      --border:rgba(255,255,255,0.16);
+      --card:rgba(255,255,255,0.07);
+      --shadow: 0 18px 45px rgba(0,0,0,0.45);
+      --accent:#f59e0b;
+    }
+
+/* Hide login status text and role badge everywhere */
+    #status,
+    #role-badge {
+      display: none !important;
+    }
+
+    /* ✅ hard stop for mobile overflow */
+    *{ box-sizing:border-box; }
+    html, body{
+      width:100%;
+      max-width:100%;
+      overflow-x:hidden; /* prevents side scrolling */
+    }
+
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+      color:var(--text);
+
+      /* ✅ background that doesn't cause width overflow */
+      background:
+        radial-gradient(600px circle at 15% 10%, rgba(245,158,11,0.22), transparent 55%),
+        radial-gradient(600px circle at 85% 25%, rgba(96,165,250,0.18), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg2));
+
+      /* ✅ safe padding on phones */
+      padding: max(12px, env(safe-area-inset-top))
+               max(12px, env(safe-area-inset-right))
+               max(12px, env(safe-area-inset-bottom))
+               max(12px, env(safe-area-inset-left));
+
+      display:flex;
+      min-height:100vh;
+      align-items:center;
+      justify-content:center;
+    }
+
+    /* ✅ main container fits all screens */
+    .shell{
+      width:100%;
+      max-width: 980px;
+      border:1px solid var(--border);
+      border-radius:18px;
+      overflow:hidden;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      box-shadow: var(--shadow);
+    }
+
+    header{
+      padding:16px;
+      border-bottom:1px solid var(--border);
+
+      /* ✅ stack on mobile */
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+    }
+
+    .brandRow{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      min-width:0;
+    }
+
+    .logo{
+      width:42px;
+      height:42px;
+      border-radius:14px;
+      display:grid;
+      place-items:center;
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, rgba(245,158,11,0.28), rgba(245,158,11,0.10));
+      border:1px solid rgba(255,255,255,0.18);
+    }
+
+    .logo span{
+      font-weight:900;
+      letter-spacing:0.7px;
+    }
+
+    .brand{
+      min-width:0;
+    }
+
+    /* ✅ responsive text that NEVER breaks layout */
+    .brand h1{
+      margin:0;
+      font-size: clamp(16px, 5vw, 22px);
+      line-height:1.15;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .brand p{
+      margin:4px 0 0;
+      font-size: clamp(12px, 3.5vw, 14px);
+      color:var(--muted);
+      line-height:1.35;
+      overflow-wrap:anywhere;
+      word-break:break-word;
+    }
+
+    .badges{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background: rgba(0,0,0,0.18);
+      color: var(--muted);
+      font-size:12px;
+      line-height:1.2;
+
+      /* ✅ allow wrapping inside badge */
+      white-space:normal;
+      max-width:100%;
+    }
+
+    .dot{
+      width:8px;
+      height:8px;
+      border-radius:50%;
+      background:#22c55e;
+      box-shadow: 0 0 0 4px rgba(34,197,94,0.15);
+      flex:0 0 auto;
+    }
+
+    main{
+      padding:16px;
+      display:flex;
+      flex-direction:column; /* ✅ mobile first */
+      gap:12px;
+    }
+
+    .hero{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--card);
+      padding:14px;
+    }
+
+    .hero h2{
+      margin:0 0 8px;
+      font-size: clamp(20px, 6.2vw, 32px);
+      line-height:1.12;
+    }
+
+    .hero p{
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .chips{
+      margin-top:12px;
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.16);
+      color: var(--muted);
+      font-size:13px;
+      max-width:100%;
+    }
+
+    .chip b{
+      color: var(--text);
+      font-weight:800;
+    }
+
+    .cta{
+      border:1px solid var(--border);
+      border-radius:16px;
+      background: var(--card);
+      padding:14px;
+    }
+
+    .cta h3{
+      margin:0 0 6px;
+      font-size:15px;
+    }
+    .cta p{
+      margin:0;
+      color: var(--muted);
+      font-size:14px;
+      line-height:1.55;
+    }
+
+    /* ✅ Mobile button: full width, no overflow */
+    .btn{
+      margin-top:12px;
+      width:100%;
+      display:inline-flex;
+      justify-content:center;
+      align-items:center;
+
+      padding:14px 16px;
+      border-radius:14px;
+      border:1px solid rgba(245,158,11,0.55);
+
+      background: linear-gradient(135deg, rgba(245,158,11,0.30), rgba(245,158,11,0.10));
+      color:var(--text);
+      font-weight:900;
+      letter-spacing:0.2px;
+
+      cursor:pointer;
+      transition: transform .15s ease, filter .15s ease, box-shadow .15s ease;
+    }
+    .btn:hover{
+      transform: translateY(-1px);
+      filter: brightness(1.08);
+      box-shadow: 0 10px 18px rgba(0,0,0,0.25);
+    }
+
+    footer{
+      padding:12px 16px;
+      border-top:1px solid var(--border);
+      color:var(--muted);
+      font-size:12px;
+
+      display:flex;
+      flex-direction:column; /* ✅ stack on phones */
+      gap:6px;
+    }
+
+    /* ✅ Desktop enhancement: 2-column layout only when there is space */
+    @media (min-width: 900px){
+      header{
+        flex-direction:row;
+        justify-content:space-between;
+        align-items:flex-start;
+      }
+      main{
+        flex-direction:row;
+        align-items:stretch;
+      }
+      .hero{ flex: 1.35; }
+      .cta{ flex: 0.65; }
+      footer{
+        flex-direction:row;
+        justify-content:space-between;
+        align-items:center;
+      }
+    }
   </style>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-app.js";
-    import { getAuth, onAuthStateChanged, signInWithCustomToken, signOut } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-auth.js";
-    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/12.8.0/firebase-functions.js";
+</head>
 
-    // Your Firebase config
-    const firebaseConfig = {
-      apiKey: "AIzaSyCqc07_iFk565ATUXfH0WN9X592-BpN454",
-      authDomain: "barber-shop-4c26f.firebaseapp.com",
-      projectId: "barber-shop-4c26f",
-      storageBucket: "barber-shop-4c26f.firebasestorage.app",
-      messagingSenderId: "213114385226",
-      appId: "1:213114385226:web:dcdf67972a683f2055c7b3",
-    };
+<body>
+  <div class="shell">
 
-    // Functions region (must match your backend)
-    const FUNCTIONS_REGION = "asia-south1";
+    <header>
+      <div class="brandRow">
+        <div class="logo" aria-hidden="true"><span>AC</span></div>
+        <div class="brand">
+          <h1>Ashwini Cut Barber Shop</h1>
+          <p>12, Anna Salai, T. Nagar, vallam - 600017</p>
+        </div>
+      </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const functions = getFunctions(app, FUNCTIONS_REGION);
+      <div class="badges">
+        <div class="badge"><span class="dot"></span> Open Now • 9:00 AM – 9:00 PM</div>
+        <div class="badge">⭐ 4.8 • 2.1k+ Customers</div>
+      </div>
+    </header>
 
-    const $ = (id) => document.getElementById(id);
-    const setStatus = (msg, cls="") => { const el = $("status"); el.textContent = msg; el.className = cls; };
+    <main>
+      <section class="hero">
+        <h2>Fresh cuts. Sharp fades. Clean shaves.</h2>
+        <p>
+          Premium grooming with hygiene-first service. Tap continue to open your barber page.
+        </p>
 
-    // Login function
-    async function doLogin(e){
-      e.preventDefault();
-      const username = $("username").value.trim();
-      const password = $("password").value;
-      try{
-        setStatus("Signing in…");
-        const loginFn = httpsCallable(functions, "login");
-        const { data } = await loginFn({ username, password });
-        await signInWithCustomToken(auth, data.token);
-        await auth.currentUser.getIdToken(true);
-        setStatus("Signed in.","ok");
-      }catch(err){
-        console.error(err);
-        setStatus(err?.message || "Login failed.","err");
-      }
-    }
+        <div class="chips">
+          <div class="chip">💈 <b>Haircut</b> & Styling</div>
+          <div class="chip">🧔 <b>Beard</b> Trim & Shape</div>
+          <div class="chip">🧼 <b>Cleanup</b> & Facial</div>
+          <div class="chip">👦 <b>Kids</b> Haircut</div>
+        </div>
+      </section>
 
-    // Admin unlock (create/promote)
-    async function doUnlock(e){
-      e.preventDefault();
-      const username = $("u_username").value.trim();
-      const password = $("u_password").value;
-      const adminCode = $("u_code").value.trim();
-      const createIfMissing = true;
-      try{
-        setStatus("Unlocking admin…");
-        const fn = httpsCallable(functions, "unlockAdmin");
-        const { data } = await fn({ username, password, adminCode, createIfMissing });
-        console.log("unlockAdmin response:", data);
+      <aside class="cta">
+        <h3>Continue</h3>
+        <p>Tap the button to proceed.</p>
+        <button class="btn" id="continueBtn">Continue</button>
 
-        // After unlocking, login
-        const loginFn = httpsCallable(functions, "login");
-        const { data: loginData } = await loginFn({ username, password });
-        await signInWithCustomToken(auth, loginData.token);
-        await auth.currentUser.getIdToken(true);
-        setStatus("Admin unlocked. Signed in.","ok");
-      }catch(err){
-        console.error("Unlock admin error:", err);
-        setStatus(err?.message || JSON.stringify(err) || "Failed to unlock admin.","err");
-      }
-    }
+              </aside>
+    </main>
 
-    async function doSignout(){
-      await signOut(auth);
-      setStatus("Signed out.");
-    }
+    <footer>
+      <span>© 2026 Ashwini Cut Barber Shop</span>
+      <span>Call: +91 99621 76423</span>
+    </footer>
 
-    onAuthStateChanged(auth, async (user)=>{
-      if(user){
-        const idt = await user.getIdTokenResult(true);
-        const role = idt.claims.role || "user";
-        $("authed").style.display = "block";
-        $("whoami").textContent = `uid=${user.uid}, role=${role}`;
-        $("adminLinkWrap").style.display = role === "admin" ? "block" : "none";
-      }else{
-        $("authed").style.display = "none";
-        $("whoami").textContent = "";
-        $("adminLinkWrap").style.display = "none";
-      }
-    });
+  </div>
 
-    window.addEventListener("DOMContentLoaded", ()=>{
-      $("login-form").addEventListener("submit", doLogin);
-      $("unlock-form").addEventListener("submit", doUnlock);
-      $("signout-btn").addEventListener("click", doSignout);
+  <script>
+    document.getElementById("continueBtn").addEventListener("click", () => {
+      window.location.assign("./barber_v3.html");
     });
   </script>
-</head>
-<body>
-  <main>
-    <h1>Sign in</h1>
-    <p style="color:#94a3b8;font-size:13px">Username can be a phone number (e.g., +447900123456).</p>
-
-    <!-- Normal login -->
-    <form id="login-form" autocomplete="off">
-      <label>Username</label>
-      <input id="username" placeholder="+447900123456" required />
-      <label>Password</label>
-      <input id="password" type="password" placeholder="••••••••" required />
-      <button type="submit">Sign in</button>
-    </form>
-
-    <!-- Quick Admin Unlock -->
-    <div class="card">
-      <h2>Quick Admin Unlock</h2>
-      <p style="color:#94a3b8;font-size:13px;margin:0">
-        Enter a username, password, and your secret admin code to <b>create/promote</b> an admin, then auto‑sign in.
-      </p>
-      <form id="unlock-form" autocomplete="off">
-        <label>Username</label>
-        <input id="u_username" placeholder="raja" required />
-        <label>Password</label>
-        <input id="u_password" type="password" placeholder="StrongPass!234" required />
-        <label>Secret admin code</label>
-        <input id="u_code" type="password" placeholder="RAJA-UNLOCK-2026" required />
-        <button type="submit">Create/Promote to Admin</button>
-      </form>
-    </div>
-
-    <section id="authed" style="display:none;margin-top:12px">
-      <div class="row" style="justify-content:space-between">
-        <div id="whoami" class="ok"></div>
-        <button id="signout-btn">Sign out</button>
-      </div>
-      <div id="adminLinkWrap" style="display:none;margin-top:10px">
-        <a href="admin.html">Go to Admin</a>
-      </div>
-    </section>
-
-    <pre id="status">Not signed in.</pre>
-
-    <p style="color:#94a3b8;font-size:12px;margin-top:8px">
-      Hosted on GitHub Pages? Add your Pages domain to Firebase <b>Authorized domains</b> (Auth → Settings).  
-      Client must call Functions in the right region via <code>getFunctions(app, "asia-south1")</code>.
-    </p>
-  </main>
 </body>
 </html>
