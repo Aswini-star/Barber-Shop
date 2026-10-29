@@ -676,29 +676,6 @@
       el.style.color = color || "#e67e22";
       el.innerText = msg || "";
     }
-function sendWhatsAppConfirmation({ phone, customerName, serviceName, barberName, date, time }) {
-  if (!phone) return;
-
-  // Ensure country code (India default)
-  let cleanedPhone = phone.replace(/\D/g, "");
-  if (!cleanedPhone.startsWith("91")) {
-    cleanedPhone = "91" + cleanedPhone;
-  }
-
-  const message =
-`✅ *Appointment Confirmed!*
-
-👤 Name: ${customerName}
-💈 Service: ${serviceName}
-✂️ Staff: ${barberName}
-📅 Date: ${date}
-⏰ Time: ${time}
-
-Thank you for choosing our barber shop 🙏`;
-
-  const url = `https://wa.me/${cleanedPhone}?text=${encodeURIComponent(message)}`;
-  window.open(url, "_blank");
-}
 
     function pillForStatus(s) {
       if (s === "booked") return `<span class="pill blue">BOOKED</span>`;
@@ -988,15 +965,6 @@ function showSectionForRole(role) {
           createdByRole: "customer",
           createdAt: serverTimestamp(),
         });
-        sendWhatsAppConfirmation({
-  phone,
-  customerName,
-  serviceName: currentSelectedService.name,
-  barberName,
-  date,
-  time
-});
-
         setMessage(statusEl,
           `✅ Appointment booked: ${currentSelectedService.name} with ${barberName} on ${date} at ${time}.`,
           "#27ae60"
@@ -1315,18 +1283,9 @@ function showSectionForRole(role) {
           <td>${lastIn}</td>
           <td>${lastOut}</td>
           <td>
-  <button
-    data-email="${s.id}"
-    data-action="toggle">
-    Enable / Disable
-  </button>
-  <button
-    data-email="${s.id}"
-    data-action="remove"
-    class="btn-danger">
-    Remove
-  </button>
-</td>
+            toggleEnable/Disable</button>
+            removeRemove</button>
+          </td>
         `;
         tbody.appendChild(tr);
       });
@@ -1635,7 +1594,5 @@ async function profit_exportCSV() {
 </body>
 
 </html>
-
-
 
 
